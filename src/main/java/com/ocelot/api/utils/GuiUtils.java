@@ -44,7 +44,7 @@ public class GuiUtils
 	/**
 	 * Plays the default minecraft button click sound.
 	 */
-	public static void playButtonClick(float pitch)
+	public static void playButtonClick()
 	{
 		Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 	}
