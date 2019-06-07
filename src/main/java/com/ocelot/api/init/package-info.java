@@ -1,8 +1,5 @@
 /**
  * 
- * <em><b>Copyright (c) 2019 Ocelot5836.</b></em>
- * <p>
- * 
  * General initialization helpers for mods.
  * 
  * @author Ocelot5836
