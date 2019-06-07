@@ -75,3 +75,14 @@ processResources {
         exclude 'mcmod.info'
     }
 }
+
+jar {
+    sourceSets {
+        main {
+            java {
+                exclude('com/example/**')
+                exclude('assets/**')
+            }
+        }
+    }
+}
