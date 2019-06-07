@@ -6,7 +6,8 @@ import net.minecraft.item.ItemStack;
 
 /**
  * 
- * <em><b>Copyright (c) 2019 Ocelot5836.</b></em> <p>
+ * <em><b>Copyright (c) 2019 Ocelot5836.</b></em>
+ * <p>
  * 
  * Has some useful methods for getting, removing, and dealing with item stacks.
  * 

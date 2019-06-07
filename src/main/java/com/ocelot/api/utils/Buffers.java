@@ -12,24 +12,27 @@ import org.lwjgl.BufferUtils;
 
 /**
  * 
- * <em><b>Copyright (c) 2019 Ocelot5836.</b></em><p>
+ * <em><b>Copyright (c) 2019 Ocelot5836.</b></em>
+ * <p>
  * 
- * Allows the ability to easily store data in the buffers for the default data types.
+ * Allows the ability to easily store data in the buffers for the default data
+ * types.
  * 
  * @author Ocelot5836
  * @since Jun 6, 2019
  *
  */
-public class Buffers {
+public class Buffers
+{
 
 	/**
 	 * Stores the data in a new byte buffer.
 	 * 
-	 * @param data
-	 *            The data to put in a new buffer
+	 * @param data The data to put in a new buffer
 	 * @return The buffer with the data inside
 	 */
-	public static ByteBuffer storeDataInByteBuffer(byte[] data) {
+	public static ByteBuffer storeDataInByteBuffer(byte[] data)
+	{
 		ByteBuffer buffer = BufferUtils.createByteBuffer(data.length);
 		buffer.put(data);
 		buffer.flip();
@@ -39,11 +42,11 @@ public class Buffers {
 	/**
 	 * Stores the data in a new short buffer.
 	 * 
-	 * @param data
-	 *            The data to put in a new buffer
+	 * @param data The data to put in a new buffer
 	 * @return The buffer with the data inside
 	 */
-	public static ShortBuffer storeDataInShortBuffer(short[] data) {
+	public static ShortBuffer storeDataInShortBuffer(short[] data)
+	{
 		ShortBuffer buffer = BufferUtils.createShortBuffer(data.length);
 		buffer.put(data);
 		buffer.flip();
@@ -53,11 +56,11 @@ public class Buffers {
 	/**
 	 * Stores the data in a new char buffer.
 	 * 
-	 * @param data
-	 *            The data to put in a new buffer
+	 * @param data The data to put in a new buffer
 	 * @return The buffer with the data inside
 	 */
-	public static CharBuffer storeDataInCharBuffer(char[] data) {
+	public static CharBuffer storeDataInCharBuffer(char[] data)
+	{
 		CharBuffer buffer = BufferUtils.createCharBuffer(data.length);
 		buffer.put(data);
 		buffer.flip();
@@ -67,11 +70,11 @@ public class Buffers {
 	/**
 	 * Stores the data in a new int buffer.
 	 * 
-	 * @param data
-	 *            The data to put in a new buffer
+	 * @param data The data to put in a new buffer
 	 * @return The buffer with the data inside
 	 */
-	public static IntBuffer storeDataInIntBuffer(int[] data) {
+	public static IntBuffer storeDataInIntBuffer(int[] data)
+	{
 		IntBuffer buffer = BufferUtils.createIntBuffer(data.length);
 		buffer.put(data);
 		buffer.flip();
@@ -81,11 +84,11 @@ public class Buffers {
 	/**
 	 * Stores the data in a new long buffer.
 	 * 
-	 * @param data
-	 *            The data to put in a new buffer
+	 * @param data The data to put in a new buffer
 	 * @return The buffer with the data inside
 	 */
-	public static LongBuffer storeDataInLongBuffer(long[] data) {
+	public static LongBuffer storeDataInLongBuffer(long[] data)
+	{
 		LongBuffer buffer = BufferUtils.createLongBuffer(data.length);
 		buffer.put(data);
 		buffer.flip();
@@ -95,11 +98,11 @@ public class Buffers {
 	/**
 	 * Stores the data in a new float buffer.
 	 * 
-	 * @param data
-	 *            The data to put in a new buffer
+	 * @param data The data to put in a new buffer
 	 * @return The buffer with the data inside
 	 */
-	public static FloatBuffer storeDataInFloatBuffer(float[] data) {
+	public static FloatBuffer storeDataInFloatBuffer(float[] data)
+	{
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
 		buffer.put(data);
 		buffer.flip();
@@ -109,11 +112,11 @@ public class Buffers {
 	/**
 	 * Stores the data in a new double buffer.
 	 * 
-	 * @param data
-	 *            The data to put in a new buffer
+	 * @param data The data to put in a new buffer
 	 * @return The buffer with the data inside
 	 */
-	public static DoubleBuffer storeDataInDoubleBuffer(double[] data) {
+	public static DoubleBuffer storeDataInDoubleBuffer(double[] data)
+	{
 		DoubleBuffer buffer = BufferUtils.createDoubleBuffer(data.length);
 		buffer.put(data);
 		buffer.flip();

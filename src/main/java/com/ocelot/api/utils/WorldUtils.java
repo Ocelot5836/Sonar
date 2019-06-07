@@ -24,7 +24,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * 
- * <em><b>Copyright (c) 2019 Ocelot5836.</b></em><p>
+ * <em><b>Copyright (c) 2019 Ocelot5836.</b></em>
+ * <p>
  * 
  * Contains some methods that help when manipulating the world.
  * 

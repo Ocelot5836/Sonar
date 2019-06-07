@@ -17,7 +17,8 @@ import org.apache.http.impl.client.HttpClients;
 
 /**
  * 
- * <em><b>Copyright (c) 2019 Ocelot5836.</b></em><p>
+ * <em><b>Copyright (c) 2019 Ocelot5836.</b></em>
+ * <p>
  * 
  * Requests information from the Internet asynchronously.
  * 
@@ -27,7 +28,7 @@ import org.apache.http.impl.client.HttpClients;
  */
 public class OnlineRequest
 {
-	/**The queue of requests being sent.*/
+	/** The queue of requests being sent. */
 	private static final ExecutorService REQUEST_POOL = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	/** The queue of requests being handled. */
 	private static final ExecutorService WAIT_POOL = Executors.newSingleThreadExecutor();
