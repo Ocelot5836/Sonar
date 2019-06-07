@@ -12,8 +12,7 @@ import org.lwjgl.BufferUtils;
 
 /**
  * 
- * <em><b>Copyright (c) 2019 Ocelot5836.</b></em><br>
- * </br>
+ * <em><b>Copyright (c) 2019 Ocelot5836.</b></em><p>
  * 
  * Allows the ability to easily store data in the buffers for the default data types.
  * 

@@ -18,8 +18,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * 
- * <em><b>Copyright (c) 2019 Ocelot5836.</b></em><br>
- * </br>
+ * <em><b>Copyright (c) 2019 Ocelot5836.</b></em><p>
  * 
  * This class contains some utility methods that would be most useful when
  * rendering a GUI.

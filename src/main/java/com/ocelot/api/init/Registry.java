@@ -14,8 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 /**
  * 
- * <em><b>Copyright (c) 2019 Ocelot5836.</b></em><br>
- * </br>
+ * <em><b>Copyright (c) 2019 Ocelot5836.</b></em><p>
  * 
  * Registers the basics required for most mods into the game.
  * 

@@ -17,8 +17,7 @@ import org.apache.http.impl.client.HttpClients;
 
 /**
  * 
- * <em><b>Copyright (c) 2019 Ocelot5836.</b></em><br>
- * </br>
+ * <em><b>Copyright (c) 2019 Ocelot5836.</b></em><p>
  * 
  * Requests information from the Internet asynchronously.
  * 

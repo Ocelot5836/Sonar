@@ -23,13 +23,14 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
- * <em><b>Copyright (c) 2019 Ocelot5836.</b></em><br>
- * </br>
+ * 
+ * <em><b>Copyright (c) 2019 Ocelot5836.</b></em><p>
  * 
  * Contains some methods that help when manipulating the world.
  * 
  * @author Ocelot5836
  * @since Jun 6, 2019
+ * 
  */
 public class WorldUtils
 {
