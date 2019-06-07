@@ -12,7 +12,6 @@ import com.example.examplemod.init.ExampleItems;
 import com.ocelot.api.init.Registry;
 import com.ocelot.api.utils.OnlineRequest;
 
-import net.minecraft.init.Blocks;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
