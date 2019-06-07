@@ -81,7 +81,6 @@ jar {
         main {
             java {
                 exclude('com/example/**')
-                exclude('assets/**')
             }
         }
     }
