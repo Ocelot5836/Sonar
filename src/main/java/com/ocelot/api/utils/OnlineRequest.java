@@ -28,7 +28,9 @@ import org.apache.http.impl.client.HttpClients;
  */
 public class OnlineRequest
 {
+	/**The queue of requests being sent.*/
 	private static final ExecutorService REQUEST_POOL = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	/** The queue of requests being handled. */
 	private static final ExecutorService WAIT_POOL = Executors.newSingleThreadExecutor();
 
 	static

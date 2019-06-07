@@ -7,13 +7,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.SoundEvents;
 import net.minecraftforge.fml.relauncher.Side;
@@ -34,7 +31,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class GuiUtils
 {
+	/** The gui instance used to make GUI render calls */
 	private static final Gui GUI = new Gui();
+	/** The logger instance for logging */
 	private static final Logger LOGGER = LogManager.getLogger();
 
 	private GuiUtils()
@@ -42,7 +41,7 @@ public class GuiUtils
 	}
 
 	/**
-	 * Plays the default minecraft button click sound.
+	 * Plays the default minecraft button click sound as full pitch.
 	 */
 	public static void playButtonClick()
 	{

@@ -1,11 +1,9 @@
 package com.ocelot.api.utils;
 
-import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -24,35 +22,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class TextureUtils
 {
-	private static final Minecraft mc = Minecraft.getMinecraft();
-	private static final Map<String, ResourceLocation> textures = new HashMap<String, ResourceLocation>();
-
-	/**
-	 * Creates a texture from a buffered image.
-	 * 
-	 * @param image The image to become a texture
-	 * @return The {@link ResourceLocation} to that texture
-	 * @deprecated Texture management with buffered images should be handled by the
-	 *             user
-	 */
-	public static ResourceLocation createBufferedImageTexture(BufferedImage image)
-	{
-		return mc.getTextureManager().getDynamicTextureLocation(" ", new DynamicTexture(image));
-	}
-
-	/**
-	 * Creates a texture from a buffered image.
-	 * 
-	 * @param name  The name of this texture
-	 * @param image The image to become a texture
-	 * @return The {@link ResourceLocation} to that texture using the specified name
-	 * @deprecated Texture management with buffered images should be handled by the
-	 *             user
-	 */
-	public static ResourceLocation createBufferedImageTexture(String name, BufferedImage image)
-	{
-		return mc.getTextureManager().getDynamicTextureLocation(name, new DynamicTexture(image));
-	}
+	/** The {@link Minecraft} instance */
+	private static final Minecraft MC = Minecraft.getMinecraft();
+	/** The cache of resource locations created */
+	private static final Map<String, ResourceLocation> TEXTURES = new HashMap<String, ResourceLocation>();
 
 	/**
 	 * Deletes the specified texture from memory.
@@ -61,7 +34,7 @@ public class TextureUtils
 	 */
 	public static void deleteTexture(ResourceLocation texture)
 	{
-		mc.getTextureManager().deleteTexture(texture);
+		MC.getTextureManager().deleteTexture(texture);
 	}
 
 	/**
@@ -71,7 +44,7 @@ public class TextureUtils
 	 */
 	public static void bindTexture(ResourceLocation texture)
 	{
-		mc.getTextureManager().bindTexture(texture);
+		MC.getTextureManager().bindTexture(texture);
 	}
 
 	/**
@@ -83,8 +56,8 @@ public class TextureUtils
 	public static void bindTexture(String domain, String path)
 	{
 		String locationString = domain + ":" + path;
-		textures.computeIfAbsent(locationString, key -> new ResourceLocation(key));
-		mc.getTextureManager().bindTexture(textures.get(locationString));
+		TEXTURES.computeIfAbsent(locationString, key -> new ResourceLocation(key));
+		MC.getTextureManager().bindTexture(TEXTURES.get(locationString));
 	}
 
 	/**

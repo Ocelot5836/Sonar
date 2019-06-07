@@ -25,7 +25,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
  */
 public class Registry
 {
+	/** The collection of items to be registered */
 	private Set<Item> items;
+	/** The collection of blocks to be registered */
 	private Set<Block> blocks;
 
 	public Registry()
@@ -87,7 +89,6 @@ public class Registry
 	{
 		event.getRegistry().registerAll(this.items.toArray(new Item[0]));
 		this.items.clear();
-		this.items = null;
 	}
 
 	@SubscribeEvent
@@ -95,6 +96,5 @@ public class Registry
 	{
 		event.getRegistry().registerAll(this.blocks.toArray(new Block[0]));
 		this.blocks.clear();
-		this.blocks = null;
 	}
 }
