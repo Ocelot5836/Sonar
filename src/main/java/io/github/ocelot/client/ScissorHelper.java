@@ -17,7 +17,7 @@ import static org.lwjgl.opengl.GL11C.*;
  *
  * @author Ocelot
  * @see GL11C <a target="_blank" href="http://docs.gl/gl4/glScissor">OpenGL Scissor Test Reference Page</a>
- * @since 0.1.0
+ * @since 2.0.0
  */
 @OnlyIn(Dist.CLIENT)
 public class ScissorHelper

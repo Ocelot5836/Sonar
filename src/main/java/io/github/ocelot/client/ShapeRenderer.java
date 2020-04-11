@@ -16,7 +16,7 @@ import static org.lwjgl.opengl.GL11C.GL_QUADS;
  * <p>To use chain rendering, use {@link #begin()} to start rendering and {@link #end()} to complete a batch.</p>
  *
  * @author Ocelot
- * @since 0.1.0
+ * @since 2.0.0
  */
 @OnlyIn(Dist.CLIENT)
 public class ShapeRenderer

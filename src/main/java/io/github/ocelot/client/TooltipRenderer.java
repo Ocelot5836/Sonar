@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Ocelot
  * @see Screen
- * @since 0.1.0
+ * @since 2.0.0
  */
 @OnlyIn(Dist.CLIENT)
 public interface TooltipRenderer

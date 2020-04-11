@@ -22,6 +22,7 @@ import java.util.function.Consumer;
  * @author Ocelot
  * @see Consumer
  * @see Future
+ * @since 2.0.0
  */
 public class OnlineRequest
 {
