@@ -166,7 +166,7 @@ public class ShapeRenderer
      *
      * @return The buffer to render into
      */
-    public static BufferBuilder begin()
+    public static IVertexBuilder begin()
     {
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
         buffer.begin(GL_QUADS, DefaultVertexFormats.POSITION_TEX);
