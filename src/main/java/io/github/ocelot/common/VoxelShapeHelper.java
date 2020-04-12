@@ -2,6 +2,7 @@ package io.github.ocelot.common;
 
 import net.minecraft.block.Block;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.shapes.IBooleanFunction;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -106,6 +107,58 @@ public class VoxelShapeHelper
         public Builder append(VoxelShape... shapes)
         {
             this.shapes.addAll(Arrays.asList(shapes));
+            return this;
+        }
+
+        /**
+         * Rotates the entire shape in the specified axis.
+         *
+         * @param axis The axis to rotate on
+         * @return The rotated builder
+         */
+        public Builder rotate(Direction.Axis axis)
+        {
+            Builder newBuilder = new Builder();
+            for (VoxelShape shape : this.shapes)
+            {
+                Set<VoxelShape> rotatedShapes = new HashSet<>();
+                for (AxisAlignedBB box : shape.toBoundingBoxList())
+                {
+                    rotatedShapes.add(VoxelShapeHelper.makeCuboidShape(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, axis));
+                }
+                VoxelShape result = VoxelShapes.empty();
+                for (VoxelShape rotatedShape : rotatedShapes)
+                {
+                    result = VoxelShapes.combine(result, rotatedShape, IBooleanFunction.OR);
+                }
+                newBuilder.append(result);
+            }
+            return this;
+        }
+
+        /**
+         * Rotates the entire shape in the specified direction.
+         *
+         * @param direction The direction to rotate on
+         * @return The rotated builder
+         */
+        public Builder rotate(Direction direction)
+        {
+            Builder newBuilder = new Builder();
+            for (VoxelShape shape : this.shapes)
+            {
+                Set<VoxelShape> rotatedShapes = new HashSet<>();
+                for (AxisAlignedBB box : shape.toBoundingBoxList())
+                {
+                    rotatedShapes.add(VoxelShapeHelper.makeCuboidShape(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, direction));
+                }
+                VoxelShape result = VoxelShapes.empty();
+                for (VoxelShape rotatedShape : rotatedShapes)
+                {
+                    result = VoxelShapes.combine(result, rotatedShape, IBooleanFunction.OR);
+                }
+                newBuilder.append(result);
+            }
             return this;
         }
 
