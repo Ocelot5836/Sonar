@@ -66,17 +66,17 @@ public class VoxelShapeHelper
         switch (direction)
         {
             case UP:
-                return Block.makeCuboidShape(x1, z1, y1, x2, z2, y2);
-            case DOWN:
-                return Block.makeCuboidShape(x1, z1, y1, x2, 16 - z2, y2);
-            case NORTH:
-                return Block.makeCuboidShape(16 - x1, y1, 16 - z2, 16 - x2, y2, 16 - z1);
-            case EAST:
-                return Block.makeCuboidShape(z1, y1, 16 - x1, z2, y2, 16 - x2);
-            case SOUTH:
                 return Block.makeCuboidShape(x1, y1, z1, x2, y2, z2);
+            case DOWN:
+                return Block.makeCuboidShape(x1, 16 - y1, z1, x2, 16 - y2, z2);
+            case NORTH:
+                return Block.makeCuboidShape(x1, z1, 16 - y1, x2, z2, 16 - y2);
+            case EAST:
+                return Block.makeCuboidShape(y1, z1, x1, y2, z2, x2);
+            case SOUTH:
+                return Block.makeCuboidShape(x1, z1, y1, x2, z2, y2);
             case WEST:
-                return Block.makeCuboidShape(16 - z2, y1, x1, 16 - z1, y2, x2);
+                return Block.makeCuboidShape(16 - y1, z1, x1, 16 - y2, z2, x2);
             default:
                 throw new IllegalStateException("Unexpected value: " + direction);
         }
@@ -124,7 +124,7 @@ public class VoxelShapeHelper
                 Set<VoxelShape> rotatedShapes = new HashSet<>();
                 for (AxisAlignedBB box : shape.toBoundingBoxList())
                 {
-                    rotatedShapes.add(VoxelShapeHelper.makeCuboidShape(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, axis));
+                    rotatedShapes.add(VoxelShapeHelper.makeCuboidShape(box.minX * 16.0, box.minY * 16.0, box.minZ * 16.0, box.maxX * 16.0, box.maxY * 16.0, box.maxZ * 16.0, axis));
                 }
                 VoxelShape result = VoxelShapes.empty();
                 for (VoxelShape rotatedShape : rotatedShapes)
@@ -133,7 +133,7 @@ public class VoxelShapeHelper
                 }
                 newBuilder.append(result);
             }
-            return this;
+            return newBuilder;
         }
 
         /**
@@ -150,7 +150,7 @@ public class VoxelShapeHelper
                 Set<VoxelShape> rotatedShapes = new HashSet<>();
                 for (AxisAlignedBB box : shape.toBoundingBoxList())
                 {
-                    rotatedShapes.add(VoxelShapeHelper.makeCuboidShape(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, direction));
+                    rotatedShapes.add(VoxelShapeHelper.makeCuboidShape(box.minX * 16.0, box.minY * 16.0, box.minZ * 16.0, box.maxX * 16.0, box.maxY * 16.0, box.maxZ * 16.0, direction));
                 }
                 VoxelShape result = VoxelShapes.empty();
                 for (VoxelShape rotatedShape : rotatedShapes)
@@ -159,7 +159,7 @@ public class VoxelShapeHelper
                 }
                 newBuilder.append(result);
             }
-            return this;
+            return newBuilder;
         }
 
         /**
