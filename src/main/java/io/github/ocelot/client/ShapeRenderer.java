@@ -191,7 +191,7 @@ public class ShapeRenderer
      * @param height The y size of the quad
      * @param sprite The sprite to render to the screen
      */
-    public static void drawRectWithTexture(BufferBuilder buffer, double x, double y, double width, double height, TextureAtlasSprite sprite)
+    public static void drawRectWithTexture(IVertexBuilder buffer, double x, double y, double width, double height, TextureAtlasSprite sprite)
     {
         drawRectWithTexture(buffer, x, y, 0, sprite.getMinU(), sprite.getMinV(), width, height, sprite.getMaxU() - sprite.getMinU(), sprite.getMaxV() - sprite.getMinV(), 1f, 1f);
     }
@@ -207,7 +207,7 @@ public class ShapeRenderer
      * @param width  The x size of the quad
      * @param height The y size of the quad
      */
-    public static void drawRectWithTexture(BufferBuilder buffer, double x, double y, float u, float v, double width, double height)
+    public static void drawRectWithTexture(IVertexBuilder buffer, double x, double y, float u, float v, double width, double height)
     {
         drawRectWithTexture(buffer, x, y, 0, u, v, width, height, (float) width, (float) height, 256f, 256f);
     }
@@ -225,7 +225,7 @@ public class ShapeRenderer
      * @param textureWidth  The x size of the selection area on the texture
      * @param textureHeight The y size on the selection area on the texture
      */
-    public static void drawRectWithTexture(BufferBuilder buffer, double x, double y, float u, float v, double width, double height, float textureWidth, float textureHeight)
+    public static void drawRectWithTexture(IVertexBuilder buffer, double x, double y, float u, float v, double width, double height, float textureWidth, float textureHeight)
     {
         drawRectWithTexture(buffer, x, y, 0, u, v, width, height, textureWidth, textureHeight, 256f, 256f);
     }
@@ -245,7 +245,7 @@ public class ShapeRenderer
      * @param sourceWidth   The width of the texture source
      * @param sourceHeight  The height of the texture source
      */
-    public static void drawRectWithTexture(BufferBuilder buffer, double x, double y, float u, float v, double width, double height, float textureWidth, float textureHeight, float sourceWidth, float sourceHeight)
+    public static void drawRectWithTexture(IVertexBuilder buffer, double x, double y, float u, float v, double width, double height, float textureWidth, float textureHeight, float sourceWidth, float sourceHeight)
     {
         drawRectWithTexture(buffer, x, y, 0, u, v, width, height, textureWidth, textureHeight, sourceWidth, sourceHeight);
     }
@@ -261,7 +261,7 @@ public class ShapeRenderer
      * @param height The y size of the quad
      * @param sprite The sprite to render to the screen
      */
-    public static void drawRectWithTexture(BufferBuilder buffer, double x, double y, double z, double width, double height, TextureAtlasSprite sprite)
+    public static void drawRectWithTexture(IVertexBuilder buffer, double x, double y, double z, double width, double height, TextureAtlasSprite sprite)
     {
         drawRectWithTexture(buffer, x, y, z, sprite.getMinU(), sprite.getMinV(), width, height, sprite.getMaxU() - sprite.getMinU(), sprite.getMaxV() - sprite.getMinV(), 1f, 1f);
     }
@@ -278,7 +278,7 @@ public class ShapeRenderer
      * @param width  The x size of the quad
      * @param height The y size of the quad
      */
-    public static void drawRectWithTexture(BufferBuilder buffer, double x, double y, double z, float u, float v, double width, double height)
+    public static void drawRectWithTexture(IVertexBuilder buffer, double x, double y, double z, float u, float v, double width, double height)
     {
         drawRectWithTexture(buffer, x, y, z, u, v, width, height, (float) width, (float) height, 256f, 256f);
     }
@@ -297,7 +297,7 @@ public class ShapeRenderer
      * @param textureWidth  The x size of the selection area on the texture
      * @param textureHeight The y size on the selection area on the texture
      */
-    public static void drawRectWithTexture(BufferBuilder buffer, double x, double y, double z, float u, float v, double width, double height, float textureWidth, float textureHeight)
+    public static void drawRectWithTexture(IVertexBuilder buffer, double x, double y, double z, float u, float v, double width, double height, float textureWidth, float textureHeight)
     {
         drawRectWithTexture(buffer, x, y, z, u, v, width, height, textureWidth, textureHeight, 256, 256);
     }
