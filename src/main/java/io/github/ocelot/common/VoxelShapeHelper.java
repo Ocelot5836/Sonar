@@ -2,7 +2,13 @@ package io.github.ocelot.common;
 
 import net.minecraft.block.Block;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.shapes.IBooleanFunction;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <p>Contains simple, useful methods for creating a {@link VoxelShape} with provided {@link Direction}.</p>
@@ -72,6 +78,61 @@ public class VoxelShapeHelper
                 return Block.makeCuboidShape(16 - z2, y1, x1, 16 - z1, y2, x2);
             default:
                 throw new IllegalStateException("Unexpected value: " + direction);
+        }
+    }
+
+    /**
+     * <p>Manages the combining of {@link VoxelShape} into a single complex shape.</p>
+     *
+     * @author Ocelot
+     * @see VoxelShape
+     * @since 0.2.0
+     */
+    public static class Builder
+    {
+        private Set<VoxelShape> shapes;
+
+        public Builder()
+        {
+            this.shapes = new HashSet<>();
+        }
+
+        /**
+         * Appends the specified shapes to the sets.
+         *
+         * @param shapes The shapes to add
+         * @return The builder instance for chaining
+         */
+        public Builder append(VoxelShape... shapes)
+        {
+            this.shapes.addAll(Arrays.asList(shapes));
+            return this;
+        }
+
+        /**
+         * @return A combined shape using {@link IBooleanFunction#OR}
+         */
+        public VoxelShape build()
+        {
+            return this.build(IBooleanFunction.OR);
+        }
+
+        /**
+         * Combines the appended shapes into a single complex shape.
+         *
+         * @param combineFunction The function to use when combining the shapes together
+         * @return A combined shape using the provided function
+         */
+        public VoxelShape build(IBooleanFunction combineFunction)
+        {
+            if (this.shapes.isEmpty())
+                return VoxelShapes.empty();
+            VoxelShape result = VoxelShapes.empty();
+            for (VoxelShape shape : this.shapes)
+            {
+                result = VoxelShapes.combine(result, shape, combineFunction);
+            }
+            return result.simplify();
         }
     }
 }
