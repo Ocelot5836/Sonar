@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '2.1.0'
+version = '2.1.1'
 group = 'io.github.ocelot' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'FishLib'
 
@@ -120,6 +120,10 @@ jar {
                 'FMLModType': 'LIBRARY'
         )
     }
+    // TODO: when FG bug is fixed, remove allJava from the api jar.
+    // https://github.com/MinecraftForge/ForgeGradle/issues/369
+    // Gradle should be able to pull them from the -sources jar.
+    from sourceSets.main.allJava
 }
 
 // Example configuration to allow publishing using the maven-publish task
