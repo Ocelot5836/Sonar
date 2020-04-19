@@ -15,7 +15,6 @@ import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -129,12 +128,12 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
             RenderSystem.translatef(0, -this.scrollHandler.getInterpolatedScroll(partialTicks), 0);
             {
                 ScissorHelper.push((this.width - this.xSize) / 2f + 6, (this.height - this.ySize) / 2f + 18, 148, 142);
-                this.renderWidgets(mouseX, mouseY, partialTicks);
+                this.renderWidgets(mouseX - (int) ((this.width - this.xSize) / 2f), mouseY - (int) ((this.height - this.ySize) / 2f) + (int) this.scrollHandler.getInterpolatedScroll(partialTicks), partialTicks);
                 this.renderLabels(partialTicks);
                 ScissorHelper.pop();
             }
             RenderSystem.popMatrix();
-            this.renderForeground(mouseX, mouseY, partialTicks);
+            this.renderForeground(mouseX - (int) ((this.width - this.xSize) / 2f), mouseY - (int) ((this.height - this.ySize) / 2f), partialTicks);
         }
         RenderSystem.popMatrix();
     }

@@ -60,7 +60,7 @@ public class TestTileEntity extends TileEntity implements ValueContainer
         {
             entries.add(new StringValueContainerEntry(new StringTextComponent(EnchantmentNameParts.getInstance().generateNewRandomName(Objects.requireNonNull(Minecraft.getInstance().getFontResourceManager().getFontRenderer(Minecraft.standardGalacticFontRenderer)), 64)), Integer.toString(i), "Epic Value btw"));
             entries.add(new FloatValueContainerEntry(new StringTextComponent("Float " + i), "test" + i, i));
-            entries.add(new VectorValueContainerEntry(new StringTextComponent("Vec " + i), "vec" + i, new Vec3d(i, i * 2, i % 8)));
+            entries.add(new BooleanValueContainerEntry(new StringTextComponent("Boolean " + i), "bool" + i, false));
         }
     }
 
