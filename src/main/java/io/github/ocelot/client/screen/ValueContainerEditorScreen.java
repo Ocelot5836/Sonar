@@ -94,8 +94,16 @@ public abstract class ValueContainerEditorScreen extends Screen
 
         super.renderBackground();
         this.renderBackground(mouseX, mouseY, partialTicks);
-        super.render(mouseX, mouseY, partialTicks);
+        this.renderWidgets(mouseX, mouseY, partialTicks);
         this.renderForeground(mouseX, mouseY, partialTicks);
+    }
+
+    public void renderWidgets(int mouseX, int mouseY, float partialTicks)
+    {
+        for (Widget button : this.buttons)
+        {
+            button.render(mouseX, mouseY, partialTicks);
+        }
     }
 
     @Override
@@ -133,12 +141,16 @@ public abstract class ValueContainerEditorScreen extends Screen
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
     {
-        if (this.getFocused() != null && !this.getFocused().isMouseOver(mouseX, mouseY))
+        if (!this.getEventListenerForPos(mouseX, mouseY).isPresent() || !super.mouseClicked(mouseX, mouseY, mouseButton))
         {
-            this.setFocused(null);
-            return true;
+            if (this.getFocused() != null && !this.getFocused().isMouseOver(mouseX, mouseY))
+            {
+                this.setFocused(null);
+                return true;
+            }
+            return false;
         }
-        return super.mouseClicked(mouseX, mouseY, mouseButton);
+        return true;
     }
 
     /**

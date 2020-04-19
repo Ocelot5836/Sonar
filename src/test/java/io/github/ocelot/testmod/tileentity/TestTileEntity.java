@@ -1,5 +1,6 @@
 package io.github.ocelot.testmod.tileentity;
 
+import io.github.ocelot.common.valuecontainer.FloatValueContainerEntry;
 import io.github.ocelot.common.valuecontainer.StringValueContainerEntry;
 import io.github.ocelot.common.valuecontainer.ValueContainer;
 import io.github.ocelot.common.valuecontainer.ValueContainerEntry;
@@ -23,8 +24,6 @@ import java.util.Optional;
 
 public class TestTileEntity extends TileEntity implements ValueContainer
 {
-    private int scroll;
-
     public TestTileEntity()
     {
         super(TestMod.TEST_TILE_ENTITY.get());
@@ -59,21 +58,23 @@ public class TestTileEntity extends TileEntity implements ValueContainer
     @Override
     public void getEntries(List<ValueContainerEntry<?>> entries)
     {
-        for (int i = 0; i < 12; i++)
+        for (int i = 0; i < 1000; i++)
         {
-            entries.add(new StringValueContainerEntry(new StringTextComponent(EnchantmentNameParts.getInstance().generateNewRandomName(Objects.requireNonNull(Minecraft.getInstance().getFontResourceManager().getFontRenderer(Minecraft.standardGalacticFontRenderer)), i % 4)), Integer.toString(i), "Epic Value btw"));
+            entries.add(new StringValueContainerEntry(new StringTextComponent(EnchantmentNameParts.getInstance().generateNewRandomName(Objects.requireNonNull(Minecraft.getInstance().getFontResourceManager().getFontRenderer(Minecraft.standardGalacticFontRenderer)), 64)), Integer.toString(i), "Epic Value btw"));
+            entries.add(new FloatValueContainerEntry(new StringTextComponent("Float " + i), "test" + i, i));
         }
     }
 
     @Override
     public void readEntries(Map<String, ValueContainerEntry<?>> entries)
     {
+        System.out.println(entries);
     }
 
     @Override
     public Optional<ITextComponent> getTitle()
     {
-        return Optional.empty();
+        return Optional.of(this.getBlockState().getBlock().getNameTextComponent());
     }
 
     @Override
