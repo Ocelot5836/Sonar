@@ -48,19 +48,43 @@ public class ScrollHandler implements INBTSerializable<CompoundNBT>
     public void update()
     {
         this.lastScroll = this.scroll;
-        float delta = this.nextScroll - this.scroll;
-        if (Math.abs(delta) < this.minSnap)
+        if (this.getMaxScroll() > 0)
         {
-            this.scroll = this.nextScroll;
+            float delta = this.nextScroll - this.scroll;
+            if (Math.abs(delta) < this.minSnap)
+            {
+                this.scroll = this.nextScroll;
+            }
+            else
+            {
+                this.scroll += delta * this.transitionSpeed;
+            }
+            if (this.scroll < 0)
+                this.setScroll(0);
+            if (this.scroll >= this.getMaxScroll())
+                this.setScroll(this.getMaxScroll());
         }
-        else
+    }
+
+    /**
+     * Handles the mouse scrolling event.
+     *
+     * @param amount The amount the mouse was scrolled
+     */
+    public boolean mouseScrolled(double maxScroll, double amount)
+    {
+        if (this.getMaxScroll() > 0)
         {
-            this.scroll += delta * this.transitionSpeed;
+            float scrollAmount = (float) Math.min(Math.abs(amount), maxScroll) * this.getScrollSpeed();
+            float finalScroll = (amount < 0 ? -1 : 1) * scrollAmount;
+            float scroll = MathHelper.clamp(this.getScroll() - finalScroll, 0, this.getMaxScroll());
+            if (this.getScroll() != scroll)
+            {
+                this.scroll(finalScroll);
+                return true;
+            }
         }
-        if (this.scroll < 0)
-            this.setScroll(0);
-        if (this.scroll >= this.getMaxScroll())
-            this.setScroll(this.getMaxScroll());
+        return false;
     }
 
     /**
