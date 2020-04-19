@@ -44,14 +44,16 @@ public class ScissorHelper
             MainWindow window = Minecraft.getInstance().getMainWindow();
             double scale = framebufferScale == 0 ? window.getGuiScaleFactor() : framebufferScale;
             int frameHeight = framebufferHeight == 0 ? window.getFramebufferHeight() : framebufferHeight;
+            enableScissor();
             glScissor((int) (entry.x * scale), (int) (frameHeight - (entry.y + entry.height) * scale), (int) Math.max(0, entry.width * scale), (int) Math.max(0, entry.height * scale));
+        }
+        else
+        {
+            disableScissor();
         }
     }
 
-    /**
-     * Enables the scissor test. Make sure to call this before any {@link #push(float, float, float, float)} calls are made.
-     */
-    public static void enableScissor()
+    private static void enableScissorInternal()
     {
         if (!scissor)
         {
@@ -60,16 +62,33 @@ public class ScissorHelper
         }
     }
 
-    /**
-     * Disables the scissor test. Make sure to call this after the last {@link #pop()} calls is made.
-     */
-    public static void disableScissor()
+    private static void disableScissorInternal()
     {
         if (scissor)
         {
             glDisable(GL_SCISSOR_TEST);
             scissor = false;
         }
+    }
+
+    /**
+     * Enables the scissor test.
+     *
+     * @deprecated TODO remove in 2.3.0
+     */
+    public static void enableScissor()
+    {
+        enableScissorInternal();
+    }
+
+    /**
+     * Disables the scissor test.
+     *
+     * @deprecated TODO remove in 2.3.0.
+     */
+    public static void disableScissor()
+    {
+        disableScissorInternal();
     }
 
     /**
@@ -97,6 +116,15 @@ public class ScissorHelper
         if (!stack.isEmpty())
             stack.pop();
         applyScissor();
+    }
+
+    /**
+     * Clears the entire scissor stack.
+     */
+    public static void clear()
+    {
+        disableScissor();
+        stack.clear();
     }
 
     /**
