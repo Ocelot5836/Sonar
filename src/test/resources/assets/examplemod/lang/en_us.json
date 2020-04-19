@@ -1,5 +1,7 @@
 {
 	"block.examplemod.test": "Test Block",
 
+	"item.examplemod.test_value_container_editor": "Test Value Container Editor",
+
 	"itemGroup.examplemod": "Test Mod"
 }
