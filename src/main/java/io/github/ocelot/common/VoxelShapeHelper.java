@@ -89,9 +89,9 @@ public class VoxelShapeHelper
      * @see VoxelShape
      * @since 0.2.0
      */
-    public static class Builder
+    public static final class Builder
     {
-        private Set<VoxelShape> shapes;
+        private final Set<VoxelShape> shapes;
 
         public Builder()
         {

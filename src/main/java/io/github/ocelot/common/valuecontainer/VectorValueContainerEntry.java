@@ -21,7 +21,7 @@ import java.util.function.Predicate;
  */
 public class VectorValueContainerEntry implements ValueContainerEntry<Vec3d>, TextFieldEntry
 {
-    private ITextComponent displayName;
+    private final ITextComponent displayName;
     private final String name;
     private final Vec3d minValue;
     private final Vec3d maxValue;

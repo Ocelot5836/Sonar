@@ -44,12 +44,12 @@ public class ScissorHelper
             MainWindow window = Minecraft.getInstance().getMainWindow();
             double scale = framebufferScale == 0 ? window.getGuiScaleFactor() : framebufferScale;
             int frameHeight = framebufferHeight == 0 ? window.getFramebufferHeight() : framebufferHeight;
-            enableScissor();
+            enableScissorInternal();
             glScissor((int) (entry.x * scale), (int) (frameHeight - (entry.y + entry.height) * scale), (int) Math.max(0, entry.width * scale), (int) Math.max(0, entry.height * scale));
         }
         else
         {
-            disableScissor();
+            disableScissorInternal();
         }
     }
 
@@ -123,7 +123,7 @@ public class ScissorHelper
      */
     public static void clear()
     {
-        disableScissor();
+        disableScissorInternal();
         stack.clear();
     }
 

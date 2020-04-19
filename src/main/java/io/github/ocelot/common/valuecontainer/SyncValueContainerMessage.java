@@ -14,8 +14,8 @@ import java.util.List;
  */
 public class SyncValueContainerMessage
 {
-    private BlockPos pos;
-    private CompoundNBT data;
+    private final BlockPos pos;
+    private final CompoundNBT data;
 
     public SyncValueContainerMessage(ValueContainer container, List<ValueContainerEntry<?>> entries)
     {
