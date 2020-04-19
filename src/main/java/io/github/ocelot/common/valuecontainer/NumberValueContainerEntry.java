@@ -1,5 +1,6 @@
 package io.github.ocelot.common.valuecontainer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import javax.annotation.Nullable;
@@ -114,7 +115,8 @@ public abstract class NumberValueContainerEntry<T extends Number> implements Val
     @Override
     public void parse(Object data)
     {
-        this.value = this.clamp(data instanceof Number ? this.getValue((Number) data) : this.getValue(NumberUtils.createNumber(String.valueOf(data))), this.minValue, this.maxValue);
+        String dataString = String.valueOf(data);
+        this.value = this.clamp(data instanceof Number ? this.getValue((Number) data) : this.getValue(NumberUtils.createNumber(StringUtils.isEmpty(dataString) ? "0" : dataString)), this.minValue, this.maxValue);
     }
 
     @Override
@@ -184,7 +186,7 @@ public abstract class NumberValueContainerEntry<T extends Number> implements Val
     {
         return s ->
         {
-            if (!NumberUtils.isCreatable(s) || !entry.isValid(s))
+            if ((!StringUtils.isEmpty(s) && !NumberUtils.isCreatable(s)) || !entry.isValid(s))
                 return false;
             try
             {

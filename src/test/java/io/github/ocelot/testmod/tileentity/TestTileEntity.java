@@ -1,9 +1,6 @@
 package io.github.ocelot.testmod.tileentity;
 
-import io.github.ocelot.common.valuecontainer.FloatValueContainerEntry;
-import io.github.ocelot.common.valuecontainer.StringValueContainerEntry;
-import io.github.ocelot.common.valuecontainer.ValueContainer;
-import io.github.ocelot.common.valuecontainer.ValueContainerEntry;
+import io.github.ocelot.common.valuecontainer.*;
 import io.github.ocelot.testmod.TestMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundNBT;
@@ -12,6 +9,7 @@ import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnchantmentNameParts;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.util.Constants;
@@ -62,6 +60,7 @@ public class TestTileEntity extends TileEntity implements ValueContainer
         {
             entries.add(new StringValueContainerEntry(new StringTextComponent(EnchantmentNameParts.getInstance().generateNewRandomName(Objects.requireNonNull(Minecraft.getInstance().getFontResourceManager().getFontRenderer(Minecraft.standardGalacticFontRenderer)), 64)), Integer.toString(i), "Epic Value btw"));
             entries.add(new FloatValueContainerEntry(new StringTextComponent("Float " + i), "test" + i, i));
+            entries.add(new VectorValueContainerEntry(new StringTextComponent("Vec " + i), "vec" + i, new Vec3d(i, i * 2, i % 8)));
         }
     }
 

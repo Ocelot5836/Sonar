@@ -6,6 +6,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.Constants;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.codehaus.plexus.util.StringUtils;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -176,7 +177,10 @@ public class VectorValueContainerEntry implements ValueContainerEntry<Vec3d>, Te
         String[] tokens = String.valueOf(data).split(",");
         if (tokens.length != 3)
             return;
-        this.value = this.clamp(new Vec3d(NumberUtils.createNumber(tokens[0].trim()).doubleValue(), NumberUtils.createNumber(tokens[1].trim()).doubleValue(), NumberUtils.createNumber(tokens[2].trim()).doubleValue()), this.minValue, this.maxValue);
+        double x = StringUtils.isEmpty(tokens[0]) ? 0 : NumberUtils.createNumber(tokens[0]).doubleValue();
+        double y = StringUtils.isEmpty(tokens[1]) ? 0 : NumberUtils.createNumber(tokens[1]).doubleValue();
+        double z = StringUtils.isEmpty(tokens[2]) ? 0 : NumberUtils.createNumber(tokens[2]).doubleValue();
+        this.value = this.clamp(new Vec3d(x, y, z), this.minValue, this.maxValue);
     }
 
     @Override
@@ -213,12 +217,18 @@ public class VectorValueContainerEntry implements ValueContainerEntry<Vec3d>, Te
         {
             if (!entry.isValid(s))
                 return false;
-            String[] tokens = s.split(",");
+            String[] tokens = s.split(",", 4);
             if (tokens.length > 3)
                 return false;
-            for (String token : tokens)
+            for (int i = 0; i < tokens.length; i++)
             {
-                if (!NumberUtils.isCreatable(token.trim()))
+                String token = tokens[i].trim();
+                if (StringUtils.isEmpty(token))
+                {
+                    tokens[i] = "0";
+                    continue;
+                }
+                if (!NumberUtils.isCreatable(token))
                     return false;
             }
             try
