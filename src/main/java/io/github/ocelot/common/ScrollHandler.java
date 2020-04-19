@@ -95,6 +95,8 @@ public class ScrollHandler implements INBTSerializable<CompoundNBT>
     public ScrollHandler scroll(float scrollAmount)
     {
         this.nextScroll -= scrollAmount;
+        if (this.markDirty != null)
+            this.markDirty.run();
         return this;
     }
 
