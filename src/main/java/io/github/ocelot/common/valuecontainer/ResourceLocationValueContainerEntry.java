@@ -13,6 +13,7 @@ import java.util.function.Predicate;
  * <p>A {@link NumberValueContainerEntry} that supports Minecraft {@link ResourceLocation}.</p>
  *
  * @author Ocelot
+ * @since 2.1.0
  */
 public class ResourceLocationValueContainerEntry implements ValueContainerEntry<ResourceLocation>, TextFieldEntry
 {

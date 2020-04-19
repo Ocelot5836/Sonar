@@ -8,6 +8,7 @@ import net.minecraftforge.common.util.Constants;
  * <p>A {@link NumberValueContainerEntry} that supports double data types.</p>
  *
  * @author Ocelot
+ * @since 2.1.0
  */
 public class DoubleValueContainerEntry extends NumberValueContainerEntry<Double>
 {

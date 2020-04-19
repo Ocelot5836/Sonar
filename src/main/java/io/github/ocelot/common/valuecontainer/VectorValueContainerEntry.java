@@ -16,6 +16,7 @@ import java.util.function.Predicate;
  * <p>Specifies a {@link ValueContainerEntry} as being for a {@link Vec3d} type</p>
  *
  * @author Ocelot
+ * @since 2.1.0
  */
 public class VectorValueContainerEntry implements ValueContainerEntry<Vec3d>, TextFieldEntry
 {

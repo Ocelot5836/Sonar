@@ -8,6 +8,7 @@ import net.minecraftforge.common.util.Constants;
  * <p>A {@link ValueContainerEntry} that supports boolean data types.</p>
  *
  * @author Ocelot
+ * @since 2.1.0
  */
 public class BooleanValueContainerEntry implements ValueContainerEntry<Boolean>, ToggleEntry
 {

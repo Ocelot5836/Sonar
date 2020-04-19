@@ -12,6 +12,7 @@ import java.util.function.Predicate;
  * <p>A {@link NumberValueContainerEntry} that supports string data types.</p>
  *
  * @author Ocelot
+ * @since 2.1.0
  */
 public class StringValueContainerEntry implements ValueContainerEntry<String>, TextFieldEntry
 {

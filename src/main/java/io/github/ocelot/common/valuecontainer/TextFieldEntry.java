@@ -7,6 +7,7 @@ import java.util.function.Predicate;
  * <p>Specifies that a {@link ValueContainerEntry} should use a custom text area validator if used.</p>
  *
  * @author Ocelot
+ * @since 2.1.0
  */
 public interface TextFieldEntry
 {

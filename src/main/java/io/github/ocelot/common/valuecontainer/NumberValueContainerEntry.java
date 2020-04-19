@@ -12,6 +12,7 @@ import java.util.function.Predicate;
  *
  * @param <T> The type of number this entry is for
  * @author Ocelot
+ * @since 2.1.0
  */
 public abstract class NumberValueContainerEntry<T extends Number> implements ValueContainerEntry<T>, TextFieldEntry, SliderEntry
 {

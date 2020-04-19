@@ -8,6 +8,7 @@ import net.minecraft.util.text.ITextComponent;
  *
  * @param <T> The type of data stored in this entry
  * @author Ocelot
+ * @since 2.1.0
  */
 public interface ValueContainerEntry<T>
 {

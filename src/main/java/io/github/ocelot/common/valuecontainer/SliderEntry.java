@@ -4,6 +4,7 @@ package io.github.ocelot.common.valuecontainer;
  * <p>Specifies that a {@link ValueContainerEntry} should use a custom percentage for sliders if used.</p>
  *
  * @author Ocelot
+ * @since 2.1.0
  */
 public interface SliderEntry
 {

@@ -8,6 +8,7 @@ import net.minecraftforge.common.util.Constants;
  * <p>A {@link NumberValueContainerEntry} that supports long data types.</p>
  *
  * @author Ocelot
+ * @since 2.1.0
  */
 public class LongValueContainerEntry extends NumberValueContainerEntry<Long>
 {
