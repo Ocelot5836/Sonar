@@ -74,7 +74,7 @@ public class ScissorHelper
     /**
      * Enables the scissor test.
      *
-     * @deprecated TODO remove in 2.3.0
+     * @deprecated TODO remove in 3.0.0
      */
     public static void enableScissor()
     {
@@ -84,7 +84,7 @@ public class ScissorHelper
     /**
      * Disables the scissor test.
      *
-     * @deprecated TODO remove in 2.3.0.
+     * @deprecated TODO remove in 3.0.0.
      */
     public static void disableScissor()
     {
