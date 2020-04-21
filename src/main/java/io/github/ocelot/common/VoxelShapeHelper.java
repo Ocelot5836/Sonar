@@ -23,7 +23,7 @@ public class VoxelShapeHelper
     private VoxelShapeHelper() {}
 
     /**
-     * Creates a rotated shape from an {@link Direction.Axis}. Everything is based on the negative axes facing positive.
+     * Creates a rotated shape from an {@link Direction.Axis}. Everything is based on the negative axes facing positive (Ex. minX to maxX, minY to maxY, and minZ to maxZ).
      *
      * @param x1   The min x for the shape
      * @param y1   The min y for the shape
@@ -50,7 +50,7 @@ public class VoxelShapeHelper
     }
 
     /**
-     * Creates a rotated shape from a {@link Direction}. Everything is based on the negative axes facing positive (Ex. minX to maxX, minY to maxY, and minZ to maxZ).
+     * Creates a rotated shape from a {@link Direction}. Everything is based on the negative axes facing positive (Ex. minX to maxX, minY to maxY, and minZ to maxZ). Base facing direction is {@link Direction#NORTH}
      *
      * @param x1        The min x for the shape
      * @param y1        The min y for the shape
@@ -66,17 +66,17 @@ public class VoxelShapeHelper
         switch (direction)
         {
             case UP:
-                return Block.makeCuboidShape(x1, y1, z1, x2, y2, z2);
-            case DOWN:
-                return Block.makeCuboidShape(x1, 16 - y1, z1, x2, 16 - y2, z2);
-            case NORTH:
-                return Block.makeCuboidShape(x1, z1, 16 - y1, x2, z2, 16 - y2);
-            case EAST:
-                return Block.makeCuboidShape(y1, z1, x1, y2, z2, x2);
-            case SOUTH:
                 return Block.makeCuboidShape(x1, z1, y1, x2, z2, y2);
+            case DOWN:
+                return Block.makeCuboidShape(x1,16 -  z1, y1, x2, 16 - z2, y2);
+            case NORTH:
+                return Block.makeCuboidShape(16 - x1, y1, 16 - z2, 16 - x2, y2, 16 - z1);
+            case EAST:
+                return Block.makeCuboidShape(z1, y1, 16 - x1, z2, y2, 16 - x2);
+            case SOUTH:
+                return Block.makeCuboidShape(x1, y1, z1, x2, y2, z2);
             case WEST:
-                return Block.makeCuboidShape(16 - y1, z1, x1, 16 - y2, z2, x2);
+                return Block.makeCuboidShape(16 - z2, y1, x1, 16 - z1, y2, x2);
             default:
                 throw new IllegalStateException("Unexpected value: " + direction);
         }
@@ -96,6 +96,11 @@ public class VoxelShapeHelper
         public Builder()
         {
             this.shapes = new HashSet<>();
+        }
+
+        public Builder(Builder other)
+        {
+            this.shapes = new HashSet<>(other.shapes);
         }
 
         /**
