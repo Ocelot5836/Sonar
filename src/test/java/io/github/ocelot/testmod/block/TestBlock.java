@@ -25,6 +25,7 @@ public class TestBlock extends BaseBlock implements IWaterLoggable
         super(properties);
     }
 
+    @Deprecated
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context)
     {
