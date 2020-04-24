@@ -168,7 +168,7 @@ public abstract class ValueContainerEditorScreen extends Screen
      */
     public SyncValueContainerMessage createSyncMessage()
     {
-        return new SyncValueContainerMessage(this.container, this.pos, this.entries);
+        return new SyncValueContainerMessage(this.pos, this.entries);
     }
 
     /**

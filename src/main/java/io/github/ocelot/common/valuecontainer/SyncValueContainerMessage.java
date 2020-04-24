@@ -23,9 +23,9 @@ public class SyncValueContainerMessage
         this(container.getContainerPos(), ValueContainer.serialize(container, entries));
     }
 
-    public SyncValueContainerMessage(ValueContainer container, BlockPos pos, List<ValueContainerEntry<?>> entries)
+    public SyncValueContainerMessage(BlockPos pos, List<ValueContainerEntry<?>> entries)
     {
-        this(pos, ValueContainer.serialize(container, entries));
+        this(pos, ValueContainer.serialize(entries));
     }
 
     public SyncValueContainerMessage(BlockPos pos, CompoundNBT data)

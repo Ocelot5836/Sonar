@@ -58,11 +58,48 @@ public interface ValueContainer
     /**
      * Serializes the container entry data.
      *
-     * @param container The container to serialize the data for
-     * @param entries   The entries to serialize
+     * @param entries The entries to serialize
      * @return The tag full of data
+     * @deprecated Use {@link #serialize(List)} instead
      */
     static CompoundNBT serialize(ValueContainer container, List<ValueContainerEntry<?>> entries)
+    {
+        CompoundNBT nbt = new CompoundNBT();
+
+        ListNBT entriesNbt = new ListNBT();
+        entries.forEach(valueContainerEntry ->
+        {
+            if (!valueContainerEntry.isDirty())
+                return;
+            try
+            {
+                CompoundNBT valueContainerEntryNbt = new CompoundNBT();
+
+                valueContainerEntryNbt.putString("name", valueContainerEntry.getName());
+
+                CompoundNBT entryDataNbt = new CompoundNBT();
+                valueContainerEntry.write(entryDataNbt);
+                valueContainerEntryNbt.put("data", entryDataNbt);
+
+                entriesNbt.add(valueContainerEntryNbt);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        });
+        nbt.put("entries", entriesNbt);
+
+        return nbt;
+    }
+
+    /**
+     * Serializes the container entry data.
+     *
+     * @param entries The entries to serialize
+     * @return The tag full of data
+     */
+    static CompoundNBT serialize(List<ValueContainerEntry<?>> entries)
     {
         CompoundNBT nbt = new CompoundNBT();
 
