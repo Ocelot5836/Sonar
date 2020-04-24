@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
@@ -54,7 +55,7 @@ public class TestTileEntity extends TileEntity implements ValueContainer
     }
 
     @Override
-    public void getEntries(List<ValueContainerEntry<?>> entries)
+    public void getEntries(World world, BlockPos pos, List<ValueContainerEntry<?>> entries)
     {
         for (int i = 0; i < 3; i++)
         {
@@ -65,14 +66,14 @@ public class TestTileEntity extends TileEntity implements ValueContainer
     }
 
     @Override
-    public void readEntries(Map<String, ValueContainerEntry<?>> entries)
+    public void readEntries(World world, BlockPos pos, Map<String, ValueContainerEntry<?>> entries)
     {
         System.out.println(entries);
     }
 
     @Override
-    public Optional<ITextComponent> getTitle()
+    public Optional<ITextComponent> getTitle(World world, BlockPos pos)
     {
-        return Optional.of(this.getBlockState().getBlock().getNameTextComponent());
+        return Optional.of(world.getBlockState(pos).getBlock().getNameTextComponent());
     }
 }

@@ -4,8 +4,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.*;
@@ -23,18 +22,41 @@ public interface ValueContainer
      * Fills the specified list with the required entries.
      *
      * @param entries The list to add entries to
+     * @deprecated use more sensitive {@link #getEntries(World, BlockPos, List)} instead
      */
-    void getEntries(List<ValueContainerEntry<?>> entries);
+    default void getEntries(List<ValueContainerEntry<?>> entries){
+    }
+
+    /**
+     * Fills the specified list with the required entries.
+     *
+     * @param world The world this container is in
+     * @param pos   The pos this container is in
+     * @param entries The list to add entries to
+     */
+    void getEntries(World world, BlockPos pos, List<ValueContainerEntry<?>> entries);
 
     /**
      * Reads the data from the provided entries.
      *
      * @param entries The entries to read from
+     * @deprecated use more sensitive {@link #readEntries(World, BlockPos, Map)} instead
      */
-    void readEntries(Map<String, ValueContainerEntry<?>> entries);
+    default void readEntries(Map<String, ValueContainerEntry<?>> entries){
+    }
+
+    /**
+     * Reads the data from the provided entries.
+     *
+     * @param world The world this container is in
+     * @param pos   The pos this container is in
+     * @param entries The entries to read from
+     */
+    void readEntries(World world, BlockPos pos, Map<String, ValueContainerEntry<?>> entries);
 
     /**
      * @return A list full of the entries from {@link #getEntries(List)}
+     * @deprecated use more sensitive {@link #getEntries(World, BlockPos)} instead
      */
     default List<ValueContainerEntry<?>> getEntries()
     {
@@ -44,10 +66,36 @@ public interface ValueContainer
     }
 
     /**
+     * Fetches a list of entries from this container.
+     *
+     * @param world The world this container is in
+     * @param pos   The pos this container is in
+     * @return A list full of the entries from {@link #getEntries(World, BlockPos, List)}
+     */
+    default List<ValueContainerEntry<?>> getEntries(World world, BlockPos pos)
+    {
+        List<ValueContainerEntry<?>> entries = new ArrayList<>();
+        this.getEntries(world, pos, entries);
+        return entries;
+    }
+
+    /**
+     * @return The title of this container or null to use the default title
+     * @deprecated use more sensitive {@link #getTitle(World, BlockPos)} instead
+     */
+    default Optional<ITextComponent> getTitle()
+    {
+        return Optional.empty();
+    }
+
+    /**
+     * Fetches the title of this container.
+     *
+     * @param world The world this container is in
+     * @param pos   The pos this container is in
      * @return The title of this container or null to use the default title
      */
-    @OnlyIn(Dist.CLIENT)
-    Optional<ITextComponent> getTitle();
+    Optional<ITextComponent> getTitle(World world, BlockPos pos);
 
     /**
      * @return The position of the tile entity

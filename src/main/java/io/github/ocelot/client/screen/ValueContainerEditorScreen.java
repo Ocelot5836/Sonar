@@ -3,6 +3,7 @@ package io.github.ocelot.client.screen;
 import io.github.ocelot.common.valuecontainer.SyncValueContainerMessage;
 import io.github.ocelot.common.valuecontainer.ValueContainer;
 import io.github.ocelot.common.valuecontainer.ValueContainerEntry;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.Widget;
@@ -41,10 +42,10 @@ public abstract class ValueContainerEditorScreen extends Screen
 
     public ValueContainerEditorScreen(ValueContainer container, BlockPos pos, Supplier<ITextComponent> defaultTitle)
     {
-        super(container.getTitle().orElseGet(defaultTitle));
+        super(container.getTitle(Minecraft.getInstance().world, pos).orElseGet(defaultTitle));
         this.container = container;
         this.pos = pos;
-        this.entries = container.getEntries();
+        this.entries = container.getEntries(Minecraft.getInstance().world, pos);
         this.formattedTitle = this.getTitle().getFormattedText();
         this.formattedEntryNames = new HashMap<>();
         this.entries.forEach(entry -> this.formattedEntryNames.put(entry, entry.getDisplayName().getFormattedText()));
