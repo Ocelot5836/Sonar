@@ -9,6 +9,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
+import org.junit.Test;
 
 import java.util.function.Supplier;
 
@@ -37,9 +38,9 @@ public class ServerMessageHandler implements MessageHandler
             BlockPos pos = msg.getPos();
 
             TileEntity te = world.getTileEntity(pos);
-            if (!(te instanceof ValueContainer))
+            if (!(te instanceof ValueContainer) && !(world.getBlockState(pos).getBlock() instanceof ValueContainer))
             {
-                TestMod.LOGGER.error("Tile Entity at '" + pos + "' was expected to be a ValueContainer, but it was " + te + "!");
+                TestMod.LOGGER.error("Tile Entity or Block at '" + pos + "' was expected to be a ValueContainer, but it was " + te + "!");
                 return;
             }
 
@@ -49,7 +50,7 @@ public class ServerMessageHandler implements MessageHandler
                 return;
             }
 
-            ValueContainer.deserialize((ValueContainer) te, msg.getData());
+            ValueContainer.deserialize(te instanceof ValueContainer ? (ValueContainer) te : (ValueContainer) world.getBlockState(pos).getBlock(), msg.getData());
         });
         ctx.get().setPacketHandled(true);
     }

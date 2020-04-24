@@ -6,6 +6,7 @@ import io.github.ocelot.common.valuecontainer.ValueContainer;
 import io.github.ocelot.testmod.TestMod;
 import io.github.ocelot.testmod.network.TestMessageHandler;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -16,15 +17,15 @@ public class TestValueContainerEditorScreen extends ValueContainerEditorScreenIm
 {
     public static final ResourceLocation TEXTURE = new ResourceLocation(TestMod.MOD_ID, "textures/gui/value_container_editor.png");
 
-    public TestValueContainerEditorScreen(ValueContainer container)
+    public TestValueContainerEditorScreen(ValueContainer container, BlockPos pos)
     {
-        super(container, () -> new StringTextComponent("Test Value Container Editor"));
+        super(container, pos, () -> new StringTextComponent("Test Value Container Editor"));
     }
 
     @Override
     protected void sendDataToServer()
     {
-        TestMessageHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new SyncValueContainerMessage(this.getContainer(), this.getEntries()));
+        TestMessageHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), this.createSyncMessage());
     }
 
     @Override

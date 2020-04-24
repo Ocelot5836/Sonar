@@ -13,6 +13,7 @@ import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -43,9 +44,15 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
 
     private boolean scrolling;
 
+    @Deprecated
     public ValueContainerEditorScreenImpl(ValueContainer container, Supplier<ITextComponent> defaultTitle)
     {
-        super(container, defaultTitle);
+        this(container, container.getContainerPos(), defaultTitle);
+    }
+
+    public ValueContainerEditorScreenImpl(ValueContainer container, BlockPos pos, Supplier<ITextComponent> defaultTitle)
+    {
+        super(container, pos, defaultTitle);
         this.xSize = WIDTH;
         this.ySize = HEIGHT;
         this.scrollHandler = new ScrollHandler(null, this.getEntries().size() * VALUE_HEIGHT, 142);

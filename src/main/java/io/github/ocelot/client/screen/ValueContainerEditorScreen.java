@@ -1,11 +1,13 @@
 package io.github.ocelot.client.screen;
 
+import io.github.ocelot.common.valuecontainer.SyncValueContainerMessage;
 import io.github.ocelot.common.valuecontainer.ValueContainer;
 import io.github.ocelot.common.valuecontainer.ValueContainerEntry;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.util.InputMappings;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -26,14 +28,22 @@ import java.util.function.Supplier;
 public abstract class ValueContainerEditorScreen extends Screen
 {
     private final ValueContainer container;
+    private final BlockPos pos;
     private final List<ValueContainerEntry<?>> entries;
     private final String formattedTitle;
     private final Map<ValueContainerEntry<?>, String> formattedEntryNames;
 
+    @Deprecated
     public ValueContainerEditorScreen(ValueContainer container, Supplier<ITextComponent> defaultTitle)
+    {
+        this(container, container.getContainerPos(), defaultTitle);
+    }
+
+    public ValueContainerEditorScreen(ValueContainer container, BlockPos pos, Supplier<ITextComponent> defaultTitle)
     {
         super(container.getTitle().orElseGet(defaultTitle));
         this.container = container;
+        this.pos = pos;
         this.entries = container.getEntries();
         this.formattedTitle = this.getTitle().getFormattedText();
         this.formattedEntryNames = new HashMap<>();
@@ -77,7 +87,7 @@ public abstract class ValueContainerEditorScreen extends Screen
             }
         });
 
-        if (!(this.minecraft.world.getTileEntity(this.container.getContainerPos()) instanceof ValueContainer))
+        if (!(this.minecraft.world.getTileEntity(this.pos) instanceof ValueContainer))
         {
             this.minecraft.player.closeScreen();
         }
@@ -154,11 +164,27 @@ public abstract class ValueContainerEditorScreen extends Screen
     }
 
     /**
+     * @return A new message that can be sent to the client to sync value container entries
+     */
+    public SyncValueContainerMessage createSyncMessage()
+    {
+        return new SyncValueContainerMessage(this.container, this.pos, this.entries);
+    }
+
+    /**
      * @return The container being edited
      */
     public ValueContainer getContainer()
     {
         return container;
+    }
+
+    /**
+     * @return The position of the container being edited
+     */
+    public BlockPos getPos()
+    {
+        return pos;
     }
 
     /**
