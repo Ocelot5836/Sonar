@@ -53,7 +53,10 @@ public interface ValueContainer
      * @return The position of the tile entity
      * @deprecated Tile entities should not be the only types of value containers
      */
-    BlockPos getContainerPos();
+    default BlockPos getContainerPos()
+    {
+        return BlockPos.ZERO;
+    }
 
     /**
      * Serializes the container entry data.

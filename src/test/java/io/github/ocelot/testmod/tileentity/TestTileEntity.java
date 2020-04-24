@@ -75,10 +75,4 @@ public class TestTileEntity extends TileEntity implements ValueContainer
     {
         return Optional.of(this.getBlockState().getBlock().getNameTextComponent());
     }
-
-    @Override
-    public BlockPos getContainerPos()
-    {
-        return this.getPos();
-    }
 }
