@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 public class OnlineRequest
 {
     private static final ExecutorService POOL = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), task -> new Thread(task, "Online Request Pool"));
+    private static String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
 
     static
     {
@@ -37,7 +38,7 @@ public class OnlineRequest
 
     private static InputStream request(String url) throws IOException
     {
-        try (CloseableHttpClient client = HttpClients.createDefault())
+        try (CloseableHttpClient client = HttpClients.custom().setUserAgent(USER_AGENT).build())
         {
             HttpGet get = new HttpGet(url);
             try (CloseableHttpResponse response = client.execute(get))
@@ -98,5 +99,15 @@ public class OnlineRequest
                 return null;
             }
         });
+    }
+
+    /**
+     * Sets the user agent to use when making online requests.
+     *
+     * @param userAgent The new user agent
+     */
+    public static void setUserAgent(String userAgent)
+    {
+        USER_AGENT = userAgent;
     }
 }
