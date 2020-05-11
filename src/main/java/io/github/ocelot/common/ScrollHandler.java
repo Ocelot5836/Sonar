@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
  * <p>Handles smooth scrolling automatically.</p>
  *
  * @author Ocelot
+ * @since 2.2.0
  */
 public class ScrollHandler implements INBTSerializable<CompoundNBT>
 {
@@ -20,8 +21,8 @@ public class ScrollHandler implements INBTSerializable<CompoundNBT>
     public static final float DEFAULT_MIN_SNAP = 0.1f;
 
     private final Runnable markDirty;
-    private final int height;
-    private final int visibleHeight;
+    private int height;
+    private int visibleHeight;
 
     private float scroll;
     private float lastScroll;
@@ -101,6 +102,22 @@ public class ScrollHandler implements INBTSerializable<CompoundNBT>
     }
 
     /**
+     * @return The height of the scrolling area
+     */
+    public int getHeight()
+    {
+        return height;
+    }
+
+    /**
+     * @return The height visible at one time
+     */
+    public int getVisibleHeight()
+    {
+        return visibleHeight;
+    }
+
+    /**
      * @return The position of the scroll bar
      */
     public float getScroll()
@@ -150,6 +167,30 @@ public class ScrollHandler implements INBTSerializable<CompoundNBT>
     public float getNextScroll()
     {
         return nextScroll;
+    }
+
+    /**
+     * Sets the height of the scrolling area.
+     *
+     * @param height The total height of the scroll area
+     */
+    public ScrollHandler setHeight(int height)
+    {
+        this.height = height;
+        this.setScroll(this.scroll);
+        return this;
+    }
+
+    /**
+     * Sets the height visible at one time.
+     *
+     * @param visibleHeight The maximum height that can be displayed at one moment
+     */
+    public ScrollHandler setVisibleHeight(int visibleHeight)
+    {
+        this.visibleHeight = visibleHeight;
+        this.setScroll(this.scroll);
+        return this;
     }
 
     /**

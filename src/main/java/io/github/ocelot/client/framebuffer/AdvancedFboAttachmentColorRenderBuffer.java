@@ -1,6 +1,8 @@
 package io.github.ocelot.client.framebuffer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.Validate;
 
 import static org.lwjgl.opengl.GL30.*;
@@ -11,6 +13,7 @@ import static org.lwjgl.opengl.GL30.*;
  * @author Ocelot
  * @since 2.4.0
  */
+@OnlyIn(Dist.CLIENT)
 public class AdvancedFboAttachmentColorRenderBuffer implements AdvancedFboAttachment
 {
     private int id;

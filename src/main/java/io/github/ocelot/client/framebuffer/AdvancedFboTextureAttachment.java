@@ -1,11 +1,15 @@
 package io.github.ocelot.client.framebuffer;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+
 /**
  * <p>A texture attachment added to an {@link AdvancedFbo}</p>
  *
  * @author Ocelot
  * @since 2.4.0
  */
+@OnlyIn(Dist.CLIENT)
 public interface AdvancedFboTextureAttachment extends AdvancedFboAttachment
 {
     @Override

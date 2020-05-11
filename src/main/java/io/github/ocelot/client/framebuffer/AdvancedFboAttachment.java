@@ -1,5 +1,7 @@
 package io.github.ocelot.client.framebuffer;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.system.NativeResource;
 
 /**
@@ -8,6 +10,7 @@ import org.lwjgl.system.NativeResource;
  * @author Ocelot
  * @since 2.4.0
  */
+@OnlyIn(Dist.CLIENT)
 public interface AdvancedFboAttachment extends NativeResource
 {
     /**

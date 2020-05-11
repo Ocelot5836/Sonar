@@ -1,6 +1,8 @@
 package io.github.ocelot.client;
 
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * <p>Contains methods for drawing text onto the screen.</p>
@@ -9,6 +11,7 @@ import net.minecraft.client.gui.FontRenderer;
  * @see FontRenderer
  * @since 2.2.0
  */
+@OnlyIn(Dist.CLIENT)
 public class FontHelper
 {
     /**
