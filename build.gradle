@@ -129,6 +129,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             artifact jar
+            artifact apiJar
         }
     }
     repositories {
