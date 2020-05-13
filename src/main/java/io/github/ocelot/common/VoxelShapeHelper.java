@@ -20,7 +20,9 @@ import java.util.Set;
  */
 public class VoxelShapeHelper
 {
-    private VoxelShapeHelper() {}
+    private VoxelShapeHelper()
+    {
+    }
 
     /**
      * Creates a rotated shape from an {@link Direction.Axis}. Everything is based on the negative axes facing positive (Ex. minX to maxX, minY to maxY, and minZ to maxZ).
@@ -68,7 +70,7 @@ public class VoxelShapeHelper
             case UP:
                 return Block.makeCuboidShape(x1, z1, y1, x2, z2, y2);
             case DOWN:
-                return Block.makeCuboidShape(x1,16 -  z1, y1, x2, 16 - z2, y2);
+                return Block.makeCuboidShape(x1, 16 - z1, y1, x2, 16 - z2, y2);
             case NORTH:
                 return Block.makeCuboidShape(16 - x1, y1, 16 - z2, 16 - x2, y2, 16 - z1);
             case EAST:
@@ -116,6 +118,34 @@ public class VoxelShapeHelper
         }
 
         /**
+         * Translates the entire shape in the specified direction.
+         *
+         * @param x The amount in the x direction to add
+         * @param y The amount in the y direction to add
+         * @param z The amount in the z direction to add
+         * @return The translated builder
+         */
+        public Builder translate(double x, double y, double z)
+        {
+            Builder newBuilder = new Builder();
+            for (VoxelShape shape : this.shapes)
+            {
+                Set<VoxelShape> rotatedShapes = new HashSet<>();
+                for (AxisAlignedBB box : shape.toBoundingBoxList())
+                {
+                    rotatedShapes.add(Block.makeCuboidShape(box.minX * 16.0 + x, box.minY * 16.0 + y, box.minZ * 16.0 + z, box.maxX * 16.0 + x, box.maxY * 16.0 + y, box.maxZ * 16.0 + z));
+                }
+                VoxelShape result = VoxelShapes.empty();
+                for (VoxelShape rotatedShape : rotatedShapes)
+                {
+                    result = VoxelShapes.combine(result, rotatedShape, IBooleanFunction.OR);
+                }
+                newBuilder.append(result.simplify());
+            }
+            return newBuilder;
+        }
+
+        /**
          * Rotates the entire shape in the specified axis.
          *
          * @param axis The axis to rotate on
@@ -136,7 +166,35 @@ public class VoxelShapeHelper
                 {
                     result = VoxelShapes.combine(result, rotatedShape, IBooleanFunction.OR);
                 }
-                newBuilder.append(result);
+                newBuilder.append(result.simplify());
+            }
+            return newBuilder;
+        }
+
+        /**
+         * Scales the entire shape in the specified directions.
+         *
+         * @param x The amount in the x direction to scale
+         * @param y The amount in the y direction to scale
+         * @param z The amount in the z direction to scale
+         * @return The scaled builder
+         */
+        public Builder scale(double x, double y, double z)
+        {
+            Builder newBuilder = new Builder();
+            for (VoxelShape shape : this.shapes)
+            {
+                Set<VoxelShape> rotatedShapes = new HashSet<>();
+                for (AxisAlignedBB box : shape.toBoundingBoxList())
+                {
+                    rotatedShapes.add(Block.makeCuboidShape(box.minX * 16.0 * x, box.minY * 16.0 * y, box.minZ * 16.0 * z, box.maxX * 16.0 * x, box.maxY * 16.0 * y, box.maxZ * 16.0 * z));
+                }
+                VoxelShape result = VoxelShapes.empty();
+                for (VoxelShape rotatedShape : rotatedShapes)
+                {
+                    result = VoxelShapes.combine(result, rotatedShape, IBooleanFunction.OR);
+                }
+                newBuilder.append(result.simplify());
             }
             return newBuilder;
         }
@@ -162,7 +220,7 @@ public class VoxelShapeHelper
                 {
                     result = VoxelShapes.combine(result, rotatedShape, IBooleanFunction.OR);
                 }
-                newBuilder.append(result);
+                newBuilder.append(result.simplify());
             }
             return newBuilder;
         }
