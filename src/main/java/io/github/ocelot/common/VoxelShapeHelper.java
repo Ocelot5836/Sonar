@@ -10,6 +10,7 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * <p>Contains simple, useful methods for creating a {@link VoxelShape} with provided {@link Direction}.</p>
@@ -105,6 +106,26 @@ public class VoxelShapeHelper
             this.shapes = new HashSet<>(other.shapes);
         }
 
+        private Builder transformRaw(Function<AxisAlignedBB, VoxelShape> transformer)
+        {
+            Builder newBuilder = new Builder();
+            for (VoxelShape shape : this.shapes)
+            {
+                Set<VoxelShape> rotatedShapes = new HashSet<>();
+                for (AxisAlignedBB box : shape.toBoundingBoxList())
+                {
+                    rotatedShapes.add(transformer.apply(box));
+                }
+                VoxelShape result = VoxelShapes.empty();
+                for (VoxelShape rotatedShape : rotatedShapes)
+                {
+                    result = VoxelShapes.combine(result, rotatedShape, IBooleanFunction.OR);
+                }
+                newBuilder.append(result.simplify());
+            }
+            return newBuilder;
+        }
+
         /**
          * Appends the specified shapes to the sets.
          *
@@ -118,6 +139,18 @@ public class VoxelShapeHelper
         }
 
         /**
+         * Appends the specified shapes to the sets.
+         *
+         * @param other The other builder with shapes to add
+         * @return The builder instance for chaining
+         */
+        public Builder append(Builder other)
+        {
+            this.shapes.addAll(other.shapes);
+            return this;
+        }
+
+        /**
          * Translates the entire shape in the specified direction.
          *
          * @param x The amount in the x direction to add
@@ -127,22 +160,7 @@ public class VoxelShapeHelper
          */
         public Builder translate(double x, double y, double z)
         {
-            Builder newBuilder = new Builder();
-            for (VoxelShape shape : this.shapes)
-            {
-                Set<VoxelShape> rotatedShapes = new HashSet<>();
-                for (AxisAlignedBB box : shape.toBoundingBoxList())
-                {
-                    rotatedShapes.add(Block.makeCuboidShape(box.minX * 16.0 + x, box.minY * 16.0 + y, box.minZ * 16.0 + z, box.maxX * 16.0 + x, box.maxY * 16.0 + y, box.maxZ * 16.0 + z));
-                }
-                VoxelShape result = VoxelShapes.empty();
-                for (VoxelShape rotatedShape : rotatedShapes)
-                {
-                    result = VoxelShapes.combine(result, rotatedShape, IBooleanFunction.OR);
-                }
-                newBuilder.append(result.simplify());
-            }
-            return newBuilder;
+            return transformRaw(box -> Block.makeCuboidShape(box.minX * 16.0 + x, box.minY * 16.0 + y, box.minZ * 16.0 + z, box.maxX * 16.0 + x, box.maxY * 16.0 + y, box.maxZ * 16.0 + z));
         }
 
         /**
@@ -153,22 +171,18 @@ public class VoxelShapeHelper
          */
         public Builder rotate(Direction.Axis axis)
         {
-            Builder newBuilder = new Builder();
-            for (VoxelShape shape : this.shapes)
-            {
-                Set<VoxelShape> rotatedShapes = new HashSet<>();
-                for (AxisAlignedBB box : shape.toBoundingBoxList())
-                {
-                    rotatedShapes.add(VoxelShapeHelper.makeCuboidShape(box.minX * 16.0, box.minY * 16.0, box.minZ * 16.0, box.maxX * 16.0, box.maxY * 16.0, box.maxZ * 16.0, axis));
-                }
-                VoxelShape result = VoxelShapes.empty();
-                for (VoxelShape rotatedShape : rotatedShapes)
-                {
-                    result = VoxelShapes.combine(result, rotatedShape, IBooleanFunction.OR);
-                }
-                newBuilder.append(result.simplify());
-            }
-            return newBuilder;
+            return transformRaw(box -> VoxelShapeHelper.makeCuboidShape(box.minX * 16.0, box.minY * 16.0, box.minZ * 16.0, box.maxX * 16.0, box.maxY * 16.0, box.maxZ * 16.0, axis));
+        }
+
+        /**
+         * Rotates the entire shape in the specified direction.
+         *
+         * @param direction The direction to rotate on
+         * @return The rotated builder
+         */
+        public Builder rotate(Direction direction)
+        {
+            return transformRaw(box -> VoxelShapeHelper.makeCuboidShape(box.minX * 16.0, box.minY * 16.0, box.minZ * 16.0, box.maxX * 16.0, box.maxY * 16.0, box.maxZ * 16.0, direction));
         }
 
         /**
@@ -181,48 +195,7 @@ public class VoxelShapeHelper
          */
         public Builder scale(double x, double y, double z)
         {
-            Builder newBuilder = new Builder();
-            for (VoxelShape shape : this.shapes)
-            {
-                Set<VoxelShape> rotatedShapes = new HashSet<>();
-                for (AxisAlignedBB box : shape.toBoundingBoxList())
-                {
-                    rotatedShapes.add(Block.makeCuboidShape(box.minX * 16.0 * x, box.minY * 16.0 * y, box.minZ * 16.0 * z, box.maxX * 16.0 * x, box.maxY * 16.0 * y, box.maxZ * 16.0 * z));
-                }
-                VoxelShape result = VoxelShapes.empty();
-                for (VoxelShape rotatedShape : rotatedShapes)
-                {
-                    result = VoxelShapes.combine(result, rotatedShape, IBooleanFunction.OR);
-                }
-                newBuilder.append(result.simplify());
-            }
-            return newBuilder;
-        }
-
-        /**
-         * Rotates the entire shape in the specified direction.
-         *
-         * @param direction The direction to rotate on
-         * @return The rotated builder
-         */
-        public Builder rotate(Direction direction)
-        {
-            Builder newBuilder = new Builder();
-            for (VoxelShape shape : this.shapes)
-            {
-                Set<VoxelShape> rotatedShapes = new HashSet<>();
-                for (AxisAlignedBB box : shape.toBoundingBoxList())
-                {
-                    rotatedShapes.add(VoxelShapeHelper.makeCuboidShape(box.minX * 16.0, box.minY * 16.0, box.minZ * 16.0, box.maxX * 16.0, box.maxY * 16.0, box.maxZ * 16.0, direction));
-                }
-                VoxelShape result = VoxelShapes.empty();
-                for (VoxelShape rotatedShape : rotatedShapes)
-                {
-                    result = VoxelShapes.combine(result, rotatedShape, IBooleanFunction.OR);
-                }
-                newBuilder.append(result.simplify());
-            }
-            return newBuilder;
+            return transformRaw(box -> Block.makeCuboidShape(box.minX * 16.0 * x, box.minY * 16.0 * y, box.minZ * 16.0 * z, box.maxX * 16.0 * x, box.maxY * 16.0 * y, box.maxZ * 16.0 * z));
         }
 
         /**
