@@ -615,7 +615,7 @@ public class AdvancedFbo implements NativeResource
      */
     public static class Wrapper extends Framebuffer
     {
-        private AdvancedFbo fbo;
+        private final AdvancedFbo fbo;
 
         private Wrapper(AdvancedFbo fbo)
         {
