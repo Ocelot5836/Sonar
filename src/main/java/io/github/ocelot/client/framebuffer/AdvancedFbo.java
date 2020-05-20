@@ -41,13 +41,8 @@ public class AdvancedFbo implements NativeResource
         this.depthAttachment = depthAttachment;
     }
 
-    /**
-     * Creates the framebuffer and all attachments.
-     */
-    public void create()
+    private void createRaw()
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-
         for (AdvancedFboAttachment attachment : this.colorAttachments)
             attachment.create();
         if (this.depthAttachment != null)
@@ -65,6 +60,21 @@ public class AdvancedFbo implements NativeResource
         if (status != GL_FRAMEBUFFER_COMPLETE)
             throw new IllegalStateException("Advanced FBO status did not return GL_FRAMEBUFFER_COMPLETE. 0x" + Integer.toHexString(status));
         unbind();
+    }
+
+    /**
+     * Creates the framebuffer and all attachments.
+     */
+    public void create()
+    {
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(this::createRaw);
+        }
+        else
+        {
+            this.createRaw();
+        }
     }
 
     /**
@@ -86,10 +96,21 @@ public class AdvancedFbo implements NativeResource
      */
     public void bind(boolean setViewport)
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        glBindFramebuffer(GL_FRAMEBUFFER, this.id);
-        if (setViewport)
-            RenderSystem.viewport(0, 0, this.width, this.height);
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(() ->
+            {
+                glBindFramebuffer(GL_FRAMEBUFFER, this.id);
+                if (setViewport)
+                    RenderSystem.viewport(0, 0, this.width, this.height);
+            });
+        }
+        else
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, this.id);
+            if (setViewport)
+                RenderSystem.viewport(0, 0, this.width, this.height);
+        }
     }
 
     /**
@@ -97,8 +118,14 @@ public class AdvancedFbo implements NativeResource
      */
     public static void unbind()
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(() -> glBindFramebuffer(GL_FRAMEBUFFER, 0));
+        }
+        else
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
     }
 
     /**
@@ -108,10 +135,21 @@ public class AdvancedFbo implements NativeResource
      */
     public void bindRead(boolean setViewport)
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, this.id);
-        if (setViewport)
-            RenderSystem.viewport(0, 0, this.width, this.height);
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(() ->
+            {
+                glBindFramebuffer(GL_READ_FRAMEBUFFER, this.id);
+                if (setViewport)
+                    RenderSystem.viewport(0, 0, this.width, this.height);
+            });
+        }
+        else
+        {
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, this.id);
+            if (setViewport)
+                RenderSystem.viewport(0, 0, this.width, this.height);
+        }
     }
 
     /**
@@ -119,8 +157,14 @@ public class AdvancedFbo implements NativeResource
      */
     public static void unbindRead()
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(() -> glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
+        }
+        else
+        {
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+        }
     }
 
     /**
@@ -130,10 +174,21 @@ public class AdvancedFbo implements NativeResource
      */
     public void bindDraw(boolean setViewport)
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this.id);
-        if (setViewport)
-            RenderSystem.viewport(0, 0, this.width, this.height);
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(() ->
+            {
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this.id);
+                if (setViewport)
+                    RenderSystem.viewport(0, 0, this.width, this.height);
+            });
+        }
+        else
+        {
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this.id);
+            if (setViewport)
+                RenderSystem.viewport(0, 0, this.width, this.height);
+        }
     }
 
     /**
@@ -141,8 +196,14 @@ public class AdvancedFbo implements NativeResource
      */
     public static void unbindDraw()
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(() -> glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
+        }
+        else
+        {
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        }
     }
 
     /**
@@ -156,12 +217,25 @@ public class AdvancedFbo implements NativeResource
      */
     public void resolveToFbo(int id, int width, int height, int mask, int filtering)
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        this.bindRead(false);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, id);
-        glBlitFramebuffer(0, 0, this.width, this.height, 0, 0, width, height, mask, filtering);
-        unbindDraw();
-        unbindRead();
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(() ->
+            {
+                this.bindRead(false);
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, id);
+                glBlitFramebuffer(0, 0, this.width, this.height, 0, 0, width, height, mask, filtering);
+                unbindDraw();
+                unbindRead();
+            });
+        }
+        else
+        {
+            this.bindRead(false);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, id);
+            glBlitFramebuffer(0, 0, this.width, this.height, 0, 0, width, height, mask, filtering);
+            unbindDraw();
+            unbindRead();
+        }
     }
 
     /**
@@ -224,28 +298,59 @@ public class AdvancedFbo implements NativeResource
      */
     public void resolveToScreen(int mask, int filtering)
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        MainWindow window = Minecraft.getInstance().getMainWindow();
-        this.bindRead(false);
-        unbindDraw();
-        glDrawBuffer(GL_BACK);
-        glBlitFramebuffer(0, 0, this.width, this.height, 0, 0, window.getFramebufferWidth(), window.getFramebufferHeight(), mask, filtering);
-        unbindRead();
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(() ->
+            {
+                MainWindow window = Minecraft.getInstance().getMainWindow();
+                this.bindRead(false);
+                unbindDraw();
+                glDrawBuffer(GL_BACK);
+                glBlitFramebuffer(0, 0, this.width, this.height, 0, 0, window.getFramebufferWidth(), window.getFramebufferHeight(), mask, filtering);
+                unbindRead();
+            });
+        }
+        else
+        {
+            MainWindow window = Minecraft.getInstance().getMainWindow();
+            this.bindRead(false);
+            unbindDraw();
+            glDrawBuffer(GL_BACK);
+            glBlitFramebuffer(0, 0, this.width, this.height, 0, 0, window.getFramebufferWidth(), window.getFramebufferHeight(), mask, filtering);
+            unbindRead();
+        }
     }
 
     @Override
     public void free()
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        if (this.id != -1)
+        if (!RenderSystem.isOnRenderThreadOrInit())
         {
-            glDeleteFramebuffers(this.id);
-            this.id = -1;
+            RenderSystem.recordRenderCall(() ->
+            {
+                if (this.id != -1)
+                {
+                    glDeleteFramebuffers(this.id);
+                    this.id = -1;
+                }
+                for (AdvancedFboAttachment attachment : this.colorAttachments)
+                    attachment.free();
+                if (this.depthAttachment != null)
+                    this.depthAttachment.free();
+            });
         }
-        for (AdvancedFboAttachment attachment : this.colorAttachments)
-            attachment.free();
-        if (this.depthAttachment != null)
-            this.depthAttachment.free();
+        else
+        {
+            if (this.id != -1)
+            {
+                glDeleteFramebuffers(this.id);
+                this.id = -1;
+            }
+            for (AdvancedFboAttachment attachment : this.colorAttachments)
+                attachment.free();
+            if (this.depthAttachment != null)
+                this.depthAttachment.free();
+        }
     }
 
     /**
