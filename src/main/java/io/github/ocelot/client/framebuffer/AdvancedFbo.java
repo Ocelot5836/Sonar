@@ -27,8 +27,8 @@ import static org.lwjgl.opengl.GL30.*;
 public class AdvancedFbo implements NativeResource
 {
     private int id;
-    private final int width;
-    private final int height;
+    private int width;
+    private int height;
     private final AdvancedFboAttachment[] colorAttachments;
     private final AdvancedFboAttachment depthAttachment;
 
@@ -65,6 +65,18 @@ public class AdvancedFbo implements NativeResource
         if (status != GL_FRAMEBUFFER_COMPLETE)
             throw new IllegalStateException("Advanced FBO status did not return GL_FRAMEBUFFER_COMPLETE. 0x" + Integer.toHexString(status));
         unbind();
+    }
+
+    /**
+     * Sets the size of this framebuffer to the specified values.
+     *
+     * @param width  The new width of the framebuffer
+     * @param height The new height of the framebuffer
+     */
+    public void setSize(int width, int height)
+    {
+        this.width = width;
+        this.height = height;
     }
 
     /**
