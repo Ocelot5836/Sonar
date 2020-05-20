@@ -1,17 +1,16 @@
-package io.github.ocelot.testmod.network.handler;
+package io.github.ocelot.network.handler;
 
 import io.github.ocelot.common.valuecontainer.SyncValueContainerMessage;
 import io.github.ocelot.common.valuecontainer.ValueContainer;
-import io.github.ocelot.testmod.TestMod;
-import io.github.ocelot.testmod.client.screen.TestValueContainerEditorScreen;
-import io.github.ocelot.testmod.network.DisplayScreenMessage;
+import io.github.ocelot.TestMod;
+import io.github.ocelot.client.screen.TestValueContainerEditorScreen;
+import io.github.ocelot.network.DisplayScreenMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
 public class ClientMessageHandler implements MessageHandler

@@ -1,24 +1,19 @@
-package io.github.ocelot.testmod.block;
+package io.github.ocelot.block;
 
 import io.github.ocelot.common.BaseBlock;
 import io.github.ocelot.common.VoxelShapeHelper;
 import io.github.ocelot.common.valuecontainer.ValueContainer;
 import io.github.ocelot.common.valuecontainer.ValueContainerEntry;
-import io.github.ocelot.testmod.tileentity.TestTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.IWaterLoggable;
 import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

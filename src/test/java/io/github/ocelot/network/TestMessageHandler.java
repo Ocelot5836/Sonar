@@ -1,10 +1,10 @@
-package io.github.ocelot.testmod.network;
+package io.github.ocelot.network;
 
 import io.github.ocelot.common.valuecontainer.SyncValueContainerMessage;
-import io.github.ocelot.testmod.TestMod;
-import io.github.ocelot.testmod.network.handler.ClientMessageHandler;
-import io.github.ocelot.testmod.network.handler.MessageHandler;
-import io.github.ocelot.testmod.network.handler.ServerMessageHandler;
+import io.github.ocelot.network.handler.ClientMessageHandler;
+import io.github.ocelot.network.handler.MessageHandler;
+import io.github.ocelot.network.handler.ServerMessageHandler;
+import io.github.ocelot.TestMod;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkEvent;

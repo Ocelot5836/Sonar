@@ -1,8 +1,8 @@
-package io.github.ocelot.testmod.item;
+package io.github.ocelot.item;
 
 import io.github.ocelot.common.valuecontainer.ValueContainer;
-import io.github.ocelot.testmod.network.DisplayScreenMessage;
-import io.github.ocelot.testmod.network.TestMessageHandler;
+import io.github.ocelot.network.DisplayScreenMessage;
+import io.github.ocelot.network.TestMessageHandler;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;

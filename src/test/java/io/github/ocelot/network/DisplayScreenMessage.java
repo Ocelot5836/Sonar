@@ -1,4 +1,4 @@
-package io.github.ocelot.testmod.network;
+package io.github.ocelot.network;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;

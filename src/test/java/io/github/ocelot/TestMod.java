@@ -1,9 +1,10 @@
-package io.github.ocelot.testmod;
+package io.github.ocelot;
 
-import io.github.ocelot.testmod.block.TestBlock;
-import io.github.ocelot.testmod.item.TestValueContainerEditorItem;
-import io.github.ocelot.testmod.network.TestMessageHandler;
-import io.github.ocelot.testmod.tileentity.TestTileEntity;
+import io.github.ocelot.block.TestBlock;
+import io.github.ocelot.client.render.TestTileEntityRenderer;
+import io.github.ocelot.item.TestValueContainerEditorItem;
+import io.github.ocelot.network.TestMessageHandler;
+import io.github.ocelot.tileentity.TestTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
@@ -13,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -64,5 +66,6 @@ public class TestMod
 
     private void initClient(FMLClientSetupEvent event)
     {
+        ClientRegistry.bindTileEntityRenderer(TEST_TILE_ENTITY.get(), TestTileEntityRenderer::new);
     }
 }

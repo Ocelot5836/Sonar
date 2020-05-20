@@ -1,10 +1,8 @@
-package io.github.ocelot.testmod.client.screen;
+package io.github.ocelot.client.screen;
 
-import io.github.ocelot.client.screen.ValueContainerEditorScreenImpl;
-import io.github.ocelot.common.valuecontainer.SyncValueContainerMessage;
 import io.github.ocelot.common.valuecontainer.ValueContainer;
-import io.github.ocelot.testmod.TestMod;
-import io.github.ocelot.testmod.network.TestMessageHandler;
+import io.github.ocelot.TestMod;
+import io.github.ocelot.network.TestMessageHandler;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;

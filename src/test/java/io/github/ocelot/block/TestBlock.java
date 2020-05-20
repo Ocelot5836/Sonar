@@ -1,8 +1,8 @@
-package io.github.ocelot.testmod.block;
+package io.github.ocelot.block;
 
 import io.github.ocelot.common.BaseBlock;
 import io.github.ocelot.common.VoxelShapeHelper;
-import io.github.ocelot.testmod.tileentity.TestTileEntity;
+import io.github.ocelot.tileentity.TestTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.IWaterLoggable;

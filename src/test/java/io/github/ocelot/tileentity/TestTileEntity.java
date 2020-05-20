@@ -1,7 +1,7 @@
-package io.github.ocelot.testmod.tileentity;
+package io.github.ocelot.tileentity;
 
 import io.github.ocelot.common.valuecontainer.*;
-import io.github.ocelot.testmod.TestMod;
+import io.github.ocelot.TestMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
@@ -9,7 +9,6 @@ import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnchantmentNameParts;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
