@@ -628,15 +628,10 @@ public class AdvancedFbo implements NativeResource
         {
             if (!RenderSystem.isOnRenderThread())
             {
-                RenderSystem.recordRenderCall(() ->
-                {
-                    this.deleteFramebuffer();
-                    this.createBuffers(width, height, onMac);
-                });
+                RenderSystem.recordRenderCall(() -> this.createBuffers(width, height, onMac));
             }
             else
             {
-                this.deleteFramebuffer();
                 this.createBuffers(width, height, onMac);
             }
         }
