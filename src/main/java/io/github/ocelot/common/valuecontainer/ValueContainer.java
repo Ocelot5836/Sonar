@@ -21,17 +21,8 @@ public interface ValueContainer
     /**
      * Fills the specified list with the required entries.
      *
-     * @param entries The list to add entries to
-     * @deprecated use more sensitive {@link #getEntries(World, BlockPos, List)} instead
-     */
-    default void getEntries(List<ValueContainerEntry<?>> entries){
-    }
-
-    /**
-     * Fills the specified list with the required entries.
-     *
-     * @param world The world this container is in
-     * @param pos   The pos this container is in
+     * @param world   The world this container is in
+     * @param pos     The pos this container is in
      * @param entries The list to add entries to
      */
     void getEntries(World world, BlockPos pos, List<ValueContainerEntry<?>> entries);
@@ -39,31 +30,11 @@ public interface ValueContainer
     /**
      * Reads the data from the provided entries.
      *
-     * @param entries The entries to read from
-     * @deprecated use more sensitive {@link #readEntries(World, BlockPos, Map)} instead
-     */
-    default void readEntries(Map<String, ValueContainerEntry<?>> entries){
-    }
-
-    /**
-     * Reads the data from the provided entries.
-     *
-     * @param world The world this container is in
-     * @param pos   The pos this container is in
+     * @param world   The world this container is in
+     * @param pos     The pos this container is in
      * @param entries The entries to read from
      */
     void readEntries(World world, BlockPos pos, Map<String, ValueContainerEntry<?>> entries);
-
-    /**
-     * @return A list full of the entries from {@link #getEntries(List)}
-     * @deprecated use more sensitive {@link #getEntries(World, BlockPos)} instead
-     */
-    default List<ValueContainerEntry<?>> getEntries()
-    {
-        List<ValueContainerEntry<?>> entries = new ArrayList<>();
-        this.getEntries(entries);
-        return entries;
-    }
 
     /**
      * Fetches a list of entries from this container.
@@ -80,15 +51,6 @@ public interface ValueContainer
     }
 
     /**
-     * @return The title of this container or null to use the default title
-     * @deprecated use more sensitive {@link #getTitle(World, BlockPos)} instead
-     */
-    default Optional<ITextComponent> getTitle()
-    {
-        return Optional.empty();
-    }
-
-    /**
      * Fetches the title of this container.
      *
      * @param world The world this container is in
@@ -96,53 +58,6 @@ public interface ValueContainer
      * @return The title of this container or null to use the default title
      */
     Optional<ITextComponent> getTitle(World world, BlockPos pos);
-
-    /**
-     * @return The position of the tile entity
-     * @deprecated Tile entities should not be the only types of value containers
-     */
-    default BlockPos getContainerPos()
-    {
-        return BlockPos.ZERO;
-    }
-
-    /**
-     * Serializes the container entry data.
-     *
-     * @param entries The entries to serialize
-     * @return The tag full of data
-     * @deprecated Use {@link #serialize(List)} instead
-     */
-    static CompoundNBT serialize(ValueContainer container, List<ValueContainerEntry<?>> entries)
-    {
-        CompoundNBT nbt = new CompoundNBT();
-
-        ListNBT entriesNbt = new ListNBT();
-        entries.forEach(valueContainerEntry ->
-        {
-            if (!valueContainerEntry.isDirty())
-                return;
-            try
-            {
-                CompoundNBT valueContainerEntryNbt = new CompoundNBT();
-
-                valueContainerEntryNbt.putString("name", valueContainerEntry.getName());
-
-                CompoundNBT entryDataNbt = new CompoundNBT();
-                valueContainerEntry.write(entryDataNbt);
-                valueContainerEntryNbt.put("data", entryDataNbt);
-
-                entriesNbt.add(valueContainerEntryNbt);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        });
-        nbt.put("entries", entriesNbt);
-
-        return nbt;
-    }
 
     /**
      * Serializes the container entry data.
@@ -187,10 +102,10 @@ public interface ValueContainer
      * @param container The container to deserialize
      * @param nbt       The tag full of data
      */
-    static void deserialize(ValueContainer container, CompoundNBT nbt)
+    static void deserialize(World world, BlockPos pos, ValueContainer container, CompoundNBT nbt)
     {
         Map<String, ValueContainerEntry<?>> entries = new HashMap<>();
-        container.getEntries().forEach(valueContainerEntry -> entries.put(valueContainerEntry.getName(), valueContainerEntry));
+        container.getEntries(world, pos).forEach(valueContainerEntry -> entries.put(valueContainerEntry.getName(), valueContainerEntry));
 
         Map<String, ValueContainerEntry<?>> deserializedEntries = new HashMap<>();
 
@@ -214,6 +129,6 @@ public interface ValueContainer
             }
         }
         if (!deserializedEntries.isEmpty())
-            container.readEntries(deserializedEntries);
+            container.readEntries(world, pos, deserializedEntries);
     }
 }

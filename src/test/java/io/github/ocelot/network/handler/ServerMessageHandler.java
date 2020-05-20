@@ -49,7 +49,7 @@ public class ServerMessageHandler implements MessageHandler
                 return;
             }
 
-            ValueContainer.deserialize(te instanceof ValueContainer ? (ValueContainer) te : (ValueContainer) world.getBlockState(pos).getBlock(), msg.getData());
+            ValueContainer.deserialize(world, pos, te instanceof ValueContainer ? (ValueContainer) te : (ValueContainer) world.getBlockState(pos).getBlock(), msg.getData());
         });
         ctx.get().setPacketHandled(true);
     }

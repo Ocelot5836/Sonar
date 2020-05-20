@@ -372,9 +372,9 @@ public class AdvancedFbo implements NativeResource
     /**
      * @return A {@link Framebuffer} that uses this advanced fbo as the target
      */
-    public AdvancedFbo.Wrapper toVanillaFramebuffer()
+    public Wrapper getVanillaWrapper()
     {
-        return new AdvancedFbo.Wrapper(this);
+        return new Wrapper(this);
     }
 
     /**
@@ -645,9 +645,11 @@ public class AdvancedFbo implements NativeResource
         @Override
         public void createBuffers(int width, int height, boolean onMac)
         {
+            this.framebufferWidth = width;
+            this.framebufferHeight = height;
+            if (this.fbo == null) // Assumed to be init phase so no action taken
+                return;
             this.fbo.setSize(width, height);
-            this.framebufferWidth = this.fbo.getWidth();
-            this.framebufferHeight = this.fbo.getHeight();
             AdvancedFboAttachment attachment = this.fbo.hasColorAttachment(0) ? this.fbo.getColorAttachment(0) : null;
             this.framebufferTextureWidth = attachment == null ? this.framebufferWidth : attachment.getWidth();
             this.framebufferTextureHeight = attachment == null ? this.framebufferHeight : attachment.getHeight();

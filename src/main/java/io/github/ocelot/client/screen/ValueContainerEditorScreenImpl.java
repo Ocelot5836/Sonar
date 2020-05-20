@@ -44,12 +44,6 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
 
     private boolean scrolling;
 
-    @Deprecated
-    public ValueContainerEditorScreenImpl(ValueContainer container, Supplier<ITextComponent> defaultTitle)
-    {
-        this(container, container.getContainerPos(), defaultTitle);
-    }
-
     public ValueContainerEditorScreenImpl(ValueContainer container, BlockPos pos, Supplier<ITextComponent> defaultTitle)
     {
         super(container, pos, defaultTitle);

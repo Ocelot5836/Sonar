@@ -34,12 +34,6 @@ public abstract class ValueContainerEditorScreen extends Screen
     private final String formattedTitle;
     private final Map<ValueContainerEntry<?>, String> formattedEntryNames;
 
-    @Deprecated
-    public ValueContainerEditorScreen(ValueContainer container, Supplier<ITextComponent> defaultTitle)
-    {
-        this(container, container.getContainerPos(), defaultTitle);
-    }
-
     public ValueContainerEditorScreen(ValueContainer container, BlockPos pos, Supplier<ITextComponent> defaultTitle)
     {
         super(container.getTitle(Minecraft.getInstance().world, pos).orElseGet(defaultTitle));

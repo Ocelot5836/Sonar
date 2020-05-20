@@ -72,26 +72,6 @@ public class ScissorHelper
     }
 
     /**
-     * Enables the scissor test.
-     *
-     * @deprecated TODO remove in 3.0.0
-     */
-    public static void enableScissor()
-    {
-        enableScissorInternal();
-    }
-
-    /**
-     * Disables the scissor test.
-     *
-     * @deprecated TODO remove in 3.0.0.
-     */
-    public static void disableScissor()
-    {
-        disableScissorInternal();
-    }
-
-    /**
      * Pushes a new scissor test onto the stack. Can be reverted to the previous state by calling {@link #pop()}.
      *
      * @param x      The x position of the rectangle

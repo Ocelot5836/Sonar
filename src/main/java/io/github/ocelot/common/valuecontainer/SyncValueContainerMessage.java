@@ -17,12 +17,6 @@ public class SyncValueContainerMessage
     private final BlockPos pos;
     private final CompoundNBT data;
 
-    @Deprecated
-    public SyncValueContainerMessage(ValueContainer container, List<ValueContainerEntry<?>> entries)
-    {
-        this(container.getContainerPos(), ValueContainer.serialize(container, entries));
-    }
-
     public SyncValueContainerMessage(BlockPos pos, List<ValueContainerEntry<?>> entries)
     {
         this(pos, ValueContainer.serialize(entries));
