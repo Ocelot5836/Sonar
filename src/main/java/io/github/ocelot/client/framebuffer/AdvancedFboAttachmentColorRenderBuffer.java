@@ -30,11 +30,8 @@ public class AdvancedFboAttachmentColorRenderBuffer implements AdvancedFboAttach
         this.samples = samples;
     }
 
-    @Override
-    public void create()
+    private void createRaw()
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        this.id = glGenRenderbuffers();
         this.bind();
         if (this.samples == 1)
         {
@@ -47,25 +44,67 @@ public class AdvancedFboAttachmentColorRenderBuffer implements AdvancedFboAttach
         this.unbind();
     }
 
+    private int getId()
+    {
+        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
+        if (this.id == -1)
+        {
+            this.id = glGenRenderbuffers();
+        }
+
+        return this.id;
+    }
+
+    @Override
+    public void create()
+    {
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(this::createRaw);
+        }
+        else
+        {
+            this.createRaw();
+        }
+    }
+
     @Override
     public void attach(int target, int attachment)
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        glFramebufferRenderbuffer(target, GL_COLOR_ATTACHMENT0+attachment, GL_RENDERBUFFER, this.id);
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(() -> glFramebufferRenderbuffer(target, GL_COLOR_ATTACHMENT0 + attachment, GL_RENDERBUFFER, this.getId()));
+        }
+        else
+        {
+            glFramebufferRenderbuffer(target, GL_COLOR_ATTACHMENT0 + attachment, GL_RENDERBUFFER, this.getId());
+        }
     }
 
     @Override
     public void bind()
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        glBindRenderbuffer(GL_RENDERBUFFER, this.id);
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(() -> glBindRenderbuffer(GL_RENDERBUFFER, this.getId()));
+        }
+        else
+        {
+            glBindRenderbuffer(GL_RENDERBUFFER, this.getId());
+        }
     }
 
     @Override
     public void unbind()
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(() -> glBindRenderbuffer(GL_RENDERBUFFER, 0));
+        }
+        else
+        {
+            glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        }
     }
 
     @Override
@@ -95,8 +134,18 @@ public class AdvancedFboAttachmentColorRenderBuffer implements AdvancedFboAttach
     @Override
     public void free()
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        if (this.id != -1)
+        if (this.id == -1)
+            return;
+
+        if (!RenderSystem.isOnRenderThread())
+        {
+            RenderSystem.recordRenderCall(() ->
+            {
+                glDeleteRenderbuffers(this.id);
+                this.id = -1;
+            });
+        }
+        else
         {
             glDeleteRenderbuffers(this.id);
             this.id = -1;
