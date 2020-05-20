@@ -132,6 +132,12 @@ public class AdvancedFboAttachmentColorRenderBuffer implements AdvancedFboAttach
     }
 
     @Override
+    public AdvancedFboAttachmentColorRenderBuffer createCopy()
+    {
+        return new AdvancedFboAttachmentColorRenderBuffer(this.width, this.height, this.samples);
+    }
+
+    @Override
     public void free()
     {
         if (this.id == -1)

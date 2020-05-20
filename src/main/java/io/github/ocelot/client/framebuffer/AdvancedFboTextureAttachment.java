@@ -31,4 +31,7 @@ public interface AdvancedFboTextureAttachment extends AdvancedFboAttachment
      * @return The mipmap levels in this attachment
      */
     int getMipmapLevels();
+
+    @Override
+    AdvancedFboTextureAttachment createCopy();
 }

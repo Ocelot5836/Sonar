@@ -68,6 +68,12 @@ public class AdvancedFboAttachmentDepthTexture2D extends Texture implements Adva
     }
 
     @Override
+    public AdvancedFboTextureAttachment createCopy()
+    {
+        return new AdvancedFboAttachmentDepthTexture2D(this.width, this.height, this.mipmapLevels);
+    }
+
+    @Override
     public void bind()
     {
         this.bindTexture();

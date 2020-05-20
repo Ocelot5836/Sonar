@@ -55,4 +55,9 @@ public interface AdvancedFboAttachment extends NativeResource
      * @return Whether or not this attachment can be read from
      */
     boolean canSample();
+
+    /**
+     * A new identical attachment to this one.
+     */
+    AdvancedFboAttachment createCopy();
 }

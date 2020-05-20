@@ -134,6 +134,12 @@ public class AdvancedFboAttachmentDepthRenderBuffer implements AdvancedFboAttach
     }
 
     @Override
+    public AdvancedFboAttachment createCopy()
+    {
+        return new AdvancedFboAttachmentDepthRenderBuffer(this.width, this.height, this.samples);
+    }
+
+    @Override
     public void free()
     {
         if (this.id == -1)

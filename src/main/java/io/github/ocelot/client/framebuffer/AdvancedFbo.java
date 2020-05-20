@@ -1,5 +1,6 @@
 package io.github.ocelot.client.framebuffer;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
@@ -21,6 +22,7 @@ import static org.lwjgl.opengl.GL30.*;
  * @author Ocelot
  * @since 2.4.0
  */
+@SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
 public class AdvancedFbo implements NativeResource
 {
@@ -259,6 +261,14 @@ public class AdvancedFbo implements NativeResource
     }
 
     /**
+     * @return The amount of color attachments in this framebuffer
+     */
+    public int getColorAttachments()
+    {
+        return colorAttachments.length;
+    }
+
+    /**
      * Checks to see if the provided attachment has been added to this framebuffer.
      *
      * @param attachment The attachment to check
@@ -348,9 +358,19 @@ public class AdvancedFbo implements NativeResource
     }
 
     /**
+     * @return A {@link Framebuffer} that uses this advanced fbo as the target
+     */
+    public Wrapper toVanillaFramebuffer()
+    {
+        return new Wrapper(this);
+    }
+
+    /**
      * <p>A builder used to attach buffers to an {@link AdvancedFbo}.</p>
      *
      * @author Ocelot
+     * @see AdvancedFbo
+     * @since 2.4.0
      */
     public static class Builder
     {
@@ -367,9 +387,60 @@ public class AdvancedFbo implements NativeResource
             this.depthAttachment = null;
         }
 
+        public Builder(AdvancedFbo parent)
+        {
+            this.width = parent.getWidth();
+            this.height = parent.getHeight();
+            this.colorAttachments = new ArrayList<>();
+            this.depthAttachment = parent.getDepthAttachment();
+            this.addAttachments(parent);
+        }
+
+        public Builder(Framebuffer parent)
+        {
+            this.width = parent.framebufferWidth;
+            this.height = parent.framebufferHeight;
+            this.colorAttachments = new ArrayList<>();
+            this.depthAttachment = null;
+            this.addAttachments(parent);
+        }
+
         private void validateColorSize()
         {
             Validate.inclusiveBetween(0, glGetInteger(GL_MAX_COLOR_ATTACHMENTS), this.colorAttachments.size());
+        }
+
+        /**
+         * Adds copies of the buffers inside the specified fbo.
+         *
+         * @param parent The parent to add the attachments for
+         */
+        public Builder addAttachments(AdvancedFbo parent)
+        {
+            for (int i = 0; i < parent.getColorAttachments(); i++)
+                this.colorAttachments.add(parent.getColorAttachment(i).createCopy());
+            if (parent.hasDepthAttachment())
+            {
+                Validate.isTrue(this.depthAttachment == null, "Only one depth attachment can be applied to an FBO.");
+                this.depthAttachment = parent.getDepthAttachment();
+            }
+            return this;
+        }
+
+        /**
+         * Adds copies of the buffers inside the specified fbo.
+         *
+         * @param parent The parent to add the attachments for
+         */
+        public Builder addAttachments(Framebuffer parent)
+        {
+            this.addColorTextureBuffer(parent.framebufferTextureWidth, parent.framebufferTextureHeight, 0);
+            if (parent.useDepth)
+            {
+                Validate.isTrue(this.depthAttachment == null, "Only one depth attachment can be applied to an FBO.");
+                this.setDepthRenderBuffer(parent.framebufferTextureWidth, parent.framebufferTextureHeight, 1);
+            }
+            return this;
         }
 
         /**
@@ -520,6 +591,104 @@ public class AdvancedFbo implements NativeResource
         public AdvancedFbo build()
         {
             return new AdvancedFbo(this.width, this.height, this.colorAttachments.toArray(new AdvancedFboAttachment[0]), this.depthAttachment);
+        }
+    }
+
+    /**
+     * <p>A vanilla {@link Framebuffer} wrapper of the {@link AdvancedFbo}.</p>
+     *
+     * @author Ocelot
+     * @see AdvancedFbo
+     * @since 2.8.0
+     */
+    public static class Wrapper extends Framebuffer
+    {
+        private AdvancedFbo fbo;
+
+        private Wrapper(AdvancedFbo fbo)
+        {
+            super(fbo.width, fbo.height, false, false);
+            this.fbo = fbo;
+        }
+
+        @Override
+        public void resize(int width, int height, boolean onMac)
+        {
+            if (!RenderSystem.isOnRenderThread())
+            {
+                RenderSystem.recordRenderCall(() ->
+                {
+                    this.deleteFramebuffer();
+                    this.createBuffers(width, height, onMac);
+                });
+            }
+            else
+            {
+
+                this.deleteFramebuffer();
+                this.createBuffers(width, height, onMac);
+            }
+        }
+
+        @Override
+        public void deleteFramebuffer()
+        {
+            this.fbo.close();
+        }
+
+        @Override
+        public void createBuffers(int width, int height, boolean onMac)
+        {
+            this.fbo = new AdvancedFbo.Builder(width, height).addAttachments(this.fbo).build();
+            this.framebufferWidth = this.fbo.getWidth();
+            this.framebufferHeight = this.fbo.getHeight();
+            AdvancedFboAttachment attachment = this.fbo.hasColorAttachment(0) ? this.fbo.getColorAttachment(0) : null;
+            this.framebufferTextureWidth = attachment == null ? this.framebufferWidth : attachment.getWidth();
+            this.framebufferTextureHeight = attachment == null ? this.framebufferHeight : attachment.getHeight();
+        }
+
+        @Override
+        public void setFramebufferFilter(int framebufferFilter)
+        {
+            RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
+            this.framebufferFilter = framebufferFilter;
+            for (int i = 0; i < this.fbo.getColorAttachments(); i++)
+            {
+                this.fbo.getColorAttachment(i).bind();
+                GlStateManager.texParameter(3553, 10241, framebufferFilter);
+                GlStateManager.texParameter(3553, 10240, framebufferFilter);
+                GlStateManager.texParameter(3553, 10242, 10496);
+                GlStateManager.texParameter(3553, 10243, 10496);
+                this.fbo.getColorAttachment(i).unbind();
+            }
+        }
+
+        @Override
+        public void bindFramebufferTexture()
+        {
+            if (this.fbo.hasColorAttachment(0))
+                this.fbo.getColorAttachment(0).bind();
+        }
+
+        @Override
+        public void unbindFramebufferTexture()
+        {
+            if (this.fbo.hasColorAttachment(0))
+                this.fbo.getColorAttachment(0).unbind();
+        }
+
+        @Override
+        public void bindFramebuffer(boolean setViewport)
+        {
+            this.fbo.bind(setViewport);
+        }
+
+        /**
+         * @return The backing advanced fbo
+         */
+        public AdvancedFbo getFbo()
+        {
+            return fbo;
         }
     }
 }
