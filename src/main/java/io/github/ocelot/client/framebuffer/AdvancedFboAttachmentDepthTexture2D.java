@@ -2,12 +2,14 @@ package io.github.ocelot.client.framebuffer;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.client.renderer.texture.TextureUtil;
+import net.minecraft.resources.IResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.Validate;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL30.GL_DEPTH_ATTACHMENT;
 import static org.lwjgl.opengl.GL30.glFramebufferTexture2D;
 
@@ -18,16 +20,14 @@ import static org.lwjgl.opengl.GL30.glFramebufferTexture2D;
  * @since 2.4.0
  */
 @OnlyIn(Dist.CLIENT)
-public class AdvancedFboAttachmentDepthTexture2D implements AdvancedFboTextureAttachment
+public class AdvancedFboAttachmentDepthTexture2D extends Texture implements AdvancedFboTextureAttachment
 {
-    private int id;
     private final int width;
     private final int height;
     private final int mipmapLevels;
 
     public AdvancedFboAttachmentDepthTexture2D(int width, int height, int mipmapLevels)
     {
-        this.id = -1;
         this.width = width;
         this.height = height;
         this.mipmapLevels = mipmapLevels;
@@ -36,17 +36,29 @@ public class AdvancedFboAttachmentDepthTexture2D implements AdvancedFboTextureAt
     @Override
     public void create()
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        this.id = glGenTextures();
-        TextureUtil.prepareImage(this.id, this.mipmapLevels, this.width, this.height);
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(() -> TextureUtil.prepareImage(this.getGlTextureId(), this.mipmapLevels, this.width, this.height));
+        }
+        else
+        {
+            TextureUtil.prepareImage(this.getGlTextureId(), this.mipmapLevels, this.width, this.height);
+        }
     }
 
     @Override
     public void attach(int target, int attachment, int level)
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
         Validate.isTrue(attachment == 0, "Only one depth buffer attachment is supported.");
-        glFramebufferTexture2D(target, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this.id, level);
+
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(() -> glFramebufferTexture2D(target, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this.getGlTextureId(), level));
+        }
+        else
+        {
+            glFramebufferTexture2D(target, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this.getGlTextureId(), level);
+        }
     }
 
     @Override
@@ -58,15 +70,20 @@ public class AdvancedFboAttachmentDepthTexture2D implements AdvancedFboTextureAt
     @Override
     public void bind()
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        GlStateManager.bindTexture(this.id);
+        this.bindTexture();
     }
 
     @Override
     public void unbind()
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        GlStateManager.bindTexture(0);
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(() -> GlStateManager.bindTexture(0));
+        }
+        else
+        {
+            GlStateManager.bindTexture(0);
+        }
     }
 
     @Override
@@ -96,11 +113,12 @@ public class AdvancedFboAttachmentDepthTexture2D implements AdvancedFboTextureAt
     @Override
     public void free()
     {
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        if (this.id != -1)
-        {
-            glDeleteTextures(this.id);
-            this.id = -1;
-        }
+        this.deleteGlTexture();
+    }
+
+    @Override
+    public void loadTexture(IResourceManager manager)
+    {
+        this.create();
     }
 }
