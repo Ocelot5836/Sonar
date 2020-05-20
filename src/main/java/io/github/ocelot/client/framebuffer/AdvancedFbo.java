@@ -372,9 +372,9 @@ public class AdvancedFbo implements NativeResource
     /**
      * @return A {@link Framebuffer} that uses this advanced fbo as the target
      */
-    public Wrapper toVanillaFramebuffer()
+    public AdvancedFbo.Wrapper toVanillaFramebuffer()
     {
-        return new Wrapper(this);
+        return new AdvancedFbo.Wrapper(this);
     }
 
     /**
@@ -636,7 +636,6 @@ public class AdvancedFbo implements NativeResource
             }
             else
             {
-
                 this.deleteFramebuffer();
                 this.createBuffers(width, height, onMac);
             }
