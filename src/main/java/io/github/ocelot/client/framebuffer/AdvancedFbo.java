@@ -716,7 +716,7 @@ public class AdvancedFbo implements NativeResource
      *
      * @author Ocelot
      * @see AdvancedFbo
-     * @since 2.8.0
+     * @since 3.0.0
      */
     public static class Wrapper extends Framebuffer
     {
