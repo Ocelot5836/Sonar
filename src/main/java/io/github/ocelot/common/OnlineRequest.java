@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 /**
@@ -42,6 +41,9 @@ public class OnlineRequest
 
     private static void request(Request request) throws Exception
     {
+        if (request.isCancelled())
+            return;
+
         HttpGet get = new HttpGet(request.getUrl());
         try (CloseableHttpClient client = HttpClients.custom().setUserAgent(USER_AGENT).build())
         {
@@ -51,13 +53,15 @@ public class OnlineRequest
                 if (contentLength != null)
                     request.setFileSize(Long.parseLong(contentLength));
                 request.setStartTime(System.currentTimeMillis());
-                CountingInputStream countingInputStream = new CountingInputStream(response.getEntity().getContent())
+                try (CountingInputStream countingInputStream = new CountingInputStream(response.getEntity().getContent())
                 {
                     @Override
                     public synchronized long skip(long length) throws IOException
                     {
                         long skip = super.skip(length);
                         request.setReceived(this.getByteCount());
+                        if (request.isCancelled())
+                            this.close();
                         return skip;
                     }
 
@@ -67,9 +71,10 @@ public class OnlineRequest
                         super.afterRead(n);
                         request.setReceived(this.getByteCount());
                     }
-                };
-                request.setValue(IOUtils.toBufferedInputStream(countingInputStream));
-                countingInputStream.close();
+                })
+                {
+                    request.setValue(IOUtils.toBufferedInputStream(countingInputStream));
+                }
             }
         }
         finally
@@ -134,19 +139,29 @@ public class OnlineRequest
     {
         private final String url;
         private final Consumer<InputStream> listener;
-        private final AtomicLong fileSize;
-        private final AtomicLong bytesReceived;
-        private long startTime;
-        private InputStream value;
+        private volatile long fileSize;
+        private volatile long bytesReceived;
+        private volatile long startTime;
+        private volatile InputStream value;
+        private volatile boolean cancelled;
 
         private Request(String url, @Nullable Consumer<InputStream> listener)
         {
             this.url = url;
             this.listener = listener;
-            this.fileSize = new AtomicLong();
-            this.bytesReceived = new AtomicLong();
+            this.fileSize = 0;
+            this.bytesReceived = 0;
             this.startTime = 0;
             this.value = null;
+            this.cancelled = false;
+        }
+
+        /**
+         * Cancels the HTTP operation before is starts or cancels byte reading if already being processed.
+         */
+        public void cancel()
+        {
+            this.cancelled = true;
         }
 
         /**
@@ -162,7 +177,7 @@ public class OnlineRequest
          */
         public long getFileSize()
         {
-            return fileSize.get();
+            return fileSize;
         }
 
         /**
@@ -170,7 +185,7 @@ public class OnlineRequest
          */
         public long getBytesReceived()
         {
-            return bytesReceived.get();
+            return bytesReceived;
         }
 
         /**
@@ -178,15 +193,7 @@ public class OnlineRequest
          */
         public double getDownloadPercentage()
         {
-            return this.fileSize.get() > 0 ? (double) this.bytesReceived.get() / (double) this.fileSize.get() : 0.0f;
-        }
-
-        /**
-         * @return Whether or not the download has started
-         */
-        public boolean hasStarted()
-        {
-            return this.startTime > 0;
+            return this.fileSize > 0 ? (double) this.bytesReceived / (double) this.fileSize : 0;
         }
 
         /**
@@ -205,28 +212,12 @@ public class OnlineRequest
             return Optional.ofNullable(this.value);
         }
 
-        /* Internal methods */
-
-        void setFileSize(long fileSize)
+        /**
+         * @return Whether or not this operation has been cancelled
+         */
+        public boolean isCancelled()
         {
-            this.fileSize.set(fileSize);
-        }
-
-        void setReceived(long bytesReceived)
-        {
-            this.bytesReceived.set(bytesReceived);
-        }
-
-        void setStartTime(long startTime)
-        {
-            this.startTime = startTime;
-        }
-
-        void setValue(InputStream stream)
-        {
-            this.value = stream;
-            if (this.listener != null)
-                this.listener.accept(stream);
+            return cancelled;
         }
 
         @Override
@@ -237,6 +228,30 @@ public class OnlineRequest
                 this.value.close();
                 this.value = null;
             }
+        }
+
+        /* Internal methods */
+
+        private synchronized void setFileSize(long fileSize)
+        {
+            this.fileSize = fileSize;
+        }
+
+        private synchronized void setReceived(long bytesReceived)
+        {
+            this.bytesReceived = bytesReceived;
+        }
+
+        private synchronized void setStartTime(long startTime)
+        {
+            this.startTime = startTime;
+        }
+
+        private synchronized void setValue(InputStream stream)
+        {
+            this.value = stream;
+            if (this.listener != null)
+                this.listener.accept(stream);
         }
     }
 }
