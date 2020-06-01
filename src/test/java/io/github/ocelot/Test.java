@@ -10,7 +10,7 @@ public class Test
 {
     public static void main(String[] args) throws IOException
     {
-        try (OnlineRequest.Request request = OnlineRequest.make("http://ipv4.download.thinkbroadband.com/50MB.zip", null, null))
+        try (OnlineRequest.Request request = OnlineRequest.make("http://ipv4.download.thinkbroadband.com/50MB.zip", null, Throwable::printStackTrace))
         {
             double currentProgress = -1;
             while (!request.isCancelled() && !request.getValue().isPresent())
