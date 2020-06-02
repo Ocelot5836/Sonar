@@ -10,7 +10,6 @@ import org.apache.http.impl.client.HttpClients;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -73,7 +72,7 @@ public class OnlineRequest
                     }
                 })
                 {
-                    request.setValue(IOUtils.toBufferedInputStream(countingInputStream)); // TODO this may cause problems when the stream is very large
+                    request.setValue(countingInputStream);
                 }
             }
         }
@@ -86,16 +85,16 @@ public class OnlineRequest
     /**
      * <p>Adds a new request to the queue.</p>
      * <p>The supplied callback will be called when a result is received and no error is thrown.</p>
+     * <p>If the stream needs to be saved for later, use {@link IOUtils#toBufferedInputStream(InputStream)} to make a copy. The stream <b><i>WILL NOT PERSIST AFTER THE CALLBACK IS CALLED!</i></b></p>
      * <p>If there is no error callback and an error is thrown <code>null</code> is passed into the callback if not null.</p>
      * <p>If the error callback is not null and an error is thrown, the callback <b><i>WILL NOT BE CALLED</i></b> and the exception will be passed into the error callback.</p>
-     * <p>The downloaded data can always be queried using {@link Request#getValue()} even if callback is null.</p>
      *
      * @param url           the URL to make a request to
      * @param callback      the response callback for the request
      * @param errorCallback The callback to use when an error occurs or null to ignore errors
      * @return The result and statistics about the request
      */
-    public static Request make(String url, @Nullable Consumer<InputStream> callback, @Nullable Consumer<Exception> errorCallback)
+    public static Request make(String url, Consumer<InputStream> callback, @Nullable Consumer<Exception> errorCallback)
     {
         Request request = new Request(url, callback);
         POOL.execute(() ->
@@ -130,29 +129,27 @@ public class OnlineRequest
     }
 
     /**
-     * <p>A request made to the internet that contains request stats and progress. Should be closed after reading from the stream is complete.</p>
+     * <p>A request made to the internet that contains request stats and progress.</p>
      *
      * @author Ocelot
      * @since 3.0.0
      */
-    public static class Request implements AutoCloseable
+    public static class Request
     {
         private final String url;
         private final Consumer<InputStream> listener;
         private volatile long fileSize;
         private volatile long bytesReceived;
         private volatile long startTime;
-        private volatile InputStream value;
         private volatile boolean cancelled;
 
-        private Request(String url, @Nullable Consumer<InputStream> listener)
+        private Request(String url, Consumer<InputStream> listener)
         {
             this.url = url;
             this.listener = listener;
             this.fileSize = 0;
             this.bytesReceived = 0;
             this.startTime = 0;
-            this.value = null;
             this.cancelled = false;
         }
 
@@ -205,29 +202,11 @@ public class OnlineRequest
         }
 
         /**
-         * @return The value retrieved from the internet. Will be empty if the download has not yet completed
-         */
-        public Optional<InputStream> getValue()
-        {
-            return Optional.ofNullable(this.value);
-        }
-
-        /**
          * @return Whether or not this operation has been cancelled
          */
         public boolean isCancelled()
         {
             return cancelled;
-        }
-
-        @Override
-        public void close() throws IOException
-        {
-            if (this.value != null)
-            {
-                this.value.close();
-                this.value = null;
-            }
         }
 
         /* Internal methods */
@@ -249,9 +228,7 @@ public class OnlineRequest
 
         private synchronized void setValue(InputStream stream)
         {
-            this.value = stream;
-            if (this.listener != null)
-                this.listener.accept(stream);
+            this.listener.accept(stream);
         }
     }
 }
