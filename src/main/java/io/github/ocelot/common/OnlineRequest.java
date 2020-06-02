@@ -59,10 +59,7 @@ public class OnlineRequest
                         long skip = super.skip(length);
                         request.setReceived(this.getByteCount());
                         if (request.isCancelled())
-                        {
                             this.close();
-                            request.setStopped(true);
-                        }
                         return skip;
                     }
 
@@ -221,14 +218,6 @@ public class OnlineRequest
             return cancelled;
         }
 
-        /**
-         * @return Whether or not this download has actually stopped after {@link #cancel()} has been called
-         */
-        public boolean isStopped()
-        {
-            return stopped;
-        }
-
         /* Internal methods */
 
         private synchronized void setFileSize(long fileSize)
@@ -246,11 +235,6 @@ public class OnlineRequest
         private synchronized void setValue(InputStream stream)
         {
             this.listener.accept(stream);
-        }
-
-        private synchronized void setStopped(boolean stopped)
-        {
-            this.stopped = stopped;
         }
     }
 }
