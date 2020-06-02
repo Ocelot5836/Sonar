@@ -11,7 +11,7 @@ public class Test
 {
     public static void main(String[] args) throws Exception
     {
-        OnlineRequest.Request request = OnlineRequest.make("http://ipv4.download.thinkbroadband.com/50MB.zip", stream -> {
+        OnlineRequest.Request request = OnlineRequest.make("http://ipv4.download.thinkbroadband.com/1GB.zip", stream -> {
             try
             {
                 IOUtils.toBufferedInputStream(stream);

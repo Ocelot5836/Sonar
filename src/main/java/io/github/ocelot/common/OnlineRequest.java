@@ -46,7 +46,8 @@ public class OnlineRequest
 
         try (CloseableHttpClient client = HttpClients.custom().setUserAgent(USER_AGENT).build())
         {
-            try (CloseableHttpResponse response = client.execute(new HttpGet(request.getUrl())))
+            HttpGet get = new HttpGet(request.getUrl());
+            try (CloseableHttpResponse response = client.execute(get))
             {
                 String contentLength = response.getFirstHeader("Content-Length").getValue();
                 if (contentLength != null)
@@ -70,6 +71,7 @@ public class OnlineRequest
                 }))
                 {
                     request.setValue(countingInputStream);
+                    get.releaseConnection();
                 }
             }
         }
