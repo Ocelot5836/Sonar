@@ -10,34 +10,32 @@ public class Test
 {
     public static void main(String[] args) throws IOException
     {
-        try (OnlineRequest.Request request = OnlineRequest.make("http://ipv4.download.thinkbroadband.com/50MB.zip", null, Throwable::printStackTrace))
-        {
-            double currentProgress = -1;
-            while (!request.isCancelled() && !request.getValue().isPresent())
-            {
-                if (currentProgress != request.getDownloadPercentage())
-                {
-                    System.out.println(currentProgress = request.getDownloadPercentage());
-                }
-                if (currentProgress >= 0.1)
-                {
-                    System.out.println("Cancelling");
-                    request.cancel();
-                }
-            }
-            if (request.isCancelled())
-            {
-                System.out.println("Download was cancelled");
-            }
-            else
-            {
-                System.out.println("Download took " + (System.currentTimeMillis() - request.getStartTime()) + "ms");
-                try (FileOutputStream os = new FileOutputStream("50MB.zip"))
-                {
-                    IOUtils.copy(request.getValue().get(), os);
-                }
-            }
-        }
+//            OnlineRequest.Request request = OnlineRequest.make("http://ipv4.download.thinkbroadband.com/50MB.zip", null, Throwable::printStackTrace)
+//            double currentProgress = -1;
+//            while (!request.isCancelled() && !request.getValue().isPresent())
+//            {
+//                if (currentProgress != request.getDownloadPercentage())
+//                {
+//                    System.out.println(currentProgress = request.getDownloadPercentage());
+//                }
+//                if (currentProgress >= 0.1)
+//                {
+//                    System.out.println("Cancelling");
+//                    request.cancel();
+//                }
+//            }
+//            if (request.isCancelled())
+//            {
+//                System.out.println("Download was cancelled");
+//            }
+//            else
+//            {
+//                System.out.println("Download took " + (System.currentTimeMillis() - request.getStartTime()) + "ms");
+//                try (FileOutputStream os = new FileOutputStream("50MB.zip"))
+//                {
+//                    IOUtils.copy(request.getValue().get(), os);
+//                }
+//            }
         System.exit(0);
     }
 }

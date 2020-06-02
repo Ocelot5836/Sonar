@@ -52,7 +52,7 @@ public class OnlineRequest
                 String contentLength = response.getFirstHeader("Content-Length").getValue();
                 if (contentLength != null)
                     request.setFileSize(Long.parseLong(contentLength));
-                try (CountingInputStream countingInputStream = new CountingInputStream(response.getEntity().getContent())
+                try (CancellableInputStream countingInputStream = new CancellableInputStream(request, new CountingInputStream(response.getEntity().getContent())
                 {
                     @Override
                     public synchronized long skip(long length) throws IOException
@@ -68,14 +68,7 @@ public class OnlineRequest
                         super.afterRead(n);
                         request.setReceived(this.getByteCount());
                     }
-                    
-                    @Override
-                    protected void beforeRead(int n) throws IOException
-                    {
-                        if (request.isCancelled())
-                            throw new CancelledException();
-                    }
-                })
+                }))
                 {
                     request.setValue(countingInputStream);
                 }
@@ -106,9 +99,6 @@ public class OnlineRequest
             try
             {
                 request(request);
-            }
-            catch (CancelledException ignored)
-            {
             }
             catch (Exception e)
             {
@@ -144,7 +134,7 @@ public class OnlineRequest
         private volatile long fileSize;
         private volatile long bytesReceived;
         private volatile long startTime;
-        private AtomicBoolean cancelled;
+        private final AtomicBoolean cancelled;
 
         private Request(String url, Consumer<InputStream> listener)
         {
@@ -240,7 +230,69 @@ public class OnlineRequest
         }
     }
 
-    private static class CancelledException extends IOException
+    private static class CancellableInputStream extends InputStream
     {
+        private final Request request;
+        private final InputStream parent;
+
+        private CancellableInputStream(Request request, InputStream parent)
+        {
+            this.request = request;
+            this.parent = parent;
+        }
+
+        @Override
+        public int read() throws IOException
+        {
+            return this.request.isCancelled() ? -1 : this.parent.read();
+        }
+
+        @Override
+        public int read(byte b[]) throws IOException
+        {
+            return this.request.isCancelled() ? -1 : this.parent.read(b);
+        }
+
+        @Override
+        public int read(byte b[], int off, int len) throws IOException
+        {
+            return this.request.isCancelled() ? -1 : this.parent.read(b, off, len);
+        }
+
+        @Override
+        public long skip(long n) throws IOException
+        {
+            return this.request.isCancelled() ? -1 : this.parent.skip(n);
+        }
+
+        @Override
+        public int available() throws IOException
+        {
+            return this.request.isCancelled() ? -1 : this.parent.available();
+        }
+
+        @Override
+        public void close() throws IOException
+        {
+            this.parent.close();
+        }
+
+        @Override
+        public synchronized void mark(int readlimit)
+        {
+            this.parent.mark(readlimit);
+        }
+
+        @Override
+        public synchronized void reset() throws IOException
+        {
+            this.parent.reset();
+        }
+
+        @Override
+        public boolean markSupported()
+        {
+            return this.parent.markSupported();
+        }
     }
 }
