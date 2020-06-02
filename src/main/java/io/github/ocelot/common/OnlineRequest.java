@@ -59,7 +59,10 @@ public class OnlineRequest
                         long skip = super.skip(length);
                         request.setReceived(this.getByteCount());
                         if (request.isCancelled())
+                        {
                             this.close();
+                            request.setStopped(true);
+                        }
                         return skip;
                     }
 
@@ -140,7 +143,8 @@ public class OnlineRequest
         private volatile long fileSize;
         private volatile long bytesReceived;
         private volatile long startTime;
-        private volatile boolean cancelled;
+        private boolean cancelled;
+        private volatile boolean stopped;
 
         private Request(String url, Consumer<InputStream> listener)
         {
@@ -150,6 +154,7 @@ public class OnlineRequest
             this.bytesReceived = 0;
             this.startTime = 0;
             this.cancelled = false;
+            this.stopped = true;
         }
 
         /**
@@ -216,6 +221,14 @@ public class OnlineRequest
             return cancelled;
         }
 
+        /**
+         * @return Whether or not this download has actually stopped after {@link #cancel()} has been called
+         */
+        public boolean isStopped()
+        {
+            return stopped;
+        }
+
         /* Internal methods */
 
         private synchronized void setFileSize(long fileSize)
@@ -226,13 +239,18 @@ public class OnlineRequest
         private synchronized void setReceived(long bytesReceived)
         {
             this.bytesReceived = bytesReceived;
-            if(this.startTime == 0)
+            if (this.startTime == 0)
                 this.startTime = System.nanoTime();
         }
 
         private synchronized void setValue(InputStream stream)
         {
             this.listener.accept(stream);
+        }
+
+        private synchronized void setStopped(boolean stopped)
+        {
+            this.stopped = stopped;
         }
     }
 }
