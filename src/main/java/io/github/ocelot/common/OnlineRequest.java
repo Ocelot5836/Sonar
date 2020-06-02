@@ -53,7 +53,6 @@ public class OnlineRequest
                 String contentLength = response.getFirstHeader("Content-Length").getValue();
                 if (contentLength != null)
                     request.setFileSize(Long.parseLong(contentLength));
-                request.response.set(response);
                 try (CancellableInputStream countingInputStream = new CancellableInputStream(request, new CountingInputStream(response.getEntity().getContent())
                 {
                     @Override
@@ -137,7 +136,6 @@ public class OnlineRequest
         private volatile long bytesReceived;
         private volatile long startTime;
         private final AtomicBoolean cancelled;
-        private final AtomicReference<CloseableHttpResponse> response;
 
         private Request(String url, Consumer<InputStream> listener)
         {
@@ -147,7 +145,6 @@ public class OnlineRequest
             this.bytesReceived = 0;
             this.startTime = 0;
             this.cancelled = new AtomicBoolean(false);
-            this.response = new AtomicReference<>();
         }
 
         /**
@@ -156,7 +153,6 @@ public class OnlineRequest
         public void cancel()
         {
             this.cancelled.set(true);
-            IOUtils.closeQuietly(this.response.get());
         }
 
         /**

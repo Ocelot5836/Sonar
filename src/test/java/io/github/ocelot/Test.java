@@ -5,15 +5,23 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class Test
 {
     public static void main(String[] args) throws Exception
     {
-        OnlineRequest.Request request = OnlineRequest.make("http://ipv4.download.thinkbroadband.com/50MB.zip", (booleanSupplier, stream) -> {
-
+        OnlineRequest.Request request = OnlineRequest.make("http://ipv4.download.thinkbroadband.com/50MB.zip", stream -> {
+            try
+            {
+                IOUtils.toBufferedInputStream(stream);
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }, Throwable::printStackTrace);
-        Thread.sleep(1000);
+        Thread.sleep(4000);
         request.cancel();
 //            OnlineRequest.Request request = OnlineRequest.make("http://ipv4.download.thinkbroadband.com/50MB.zip", null, Throwable::printStackTrace)
 //            double currentProgress = -1;
@@ -41,6 +49,5 @@ public class Test
 //                    IOUtils.copy(request.getValue().get(), os);
 //                }
 //            }
-        System.exit(0);
     }
 }
