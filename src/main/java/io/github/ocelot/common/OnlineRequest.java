@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
@@ -67,6 +68,13 @@ public class OnlineRequest
                         super.afterRead(n);
                         request.setReceived(this.getByteCount());
                     }
+                    
+                    @Override
+                    protected void beforeRead(int n) throws IOException
+                    {
+                        if (request.isCancelled())
+                            throw new CancelledException();
+                    }
                 })
                 {
                     request.setValue(countingInputStream);
@@ -83,7 +91,6 @@ public class OnlineRequest
      * <p>Adds a new request to the queue.</p>
      * <p>The supplied callback will be called when a result is received and no error is thrown.</p>
      * <p>If the stream needs to be saved for later, use {@link IOUtils#toBufferedInputStream(InputStream)} to make a copy. The stream <b><i>WILL NOT PERSIST AFTER THE CALLBACK IS CALLED!</i></b></p>
-     * <p>If there is no error callback and an error is thrown <code>null</code> is passed into the callback if not null.</p>
      * <p>If the error callback is not null and an error is thrown, the callback <b><i>WILL NOT BE CALLED</i></b> and the exception will be passed into the error callback.</p>
      *
      * @param url           the URL to make a request to
@@ -100,15 +107,14 @@ public class OnlineRequest
             {
                 request(request);
             }
+            catch (CancelledException ignored)
+            {
+            }
             catch (Exception e)
             {
                 if (errorCallback != null)
                 {
                     errorCallback.accept(e);
-                }
-                else
-                {
-                    request.setValue(null);
                 }
             }
         });
@@ -138,8 +144,7 @@ public class OnlineRequest
         private volatile long fileSize;
         private volatile long bytesReceived;
         private volatile long startTime;
-        private boolean cancelled;
-        private InputStream stream;
+        private AtomicBoolean cancelled;
 
         private Request(String url, Consumer<InputStream> listener)
         {
@@ -148,8 +153,7 @@ public class OnlineRequest
             this.fileSize = 0;
             this.bytesReceived = 0;
             this.startTime = 0;
-            this.cancelled = false;
-            this.stream = null;
+            this.cancelled = new AtomicBoolean(false);
         }
 
         /**
@@ -157,8 +161,7 @@ public class OnlineRequest
          */
         public void cancel()
         {
-            this.cancelled = true;
-            IOUtils.closeQuietly(this.stream);
+            this.cancelled.set(true);
         }
 
         /**
@@ -214,7 +217,7 @@ public class OnlineRequest
          */
         public boolean isCancelled()
         {
-            return cancelled;
+            return cancelled.get();
         }
 
         /* Internal methods */
@@ -233,8 +236,11 @@ public class OnlineRequest
 
         private synchronized void setValue(InputStream stream)
         {
-            this.stream = stream;
             this.listener.accept(stream);
         }
+    }
+
+    private static class CancelledException extends IOException
+    {
     }
 }
