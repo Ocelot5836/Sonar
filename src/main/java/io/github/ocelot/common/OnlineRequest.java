@@ -14,7 +14,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 /**
@@ -45,10 +44,9 @@ public class OnlineRequest
         if (request.isCancelled())
             return;
 
-        HttpGet get = new HttpGet(request.getUrl());
         try (CloseableHttpClient client = HttpClients.custom().setUserAgent(USER_AGENT).build())
         {
-            try (CloseableHttpResponse response = client.execute(get))
+            try (CloseableHttpResponse response = client.execute(new HttpGet(request.getUrl())))
             {
                 String contentLength = response.getFirstHeader("Content-Length").getValue();
                 if (contentLength != null)
@@ -74,10 +72,6 @@ public class OnlineRequest
                     request.setValue(countingInputStream);
                 }
             }
-        }
-        finally
-        {
-            get.releaseConnection();
         }
     }
 
