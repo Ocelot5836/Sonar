@@ -202,6 +202,14 @@ public class OnlineRequest
         }
 
         /**
+         * @return Whether or not all bytes have been read from the download
+         */
+        public boolean isDownloaded()
+        {
+            return this.fileSize > 0 && this.bytesReceived >= this.fileSize;
+        }
+
+        /**
          * @return Whether or not this operation has been cancelled
          */
         public boolean isCancelled()
