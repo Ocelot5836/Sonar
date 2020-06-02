@@ -8,8 +8,13 @@ import java.io.IOException;
 
 public class Test
 {
-    public static void main(String[] args) throws IOException
+    public static void main(String[] args) throws Exception
     {
+        OnlineRequest.Request request = OnlineRequest.make("http://ipv4.download.thinkbroadband.com/50MB.zip", (booleanSupplier, stream) -> {
+
+        }, Throwable::printStackTrace);
+        Thread.sleep(1000);
+        request.cancel();
 //            OnlineRequest.Request request = OnlineRequest.make("http://ipv4.download.thinkbroadband.com/50MB.zip", null, Throwable::printStackTrace)
 //            double currentProgress = -1;
 //            while (!request.isCancelled() && !request.getValue().isPresent())
