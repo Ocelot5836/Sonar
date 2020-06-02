@@ -58,8 +58,6 @@ public class OnlineRequest
                     {
                         long skip = super.skip(length);
                         request.setReceived(this.getByteCount());
-                        if (request.isCancelled())
-                            this.close();
                         return skip;
                     }
 
@@ -141,7 +139,7 @@ public class OnlineRequest
         private volatile long bytesReceived;
         private volatile long startTime;
         private boolean cancelled;
-        private volatile boolean stopped;
+        private InputStream stream;
 
         private Request(String url, Consumer<InputStream> listener)
         {
@@ -151,7 +149,7 @@ public class OnlineRequest
             this.bytesReceived = 0;
             this.startTime = 0;
             this.cancelled = false;
-            this.stopped = true;
+            this.stream = null;
         }
 
         /**
@@ -160,6 +158,7 @@ public class OnlineRequest
         public void cancel()
         {
             this.cancelled = true;
+            IOUtils.closeQuietly(this.stream);
         }
 
         /**
@@ -234,6 +233,7 @@ public class OnlineRequest
 
         private synchronized void setValue(InputStream stream)
         {
+            this.stream = stream;
             this.listener.accept(stream);
         }
     }
