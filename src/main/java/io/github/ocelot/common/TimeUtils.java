@@ -1,6 +1,5 @@
 package io.github.ocelot.common;
 
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.*;
@@ -18,14 +17,13 @@ public class TimeUtils
      *
      * @param time     The time to abbreviate
      * @param timeUnit The unit to abbreviate
-     * @return A time string with the abbreviated time unit appending it
+     * @return A double value of how many of the largest unit the time can be represented in
      */
-    public static String abbreviateLargestUnit(long time, TimeUnit timeUnit)
+    public static double abbreviateLargestUnit(long time, TimeUnit timeUnit)
     {
         long nanos = timeUnit.toNanos(time);
         TimeUnit unit = getLargestUnit(time, timeUnit);
-        double value = (double) nanos / NANOSECONDS.convert(1, unit);
-        return String.format(Locale.ROOT, "%.4g", value) + " " + abbreviate(unit);
+        return (double) nanos / NANOSECONDS.convert(1, unit);
     }
 
     /**
