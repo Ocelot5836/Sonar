@@ -51,7 +51,6 @@ public class OnlineRequest
                 String contentLength = response.getFirstHeader("Content-Length").getValue();
                 if (contentLength != null)
                     request.setFileSize(Long.parseLong(contentLength));
-                request.setStartTime(System.currentTimeMillis());
                 try (CountingInputStream countingInputStream = new CountingInputStream(response.getEntity().getContent())
                 {
                     @Override
@@ -227,11 +226,8 @@ public class OnlineRequest
         private synchronized void setReceived(long bytesReceived)
         {
             this.bytesReceived = bytesReceived;
-        }
-
-        private synchronized void setStartTime(long startTime)
-        {
-            this.startTime = startTime;
+            if(this.startTime == 0)
+                this.startTime = System.nanoTime();
         }
 
         private synchronized void setValue(InputStream stream)
