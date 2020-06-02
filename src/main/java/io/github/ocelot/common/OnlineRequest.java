@@ -73,7 +73,7 @@ public class OnlineRequest
                     }
                 })
                 {
-                    request.setValue(IOUtils.toBufferedInputStream(countingInputStream));
+                    request.setValue(IOUtils.toBufferedInputStream(countingInputStream)); // TODO this may cause problems when the stream is very large
                 }
             }
         }
