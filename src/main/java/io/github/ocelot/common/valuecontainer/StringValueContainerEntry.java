@@ -14,6 +14,7 @@ import java.util.function.Predicate;
  * @author Ocelot
  * @since 2.1.0
  */
+@SuppressWarnings("unused")
 public class StringValueContainerEntry implements ValueContainerEntry<String>, TextFieldEntry
 {
     private final ITextComponent displayName;

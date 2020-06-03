@@ -10,6 +10,7 @@ import net.minecraftforge.common.util.Constants;
  * @author Ocelot
  * @since 2.1.0
  */
+@SuppressWarnings("unused")
 public class LongValueContainerEntry extends NumberValueContainerEntry<Long>
 {
     private final ITextComponent displayName;

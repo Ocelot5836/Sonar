@@ -7,13 +7,13 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
@@ -25,7 +25,8 @@ import java.util.function.Consumer;
  * @see Future
  * @since 2.0.0
  */
-public class OnlineRequest
+@SuppressWarnings("unused")
+public final class OnlineRequest
 {
     private static final ExecutorService POOL = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), task -> new Thread(task, "Online Request Pool"));
     private static String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
@@ -81,6 +82,7 @@ public class OnlineRequest
      * <p>Adds a new request to the queue.</p>
      * <p>The supplied callback will be called when a result is received and no error is thrown.</p>
      * <p>If the stream needs to be saved for later, use {@link IOUtils#toBufferedInputStream(InputStream)} to make a copy. The stream <b><i>WILL NOT PERSIST AFTER THE CALLBACK IS CALLED!</i></b></p>
+     * <p>The data may be incomplete if {@link Request#cancel()} was called</p>
      * <p>If the error callback is not null and an error is thrown, the callback <b><i>WILL NOT BE CALLED</i></b> and the exception will be passed into the error callback.</p>
      *
      * @param url           the URL to make a request to
@@ -131,7 +133,7 @@ public class OnlineRequest
         private volatile long fileSize;
         private volatile long bytesReceived;
         private volatile long startTime;
-        private final AtomicBoolean cancelled;
+        private volatile boolean cancelled;
 
         private Request(String url, Consumer<InputStream> listener)
         {
@@ -140,15 +142,15 @@ public class OnlineRequest
             this.fileSize = 0;
             this.bytesReceived = 0;
             this.startTime = 0;
-            this.cancelled = new AtomicBoolean(false);
+            this.cancelled = false;
         }
 
         /**
          * Cancels the HTTP operation before is starts or cancels byte reading if already being processed.
          */
-        public void cancel()
+        public synchronized void cancel()
         {
-            this.cancelled.set(true);
+            this.cancelled = true;
         }
 
         /**
@@ -204,7 +206,7 @@ public class OnlineRequest
          */
         public boolean isCancelled()
         {
-            return cancelled.get();
+            return cancelled;
         }
 
         /* Internal methods */
@@ -245,13 +247,13 @@ public class OnlineRequest
         }
 
         @Override
-        public int read(byte b[]) throws IOException
+        public int read(@Nonnull byte[] b) throws IOException
         {
             return this.request.isCancelled() ? -1 : this.parent.read(b);
         }
 
         @Override
-        public int read(byte b[], int off, int len) throws IOException
+        public int read(@Nonnull byte[] b, int off, int len) throws IOException
         {
             return this.request.isCancelled() ? -1 : this.parent.read(b, off, len);
         }

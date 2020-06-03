@@ -25,6 +25,7 @@ import java.util.function.Supplier;
  * @see ValueContainer
  * @since 2.2.0
  */
+@SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
 public abstract class ValueContainerEditorScreen extends Screen
 {

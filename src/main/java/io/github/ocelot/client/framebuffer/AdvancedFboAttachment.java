@@ -10,6 +10,7 @@ import org.lwjgl.system.NativeResource;
  * @author Ocelot
  * @since 2.4.0
  */
+@SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
 public interface AdvancedFboAttachment extends NativeResource
 {

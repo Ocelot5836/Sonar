@@ -19,6 +19,7 @@ import java.util.function.Predicate;
  * @author Ocelot
  * @since 2.1.0
  */
+@SuppressWarnings("unused")
 public class VectorValueContainerEntry implements ValueContainerEntry<Vec3d>, TextFieldEntry
 {
     private final ITextComponent displayName;

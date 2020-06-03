@@ -19,8 +19,9 @@ import static org.lwjgl.opengl.GL11C.*;
  * @see GL11C <a target="_blank" href="http://docs.gl/gl4/glScissor">OpenGL Scissor Test Reference Page</a>
  * @since 2.0.0
  */
+@SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
-public class ScissorHelper
+public final class ScissorHelper
 {
     private static final Stack<Entry> stack = new Stack<>();
     private static boolean scissor = glGetBoolean(GL_SCISSOR_TEST);

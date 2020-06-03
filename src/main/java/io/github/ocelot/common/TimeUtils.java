@@ -10,7 +10,8 @@ import static java.util.concurrent.TimeUnit.*;
  * @author Ocelot
  * @since 3.0.0
  */
-public class TimeUtils
+@SuppressWarnings("unused")
+public final class TimeUtils
 {
     /**
      * Abbreviates the provided time into the largest unit over zero.

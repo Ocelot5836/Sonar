@@ -11,8 +11,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @see FontRenderer
  * @since 2.2.0
  */
+@SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
-public class FontHelper
+public final class FontHelper
 {
     /**
      * Draws the specified string of text.

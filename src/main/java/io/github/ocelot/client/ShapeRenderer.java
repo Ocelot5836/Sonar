@@ -18,8 +18,9 @@ import static org.lwjgl.opengl.GL11C.GL_QUADS;
  * @author Ocelot
  * @since 2.0.0
  */
+@SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
-public class ShapeRenderer
+public final class ShapeRenderer
 {
     private ShapeRenderer() {}
 

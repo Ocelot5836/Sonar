@@ -13,6 +13,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author Ocelot
  * @since 2.2.0
  */
+@SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
 public class ValueContainerEntryButtonImpl extends AbstractButton
 {

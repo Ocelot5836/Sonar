@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
  * @author Ocelot
  * @since 2.8.0
  */
+@SuppressWarnings("unused")
 public class SpawnEggItemBase<T extends Entity> extends SpawnEggItem
 {
     private final RegistryObject<EntityType<T>> type;
