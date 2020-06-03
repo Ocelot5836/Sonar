@@ -91,7 +91,7 @@ public final class VoxelShapeHelper
      *
      * @author Ocelot
      * @see VoxelShape
-     * @since 0.2.0
+     * @since 2.0.0
      */
     public static final class Builder
     {
