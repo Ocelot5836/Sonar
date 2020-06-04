@@ -12,6 +12,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.PacketDistributor;
 
+/**
+ * @author Ocelot
+ */
 public class TestValueContainerEditorItem extends Item
 {
     public TestValueContainerEditorItem(Item.Properties properties)
@@ -27,7 +30,7 @@ public class TestValueContainerEditorItem extends Item
         PlayerEntity player = context.getPlayer();
         if (player != null && player.isCreative())
         {
-            if (world.getTileEntity(pos) instanceof ValueContainer)
+            if (world.getBlockState(pos).getBlock() instanceof ValueContainer || world.getTileEntity(pos) instanceof ValueContainer)
             {
                 if (!world.isRemote())
                     TestMessageHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), new DisplayScreenMessage(DisplayScreenMessage.GuiType.VALUE_CONTAINER_EDITOR, pos));

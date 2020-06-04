@@ -2,6 +2,7 @@ package io.github.ocelot.block;
 
 import io.github.ocelot.common.BaseBlock;
 import io.github.ocelot.common.VoxelShapeHelper;
+import io.github.ocelot.common.valuecontainer.BooleanValueContainerEntry;
 import io.github.ocelot.common.valuecontainer.ValueContainer;
 import io.github.ocelot.common.valuecontainer.ValueContainerEntry;
 import net.minecraft.block.Block;
@@ -12,6 +13,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -36,13 +38,12 @@ public class TestStateBlock extends BaseBlock implements IWaterLoggable, ValueCo
     @Override
     public void getEntries(World world, BlockPos pos, List<ValueContainerEntry<?>> entries)
     {
-        
+        entries.add(new BooleanValueContainerEntry(new StringTextComponent("test"), "test", true));
     }
 
     @Override
     public void readEntries(World world, BlockPos pos, Map<String, ValueContainerEntry<?>> entries)
     {
-
     }
 
     @Override

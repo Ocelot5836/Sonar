@@ -4,6 +4,7 @@ import io.github.ocelot.common.valuecontainer.SyncValueContainerMessage;
 import io.github.ocelot.common.valuecontainer.ValueContainer;
 import io.github.ocelot.common.valuecontainer.ValueContainerEntry;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.Widget;
@@ -69,21 +70,36 @@ public abstract class ValueContainerEditorScreen extends Screen
      */
     protected abstract void renderForeground(int mouseX, int mouseY, float partialTicks);
 
+    /**
+     * Ticks the specified child element if it needs ticking.
+     *
+     * @param child The child to tick
+     */
+    protected void tickChild(IGuiEventListener child)
+    {
+        if (child instanceof TextFieldWidget)
+        {
+            ((TextFieldWidget) child).tick();
+        }
+    }
+
+    /**
+     * @return Whether or not this screen is able to stay open
+     */
+    protected boolean shouldStayOpen()
+    {
+        return this.minecraft == null || this.minecraft.world == null || this.minecraft.world.getBlockState(this.pos).getBlock() instanceof ValueContainer || this.minecraft.world.getTileEntity(this.pos) instanceof ValueContainer;
+    }
+
     @Override
     public void tick()
     {
         if (this.minecraft == null || this.minecraft.player == null || this.minecraft.world == null)
             return;
 
-        this.children.forEach(child ->
-        {
-            if (child instanceof TextFieldWidget)
-            {
-                ((TextFieldWidget) child).tick();
-            }
-        });
+        this.children.forEach(this::tickChild);
 
-        if (!(this.minecraft.world.getTileEntity(this.pos) instanceof ValueContainer))
+        if (!this.shouldStayOpen())
         {
             this.minecraft.player.closeScreen();
         }
