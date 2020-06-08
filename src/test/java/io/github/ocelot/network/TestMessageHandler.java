@@ -1,10 +1,10 @@
 package io.github.ocelot.network;
 
-import io.github.ocelot.common.valuecontainer.SyncValueContainerMessage;
-import io.github.ocelot.network.handler.ClientMessageHandler;
-import io.github.ocelot.network.handler.MessageHandler;
-import io.github.ocelot.network.handler.ServerMessageHandler;
 import io.github.ocelot.TestMod;
+import io.github.ocelot.common.valuecontainer.DefaultValueContainerClientFunctionality;
+import io.github.ocelot.common.valuecontainer.DefaultValueContainerServerFunctionality;
+import io.github.ocelot.common.valuecontainer.OpenValueContainerMessage;
+import io.github.ocelot.common.valuecontainer.SyncValueContainerMessage;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -24,17 +24,12 @@ public class TestMessageHandler
 
     public static void init()
     {
-        registerMessage(DisplayScreenMessage.class, DisplayScreenMessage::encode, DisplayScreenMessage::decode, (msg, ctx) -> getHandler(ctx).handleOpenGuiMessage(msg, ctx));
-        registerMessage(SyncValueContainerMessage.class, SyncValueContainerMessage::encode, SyncValueContainerMessage::decode, (msg, ctx) -> getHandler(ctx).handleSyncValueContainerMessage(msg, ctx));
+        registerMessage(OpenValueContainerMessage.class, OpenValueContainerMessage::encode, OpenValueContainerMessage::decode, DefaultValueContainerClientFunctionality::handleOpenGuiMessage);
+        registerMessage(SyncValueContainerMessage.class, SyncValueContainerMessage::encode, SyncValueContainerMessage::decode, DefaultValueContainerServerFunctionality::handleSyncValueContainerMessage);
     }
 
     private static <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder, Function<PacketBuffer, MSG> decoder, BiConsumer<MSG, Supplier<NetworkEvent.Context>> messageConsumer)
     {
         INSTANCE.registerMessage(index++, messageType, encoder, decoder, messageConsumer);
-    }
-
-    private static MessageHandler getHandler(Supplier<NetworkEvent.Context> ctx)
-    {
-        return ctx.get().getDirection().getReceptionSide().isClient() ? ClientMessageHandler.INSTANCE : ServerMessageHandler.INSTANCE;
     }
 }

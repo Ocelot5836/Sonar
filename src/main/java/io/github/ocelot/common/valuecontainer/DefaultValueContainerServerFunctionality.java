@@ -1,32 +1,36 @@
-package io.github.ocelot.network.handler;
+package io.github.ocelot.common.valuecontainer;
 
-import io.github.ocelot.common.valuecontainer.SyncValueContainerMessage;
-import io.github.ocelot.common.valuecontainer.ValueContainer;
-import io.github.ocelot.TestMod;
-import io.github.ocelot.network.DisplayScreenMessage;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.function.Supplier;
 
-public class ServerMessageHandler implements MessageHandler
+/**
+ * <p>Helps with creating a {@link ValueContainer} framework.</p>
+ *
+ * @author Ocelot
+ * @since 3.1.0
+ */
+public class DefaultValueContainerServerFunctionality
 {
-    public static final MessageHandler INSTANCE = new ServerMessageHandler();
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    private ServerMessageHandler() {}
-
-    @Override
-    public void handleOpenGuiMessage(DisplayScreenMessage msg, Supplier<NetworkEvent.Context> ctx)
+    /**
+     * Handles receiving the {@link SyncValueContainerMessage} for the default implementation.
+     *
+     * @param msg The message received
+     * @param ctx The network context
+     */
+    public static void handleSyncValueContainerMessage(SyncValueContainerMessage msg, Supplier<NetworkEvent.Context> ctx)
     {
-        throw new UnsupportedOperationException("Server cannot open a GUI");
-    }
+        if (ctx.get().getDirection().getReceptionSide().isClient())
+            return;
 
-    @Override
-    public void handleSyncValueContainerMessage(SyncValueContainerMessage msg, Supplier<NetworkEvent.Context> ctx)
-    {
         ServerPlayerEntity player = ctx.get().getSender();
 
         ctx.get().enqueueWork(() ->
@@ -39,13 +43,13 @@ public class ServerMessageHandler implements MessageHandler
             TileEntity te = world.getTileEntity(pos);
             if (!(te instanceof ValueContainer) && !(world.getBlockState(pos).getBlock() instanceof ValueContainer))
             {
-                TestMod.LOGGER.error("Tile Entity or Block at '" + pos + "' was expected to be a ValueContainer, but it was " + te + "!");
+                LOGGER.error("Tile Entity or Block at '" + pos + "' was expected to be a ValueContainer, but it was " + te + "!");
                 return;
             }
 
             if (!player.canUseCommandBlock())
             {
-                TestMod.LOGGER.error("Player with id " + player.getUniqueID() + " does not have the permission to modify value containers!");
+                LOGGER.error("Player with id " + player.getUniqueID() + " does not have the permission to modify value containers!");
                 return;
             }
 

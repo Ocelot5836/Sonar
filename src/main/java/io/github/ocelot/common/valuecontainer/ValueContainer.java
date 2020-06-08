@@ -11,9 +11,12 @@ import java.util.*;
 
 /**
  * <p>Specifies this block has special parameters that can be modified by clients.</p>
+ * <p>To set up a basic framework, reference {@link DefaultValueContainerServerFunctionality} && {@link DefaultValueContainerClientFunctionality}</p>
  *
  * @author Ocelot
  * @see ValueContainerEntry
+ * @see DefaultValueContainerServerFunctionality
+ * @see DefaultValueContainerClientFunctionality
  * @since 2.1.0
  */
 public interface ValueContainer

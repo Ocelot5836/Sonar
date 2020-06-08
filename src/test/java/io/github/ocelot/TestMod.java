@@ -2,8 +2,9 @@ package io.github.ocelot;
 
 import io.github.ocelot.block.TestBlock;
 import io.github.ocelot.block.TestStateBlock;
-import io.github.ocelot.client.render.TestTileEntityRenderer;
-import io.github.ocelot.item.TestValueContainerEditorItem;
+import io.github.ocelot.client.TestClientInit;
+import io.github.ocelot.common.item.ValueContainerEditorItem;
+import io.github.ocelot.common.valuecontainer.OpenValueContainerMessage;
 import io.github.ocelot.network.TestMessageHandler;
 import io.github.ocelot.tileentity.TestTileEntity;
 import net.minecraft.block.Block;
@@ -15,11 +16,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.RegistryObject;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
@@ -48,7 +49,7 @@ public class TestMod
     public static final RegistryObject<TestStateBlock> TEST_STATE_BLOCK = BLOCKS.register("test_state", () -> new TestStateBlock(Block.Properties.from(Blocks.IRON_BLOCK)));
     public static final RegistryObject<BlockItem> TEST_BLOCK_ITEM = ITEMS.register("test", () -> new BlockItem(TEST_BLOCK.get(), new Item.Properties().group(TEST_GROUP)));
     public static final RegistryObject<BlockItem> TEST_STATE_BLOCK_ITEM = ITEMS.register("test_state", () -> new BlockItem(TEST_STATE_BLOCK.get(), new Item.Properties().group(TEST_GROUP)));
-    public static final RegistryObject<Item> TEST_EDITOR_ITEM = ITEMS.register("test_value_container_editor", () -> new TestValueContainerEditorItem(new Item.Properties().group(TEST_GROUP)));
+    public static final RegistryObject<Item> TEST_EDITOR_ITEM = ITEMS.register("test_value_container_editor", () -> new ValueContainerEditorItem(new Item.Properties().group(TEST_GROUP), (player, pos) -> TestMessageHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new OpenValueContainerMessage(pos))));
 
     public static final RegistryObject<TileEntityType<TestTileEntity>> TEST_TILE_ENTITY = TILE_ENTITIES.register("test", () -> TileEntityType.Builder.create(TestTileEntity::new, TEST_BLOCK.get()).build(null));
 
@@ -69,6 +70,6 @@ public class TestMod
 
     private void initClient(FMLClientSetupEvent event)
     {
-        ClientRegistry.bindTileEntityRenderer(TEST_TILE_ENTITY.get(), TestTileEntityRenderer::new);
+        TestClientInit.init();
     }
 }
