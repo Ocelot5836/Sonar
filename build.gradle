@@ -102,11 +102,13 @@ jar {
                 'FMLModType': 'LIBRARY'
         )
     }
+    from sourceSets.main.resources
 }
 
 task apiJar(type: Jar) {
     classifier = "api"
     from sourceSets.main.output
+    from sourceSets.main.resources
 
     // TODO: when FG bug is fixed, remove allJava from the api jar.
     // https://github.com/MinecraftForge/ForgeGradle/issues/369
