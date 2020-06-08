@@ -102,7 +102,6 @@ jar {
                 'FMLModType': 'LIBRARY'
         )
     }
-    from sourceSets.main.resources
 }
 
 task apiJar(type: Jar) {

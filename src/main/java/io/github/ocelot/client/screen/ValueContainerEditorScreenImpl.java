@@ -33,7 +33,6 @@ import java.util.function.Supplier;
 @OnlyIn(Dist.CLIENT)
 public abstract class ValueContainerEditorScreenImpl extends ValueContainerEditorScreen
 {
-    public static final ResourceLocation DEFAULT_TEXTURE = new ResourceLocation("fishlib", "textures/gui/value_container_editor.png");
     public static final double MAX_SCROLL = 2f;
     public static final int WIDTH = 176;
     public static final int HEIGHT = 166;
@@ -251,8 +250,5 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     /**
      * @return The location of the image that should be used for the background of the screen
      */
-    public ResourceLocation getBackgroundTextureLocation()
-    {
-        return DEFAULT_TEXTURE;
-    }
+    public abstract ResourceLocation getBackgroundTextureLocation();
 }
