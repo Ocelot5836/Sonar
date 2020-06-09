@@ -187,7 +187,7 @@ public abstract class NumberValueContainerEntry<T extends Number> implements Val
     {
         return s ->
         {
-            if (!entry.isValid(s))
+            if ((!StringUtils.isEmpty(s) && !NumberUtils.isCreatable(s)) || !entry.isValid(s))
                 return false;
             try
             {
