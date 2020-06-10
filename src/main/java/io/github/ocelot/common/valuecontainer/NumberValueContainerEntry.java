@@ -185,19 +185,6 @@ public abstract class NumberValueContainerEntry<T extends Number> implements Val
      */
     public static Predicate<String> createDefaultValidator(NumberValueContainerEntry<?> entry)
     {
-        return s ->
-        {
-            if ((!StringUtils.isEmpty(s) && !NumberUtils.isCreatable(s)) || !entry.isValid(s))
-                return false;
-            try
-            {
-                entry.parse(s);
-                return true;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-        };
+        return s -> (!StringUtils.isEmpty(s) && !NumberUtils.isCreatable(s)) || !entry.isValid(s);
     }
 }
