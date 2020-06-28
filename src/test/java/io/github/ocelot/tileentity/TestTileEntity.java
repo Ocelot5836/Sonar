@@ -1,7 +1,9 @@
 package io.github.ocelot.tileentity;
 
-import io.github.ocelot.common.valuecontainer.*;
 import io.github.ocelot.TestMod;
+import io.github.ocelot.common.valuecontainer.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
@@ -13,7 +15,10 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.loot.LootTables;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -57,12 +62,13 @@ public class TestTileEntity extends TileEntity implements ValueContainer
     @Override
     public void getEntries(World world, BlockPos pos, List<ValueContainerEntry<?>> entries)
     {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 512; i++)
         {
             entries.add(new StringValueContainerEntry(new StringTextComponent(EnchantmentNameParts.getInstance().generateNewRandomName(Objects.requireNonNull(Minecraft.getInstance().getFontResourceManager().getFontRenderer(Minecraft.standardGalacticFontRenderer)), 64)), Integer.toString(i), "Epic Value btw"));
             entries.add(new FloatValueContainerEntry(new StringTextComponent("Float " + i), "test" + i, i));
-            entries.add(new BooleanValueContainerEntry(new StringTextComponent("Boolean " + i), "bool" + i, false));
-            entries.add(new ResourceLocationValueContainerEntry(new StringTextComponent("Resource Loc " + i), "resource loc " + i, LootTables.EMPTY));
+            entries.add(new BooleanValueContainerEntry(new StringTextComponent("Boolean " + i), "bool" + i, false).setToggle(i % 3 != 0));
+            entries.add(new ResourceLocationValueContainerEntry(new StringTextComponent("Resource Location " + i), "resourceLocation" + i, LootTables.EMPTY));
+            entries.add(new RegistryObjectValueContainerEntry<>(new StringTextComponent("Block " + i), "block" + i, ForgeRegistries.BLOCKS, Blocks.ACACIA_PLANKS));
         }
     }
 
@@ -72,6 +78,7 @@ public class TestTileEntity extends TileEntity implements ValueContainer
         System.out.println(entries);
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public Optional<ITextComponent> getTitle(World world, BlockPos pos)
     {
