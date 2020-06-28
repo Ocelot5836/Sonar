@@ -61,7 +61,7 @@ public class BooleanValueContainerEntry implements ValueContainerEntry<Boolean>,
     @Override
     public boolean isDirty()
     {
-        return this.value != this.previousValue;
+        return this.value.booleanValue() != this.previousValue.booleanValue();
     }
 
     @Override
