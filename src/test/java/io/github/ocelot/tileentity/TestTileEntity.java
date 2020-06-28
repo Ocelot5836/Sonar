@@ -63,7 +63,7 @@ public class TestTileEntity extends TileEntity implements ValueContainer
     @Override
     public void getEntries(World world, BlockPos pos, List<ValueContainerEntry<?>> entries)
     {
-        for (int i = 0; i < 512; i++)
+        for (int i = 0; i < 4096; i++)
         {
             entries.add(new StringValueContainerEntry(new StringTextComponent(EnchantmentNameParts.getInstance().generateNewRandomName(Objects.requireNonNull(Minecraft.getInstance().getFontResourceManager().getFontRenderer(Minecraft.standardGalacticFontRenderer)), 64)), Integer.toString(i), "Epic Value btw"));
             entries.add(new FloatValueContainerEntry(new StringTextComponent("Float " + i), "test" + i, i));
