@@ -95,13 +95,13 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
                     TextFieldWidget textField = new TextFieldWidget(this.getMinecraft().fontRenderer, 8, 22 + this.getMinecraft().fontRenderer.FONT_HEIGHT + i * VALUE_HEIGHT, 144, 20, "");
                     textField.setMaxStringLength(Integer.MAX_VALUE);
                     textField.setText(entry.getDisplay());
-                    optional.ifPresent(validator -> textField.setResponder(text ->
+                    textField.setResponder(text ->
                     {
-                        boolean valid = validator.test(text);
+                        boolean valid = !optional.isPresent() || optional.get().test(text);
                         textField.setTextColor(valid ? 14737632 : 16733525);
                         if (valid)
                             entry.parse(text);
-                    }));
+                    });
                     this.entryWidgets.add(textField);
                     break;
                 }
