@@ -2,6 +2,8 @@ package io.github.ocelot.common.valuecontainer;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
@@ -88,12 +90,14 @@ public class StringValueContainerEntry implements ValueContainerEntry<String>
         this.value = nbt.contains(this.getName(), Constants.NBT.TAG_STRING) ? nbt.getString(this.getName()) : this.previousValue;
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void parse(String data)
     {
         this.value = data;
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public Optional<Predicate<String>> getValidator()
     {
@@ -105,8 +109,10 @@ public class StringValueContainerEntry implements ValueContainerEntry<String>
      *
      * @param validator The new validator value or null for no validator
      */
-    public void setValidator(@Nullable Predicate<String> validator)
+    @OnlyIn(Dist.CLIENT)
+    public StringValueContainerEntry setValidator(@Nullable Predicate<String> validator)
     {
         this.validator = validator;
+        return this;
     }
 }

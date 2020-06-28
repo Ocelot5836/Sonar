@@ -22,6 +22,7 @@ public class BooleanValueContainerEntry implements ValueContainerEntry<Boolean>,
     private final Boolean previousValue;
     private Boolean value;
     private Predicate<String> validator;
+    private boolean toggle;
 
     public BooleanValueContainerEntry(ITextComponent displayName, String name, boolean value)
     {
@@ -30,6 +31,7 @@ public class BooleanValueContainerEntry implements ValueContainerEntry<Boolean>,
         this.previousValue = value;
         this.value = value;
         this.validator = createDefaultValidator();
+        this.toggle = true;
     }
 
     @Override
@@ -47,7 +49,7 @@ public class BooleanValueContainerEntry implements ValueContainerEntry<Boolean>,
     @Override
     public InputType getInputType()
     {
-        return InputType.TOGGLE;
+        return this.toggle ? InputType.TOGGLE : InputType.TEXT_FIELD;
     }
 
     @SuppressWarnings("unchecked")
@@ -87,9 +89,10 @@ public class BooleanValueContainerEntry implements ValueContainerEntry<Boolean>,
      *
      * @param validator The new validator value or null for no validator
      */
-    public void setValidator(@Nullable Predicate<String> validator)
+    public BooleanValueContainerEntry setValidator(@Nullable Predicate<String> validator)
     {
         this.validator = validator;
+        return this;
     }
 
     @Override
@@ -114,6 +117,17 @@ public class BooleanValueContainerEntry implements ValueContainerEntry<Boolean>,
     public boolean isToggled()
     {
         return this.value;
+    }
+
+    /**
+     * Sets whether or not this entry should appear as a text area or a toggle button.
+     *
+     * @param toggle The new button value
+     */
+    public BooleanValueContainerEntry setToggle(boolean toggle)
+    {
+        this.toggle = toggle;
+        return this;
     }
 
     /**

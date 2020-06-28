@@ -15,6 +15,8 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.List;
 import java.util.Map;
@@ -48,9 +50,10 @@ public class TestStateBlock extends BaseBlock implements IWaterLoggable, ValueCo
     {
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public Optional<ITextComponent> getTitle(World world, BlockPos pos)
     {
-        return Optional.empty();
+        return Optional.of(this.getNameTextComponent());
     }
 }

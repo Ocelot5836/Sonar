@@ -1,5 +1,7 @@
 package io.github.ocelot.common.valuecontainer;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -154,6 +156,7 @@ public abstract class NumberValueContainerEntry<T extends Number> implements Val
         return this;
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public Optional<Predicate<String>> getValidator()
     {
@@ -165,9 +168,11 @@ public abstract class NumberValueContainerEntry<T extends Number> implements Val
      *
      * @param validator The new validator value or null for no validator
      */
-    public void setValidator(@Nullable Predicate<String> validator)
+    @OnlyIn(Dist.CLIENT)
+    public NumberValueContainerEntry<T> setValidator(@Nullable Predicate<String> validator)
     {
         this.validator = validator;
+        return this;
     }
 
     /**
@@ -176,6 +181,7 @@ public abstract class NumberValueContainerEntry<T extends Number> implements Val
      * @param entry The entry to create the validator for
      * @return A new predicate that will be used for text area parsing
      */
+    @OnlyIn(Dist.CLIENT)
     public static Predicate<String> createDefaultValidator(NumberValueContainerEntry<?> entry)
     {
         return s -> !StringUtils.isEmpty(s.trim()) && NumberUtils.isCreatable(s.trim());

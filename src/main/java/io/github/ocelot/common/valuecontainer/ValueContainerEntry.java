@@ -2,6 +2,8 @@ package io.github.ocelot.common.valuecontainer;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -53,6 +55,7 @@ public interface ValueContainerEntry<T>
     /**
      * @return The validator or null for no validator to be used
      */
+    @OnlyIn(Dist.CLIENT)
     Optional<Predicate<String>> getValidator();
 
     /**

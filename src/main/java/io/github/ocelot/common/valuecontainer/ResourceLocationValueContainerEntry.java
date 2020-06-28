@@ -3,6 +3,8 @@ package io.github.ocelot.common.valuecontainer;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
@@ -95,6 +97,7 @@ public class ResourceLocationValueContainerEntry implements ValueContainerEntry<
         this.value = new ResourceLocation(data);
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public Optional<Predicate<String>> getValidator()
     {
@@ -106,9 +109,11 @@ public class ResourceLocationValueContainerEntry implements ValueContainerEntry<
      *
      * @param validator The new validator value or null for no validator
      */
-    public void setValidator(@Nullable Predicate<String> validator)
+    @OnlyIn(Dist.CLIENT)
+    public ResourceLocationValueContainerEntry setValidator(@Nullable Predicate<String> validator)
     {
         this.validator = validator;
+        return this;
     }
 
     /**
@@ -116,6 +121,7 @@ public class ResourceLocationValueContainerEntry implements ValueContainerEntry<
      *
      * @return A new predicate that will be used for text area parsing
      */
+    @OnlyIn(Dist.CLIENT)
     public static Predicate<String> createDefaultValidator()
     {
         return ResourceLocation::isResouceNameValid;

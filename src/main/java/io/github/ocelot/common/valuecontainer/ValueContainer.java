@@ -5,6 +5,8 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.*;
@@ -60,6 +62,7 @@ public interface ValueContainer
      * @param pos   The pos this container is in
      * @return The title of this container or null to use the default title
      */
+    @OnlyIn(Dist.CLIENT)
     Optional<ITextComponent> getTitle(World world, BlockPos pos);
 
     /**
