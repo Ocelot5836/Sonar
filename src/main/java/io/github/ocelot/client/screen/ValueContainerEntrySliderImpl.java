@@ -9,6 +9,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * <p>A simple implementation of an {@link AbstractSlider} that can be used to modify {@link SliderEntry}.</p>
@@ -53,9 +55,13 @@ public class ValueContainerEntrySliderImpl extends AbstractSlider
     @Override
     protected void applyValue()
     {
+        Optional<Predicate<String>> optional = this.entry.getValidator();
         double sliderValue = this.value * (this.sliderEntry.getMaxSliderValue() - this.sliderEntry.getMinSliderValue()) + this.sliderEntry.getMinSliderValue();
-        if (this.entry.isValid(this.sliderEntry.isDecimal() ? sliderValue : Math.floor(sliderValue)))
-            this.entry.parse(this.sliderEntry.isDecimal() ? sliderValue : Math.floor(sliderValue));
+        String value = String.valueOf(this.sliderEntry.isDecimal() ? sliderValue : Math.floor(sliderValue));
+        if (optional.isPresent() && !optional.get().test(value))
+            return;
+
+        this.entry.parse(value);
     }
 
     /**

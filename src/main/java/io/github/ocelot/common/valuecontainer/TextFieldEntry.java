@@ -8,6 +8,7 @@ import java.util.function.Predicate;
  *
  * @author Ocelot
  * @since 2.1.0
+ * @deprecated TODO remove in 4.0.0
  */
 public interface TextFieldEntry
 {

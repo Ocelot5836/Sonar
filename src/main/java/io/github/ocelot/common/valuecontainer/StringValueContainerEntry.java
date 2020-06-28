@@ -15,7 +15,7 @@ import java.util.function.Predicate;
  * @since 2.1.0
  */
 @SuppressWarnings("unused")
-public class StringValueContainerEntry implements ValueContainerEntry<String>, TextFieldEntry
+public class StringValueContainerEntry implements ValueContainerEntry<String>
 {
     private final ITextComponent displayName;
     private final String name;
@@ -89,15 +89,9 @@ public class StringValueContainerEntry implements ValueContainerEntry<String>, T
     }
 
     @Override
-    public void parse(Object data)
+    public void parse(String data)
     {
-        this.value = (String) data;
-    }
-
-    @Override
-    public boolean isValid(Object data)
-    {
-        return data instanceof String;
+        this.value = data;
     }
 
     @Override

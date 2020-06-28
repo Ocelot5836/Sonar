@@ -4,6 +4,10 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.Constants;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
+import java.util.function.Predicate;
+
 /**
  * <p>A {@link ValueContainerEntry} that supports boolean data types.</p>
  *
@@ -17,6 +21,7 @@ public class BooleanValueContainerEntry implements ValueContainerEntry<Boolean>,
     private final String name;
     private final Boolean previousValue;
     private Boolean value;
+    private Predicate<String> validator;
 
     public BooleanValueContainerEntry(ITextComponent displayName, String name, boolean value)
     {
@@ -24,6 +29,7 @@ public class BooleanValueContainerEntry implements ValueContainerEntry<Boolean>,
         this.name = name;
         this.previousValue = value;
         this.value = value;
+        this.validator = createDefaultValidator();
     }
 
     @Override
@@ -71,6 +77,22 @@ public class BooleanValueContainerEntry implements ValueContainerEntry<Boolean>,
     }
 
     @Override
+    public Optional<Predicate<String>> getValidator()
+    {
+        return Optional.ofNullable(this.validator);
+    }
+
+    /**
+     * Sets the validator to the specified value.
+     *
+     * @param validator The new validator value or null for no validator
+     */
+    public void setValidator(@Nullable Predicate<String> validator)
+    {
+        this.validator = validator;
+    }
+
+    @Override
     public void write(CompoundNBT nbt)
     {
         nbt.putBoolean(this.getName(), this.value);
@@ -83,20 +105,24 @@ public class BooleanValueContainerEntry implements ValueContainerEntry<Boolean>,
     }
 
     @Override
-    public void parse(Object data)
+    public void parse(String data)
     {
-        this.value = data instanceof Boolean ? (Boolean) data : Boolean.parseBoolean(String.valueOf(data));
-    }
-
-    @Override
-    public boolean isValid(Object data)
-    {
-        return data instanceof Boolean || data instanceof String;
+        this.value = Boolean.parseBoolean(data);
     }
 
     @Override
     public boolean isToggled()
     {
         return this.value;
+    }
+
+    /**
+     * Generates the default validator for boolean entries.
+     *
+     * @return A new predicate that will be used for text area parsing
+     */
+    public static Predicate<String> createDefaultValidator()
+    {
+        return s -> "true".equalsIgnoreCase(s) || "false".equalsIgnoreCase(s);
     }
 }

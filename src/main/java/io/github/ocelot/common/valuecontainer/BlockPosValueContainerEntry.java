@@ -8,6 +8,8 @@ import net.minecraftforge.common.util.Constants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.util.function.Predicate;
+
 /**
  * <p>Specifies a {@link ValueContainerEntry} as being for a {@link BlockPos} type</p>
  *
@@ -64,31 +66,12 @@ public class BlockPosValueContainerEntry extends AbstractVectorValueContainerEnt
     }
 
     @Override
-    public void parse(Object data)
+    public void parse(String data)
     {
-        if (data instanceof BlockPos)
-        {
-            this.value = this.clamp((BlockPos) data, this.getMinValue(), this.getMaxValue());
-            return;
-        }
-        if (data instanceof Vec3i)
-        {
-            this.value = this.clamp(new BlockPos((Vec3i) data), this.getMinValue(), this.getMaxValue());
-            return;
-        }
         String[] tokens = String.valueOf(data).split(",");
-        if(tokens.length != 3)
-            return;
-        Number x = StringUtils.isEmpty(tokens[0]) ? 0 : NumberUtils.createNumber(tokens[0]);
-        Number y = StringUtils.isEmpty(tokens[1]) ? 0 : NumberUtils.createNumber(tokens[1]);
-        Number z = StringUtils.isEmpty(tokens[2]) ? 0 : NumberUtils.createNumber(tokens[2]);
+        Number x = NumberUtils.createNumber(tokens[0].trim());
+        Number y = NumberUtils.createNumber(tokens[1].trim());
+        Number z = NumberUtils.createNumber(tokens[2].trim());
         this.value = this.clamp(new BlockPos(x.intValue(), y.intValue(), z.intValue()), this.getMinValue(), this.getMaxValue());
     }
-
-    @Override
-    public boolean isValid(Object data)
-    {
-        return data instanceof Vec3i || data instanceof String;
-    }
-
 }

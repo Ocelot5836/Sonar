@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
+import net.minecraft.world.storage.loot.LootTables;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
@@ -61,6 +62,7 @@ public class TestTileEntity extends TileEntity implements ValueContainer
             entries.add(new StringValueContainerEntry(new StringTextComponent(EnchantmentNameParts.getInstance().generateNewRandomName(Objects.requireNonNull(Minecraft.getInstance().getFontResourceManager().getFontRenderer(Minecraft.standardGalacticFontRenderer)), 64)), Integer.toString(i), "Epic Value btw"));
             entries.add(new FloatValueContainerEntry(new StringTextComponent("Float " + i), "test" + i, i));
             entries.add(new BooleanValueContainerEntry(new StringTextComponent("Boolean " + i), "bool" + i, false));
+            entries.add(new ResourceLocationValueContainerEntry(new StringTextComponent("Resource Loc " + i), "resource loc " + i, LootTables.EMPTY));
         }
     }
 

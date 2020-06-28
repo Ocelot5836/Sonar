@@ -5,7 +5,6 @@ import io.github.ocelot.client.FontHelper;
 import io.github.ocelot.client.ScissorHelper;
 import io.github.ocelot.client.ShapeRenderer;
 import io.github.ocelot.common.ScrollHandler;
-import io.github.ocelot.common.valuecontainer.TextFieldEntry;
 import io.github.ocelot.common.valuecontainer.ValueContainer;
 import io.github.ocelot.common.valuecontainer.ValueContainerEntry;
 import net.minecraft.client.Minecraft;
@@ -82,18 +81,17 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
             {
                 case TEXT_FIELD:
                 {
-                    Optional<Predicate<String>> validator = Optional.empty();
-                    if (entry instanceof TextFieldEntry)
-                        validator = ((TextFieldEntry) entry).getValidator();
+                    Optional<Predicate<String>> optional = entry.getValidator();
                     TextFieldWidget textField = new TextFieldWidget(this.getMinecraft().fontRenderer, 8, 22 + this.getMinecraft().fontRenderer.FONT_HEIGHT + i * VALUE_HEIGHT, 144, 20, this.getFormattedEntryNames().getOrDefault(entry, "missingno"));
                     textField.setMaxStringLength(Integer.MAX_VALUE);
                     textField.setText(entry.getDisplay());
-                    textField.setResponder(text ->
+                    optional.ifPresent(validator -> textField.setResponder(text ->
                     {
-                        if (entry.isValid(text))
+                        boolean valid = validator.test(text);
+                        textField.setTextColor(valid ? 14737632 : 16733525);
+                        if (valid)
                             entry.parse(text);
-                    });
-                    validator.ifPresent(textField::setValidator);
+                    }));
                     this.addButton(textField);
                     break;
                 }

@@ -7,6 +7,9 @@ import net.minecraft.client.resources.I18n;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.util.Optional;
+import java.util.function.Predicate;
+
 /**
  * <p>A simple implementation of an {@link AbstractButton} that can be used to modify {@link ToggleEntry}.</p>
  *
@@ -34,9 +37,13 @@ public class ValueContainerEntryButtonImpl extends AbstractButton
     @Override
     public void onPress()
     {
+        Optional<Predicate<String>> optional = this.entry.getValidator();
+        String value = Boolean.toString(!this.toggled);
+        if (optional.isPresent() && !optional.get().test(value))
+            return;
+        
         this.setToggled(!this.toggled);
-        if (this.entry.isValid(this.toggled))
-            this.entry.parse(this.toggled);
+        this.entry.parse(value);
     }
 
     /**

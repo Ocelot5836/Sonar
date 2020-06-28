@@ -16,7 +16,7 @@ import java.util.function.Predicate;
  * @since 3.1.0
  */
 @SuppressWarnings("unused")
-public abstract class AbstractVectorValueContainerEntry<T> implements ValueContainerEntry<T>, TextFieldEntry
+public abstract class AbstractVectorValueContainerEntry<T> implements ValueContainerEntry<T>
 {
     private final ITextComponent displayName;
     private final String name;
@@ -197,20 +197,13 @@ public abstract class AbstractVectorValueContainerEntry<T> implements ValueConta
     {
         return s ->
         {
-            if (!entry.isValid(s))
-                return false;
             String[] tokens = s.split(",", 4);
-            if (tokens.length > 3)
+            if (tokens.length != 3)
                 return false;
-            for (int i = 0; i < tokens.length; i++)
+            for (String item : tokens)
             {
-                String token = tokens[i].trim();
-                if (StringUtils.isEmpty(token))
-                {
-                    tokens[i] = "0";
-                    continue;
-                }
-                if (!NumberUtils.isCreatable(token))
+                String token = item.trim();
+                if (StringUtils.isEmpty(token) || !NumberUtils.isCreatable(token))
                     return false;
                 if (!allowDecimals)
                 {
@@ -219,16 +212,7 @@ public abstract class AbstractVectorValueContainerEntry<T> implements ValueConta
                         return false;
                 }
             }
-            try
-            {
-                if (tokens.length == 3)
-                    entry.parse(s);
-                return true;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
+            return true;
         };
     }
 }

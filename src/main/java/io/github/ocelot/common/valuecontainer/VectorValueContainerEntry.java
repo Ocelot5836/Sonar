@@ -3,6 +3,7 @@ package io.github.ocelot.common.valuecontainer;
 import net.minecraft.dispenser.IPosition;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.Constants;
 import org.apache.commons.lang3.StringUtils;
@@ -81,31 +82,12 @@ public class VectorValueContainerEntry extends AbstractVectorValueContainerEntry
     }
 
     @Override
-    public void parse(Object data)
+    public void parse(String data)
     {
-        if (data instanceof Vec3d)
-        {
-            this.value = this.clamp((Vec3d) data, this.getMinValue(), this.getMaxValue());
-            return;
-        }
-        if (data instanceof IPosition)
-        {
-            IPosition position = (IPosition) data;
-            this.value = this.clamp(new Vec3d(position.getX(), position.getY(), position.getZ()), this.getMinValue(), this.getMaxValue());
-            return;
-        }
         String[] tokens = String.valueOf(data).split(",");
-        if (tokens.length != 3)
-            return;
-        double x = StringUtils.isEmpty(tokens[0]) ? 0 : NumberUtils.createNumber(tokens[0]).doubleValue();
-        double y = StringUtils.isEmpty(tokens[1]) ? 0 : NumberUtils.createNumber(tokens[1]).doubleValue();
-        double z = StringUtils.isEmpty(tokens[2]) ? 0 : NumberUtils.createNumber(tokens[2]).doubleValue();
-        this.value = this.clamp(new Vec3d(x, y, z), this.getMinValue(), this.getMaxValue());
-    }
-
-    @Override
-    public boolean isValid(Object data)
-    {
-        return data instanceof IPosition || data instanceof String;
+        Number x = NumberUtils.createNumber(tokens[0].trim());
+        Number y = NumberUtils.createNumber(tokens[1].trim());
+        Number z = NumberUtils.createNumber(tokens[2].trim());
+        this.value = this.clamp(new Vec3d(x.doubleValue(), y.doubleValue(), z.doubleValue()), this.getMinValue(), this.getMaxValue());
     }
 }

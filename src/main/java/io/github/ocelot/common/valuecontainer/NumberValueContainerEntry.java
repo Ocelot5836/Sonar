@@ -16,7 +16,7 @@ import java.util.function.Predicate;
  * @since 2.1.0
  */
 @SuppressWarnings("unused")
-public abstract class NumberValueContainerEntry<T extends Number> implements ValueContainerEntry<T>, TextFieldEntry, SliderEntry
+public abstract class NumberValueContainerEntry<T extends Number> implements ValueContainerEntry<T>, SliderEntry
 {
     private final String name;
     private final T minValue;
@@ -114,16 +114,9 @@ public abstract class NumberValueContainerEntry<T extends Number> implements Val
     }
 
     @Override
-    public void parse(Object data)
+    public void parse(String data)
     {
-        String dataString = String.valueOf(data);
-        this.value = this.clamp(data instanceof Number ? this.getValue((Number) data) : this.getValue(NumberUtils.createNumber(StringUtils.isEmpty(dataString) ? "0" : dataString)), this.minValue, this.maxValue);
-    }
-
-    @Override
-    public boolean isValid(Object data)
-    {
-        return data instanceof Number || data instanceof String;
+        this.value = this.clamp(this.getValue(NumberUtils.createNumber(data)), this.minValue, this.maxValue);
     }
 
     @Override
@@ -185,6 +178,6 @@ public abstract class NumberValueContainerEntry<T extends Number> implements Val
      */
     public static Predicate<String> createDefaultValidator(NumberValueContainerEntry<?> entry)
     {
-        return s -> (!StringUtils.isEmpty(s) && !NumberUtils.isCreatable(s)) || !entry.isValid(s);
+        return s -> !StringUtils.isEmpty(s.trim()) && NumberUtils.isCreatable(s.trim());
     }
 }

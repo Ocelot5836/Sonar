@@ -3,6 +3,9 @@ package io.github.ocelot.common.valuecontainer;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
 
+import java.util.Optional;
+import java.util.function.Predicate;
+
 /**
  * <p>Handles the serialization and deserialization of {@link ValueContainer} entries to/from the screen.</p>
  *
@@ -48,6 +51,11 @@ public interface ValueContainerEntry<T>
     String getDisplay();
 
     /**
+     * @return The validator or null for no validator to be used
+     */
+    Optional<Predicate<String>> getValidator();
+
+    /**
      * Writes this entry value to NBT.
      *
      * @param nbt The tag to put data into
@@ -66,15 +74,7 @@ public interface ValueContainerEntry<T>
      *
      * @param data The data to parse
      */
-    void parse(Object data);
-
-    /**
-     * Checks to see if the provided value is valid for this entry.
-     *
-     * @param data The value to test
-     * @return Whether or not the value is a valid entry
-     */
-    boolean isValid(Object data);
+    void parse(String data);
 
     /**
      * <p>The type of input an entry can be.</p>

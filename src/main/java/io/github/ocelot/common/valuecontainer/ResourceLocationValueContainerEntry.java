@@ -16,7 +16,7 @@ import java.util.function.Predicate;
  * @since 2.1.0
  */
 @SuppressWarnings("unused")
-public class ResourceLocationValueContainerEntry implements ValueContainerEntry<ResourceLocation>, TextFieldEntry
+public class ResourceLocationValueContainerEntry implements ValueContainerEntry<ResourceLocation>
 {
     private final ITextComponent displayName;
     private final String name;
@@ -30,7 +30,7 @@ public class ResourceLocationValueContainerEntry implements ValueContainerEntry<
         this.name = name;
         this.previousValue = value;
         this.value = value;
-        this.validator = null;
+        this.validator = createDefaultValidator();
     }
 
     @Override
@@ -90,15 +90,9 @@ public class ResourceLocationValueContainerEntry implements ValueContainerEntry<
     }
 
     @Override
-    public void parse(Object data)
+    public void parse(String data)
     {
-        this.value = data instanceof ResourceLocation ? (ResourceLocation) data : new ResourceLocation(String.valueOf(data));
-    }
-
-    @Override
-    public boolean isValid(Object data)
-    {
-        return data instanceof ResourceLocation || data instanceof String;
+        this.value = new ResourceLocation(data);
     }
 
     @Override
@@ -118,26 +112,12 @@ public class ResourceLocationValueContainerEntry implements ValueContainerEntry<
     }
 
     /**
-     * Generates the default validator for the specified {@link ResourceLocationValueContainerEntry}.
+     * Generates the default validator for boolean entries.
      *
-     * @param entry The entry to create the validator for
      * @return A new predicate that will be used for text area parsing
      */
-    public static Predicate<String> createDefaultValidator(ResourceLocationValueContainerEntry entry)
+    public static Predicate<String> createDefaultValidator()
     {
-        return s ->
-        {
-            if (!ResourceLocation.isResouceNameValid(s))
-                return false;
-            try
-            {
-                entry.parse(s);
-                return true;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-        };
+        return ResourceLocation::isResouceNameValid;
     }
 }
