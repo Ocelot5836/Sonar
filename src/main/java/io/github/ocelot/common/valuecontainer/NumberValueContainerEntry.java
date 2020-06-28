@@ -118,7 +118,7 @@ public abstract class NumberValueContainerEntry<T extends Number> implements Val
     @Override
     public void parse(String data)
     {
-        this.value = this.clamp(this.getValue(NumberUtils.createNumber(data)), this.minValue, this.maxValue);
+        this.value = this.clamp(this.getValue(NumberUtils.createNumber(data.trim())), this.minValue, this.maxValue);
     }
 
     @Override

@@ -2,14 +2,15 @@ package io.github.ocelot.tileentity;
 
 import io.github.ocelot.TestMod;
 import io.github.ocelot.common.valuecontainer.*;
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnchantmentNameParts;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -66,9 +67,11 @@ public class TestTileEntity extends TileEntity implements ValueContainer
         {
             entries.add(new StringValueContainerEntry(new StringTextComponent(EnchantmentNameParts.getInstance().generateNewRandomName(Objects.requireNonNull(Minecraft.getInstance().getFontResourceManager().getFontRenderer(Minecraft.standardGalacticFontRenderer)), 64)), Integer.toString(i), "Epic Value btw"));
             entries.add(new FloatValueContainerEntry(new StringTextComponent("Float " + i), "test" + i, i));
-            entries.add(new BooleanValueContainerEntry(new StringTextComponent("Boolean " + i), "bool" + i, false).setToggle(i % 3 != 0));
+            entries.add(new BooleanValueContainerEntry(new StringTextComponent("Boolean " + i), "bool" + i, i % 2 == 0));
             entries.add(new ResourceLocationValueContainerEntry(new StringTextComponent("Resource Location " + i), "resourceLocation" + i, LootTables.EMPTY));
+            entries.add(new RegistryObjectValueContainerEntry<>(new StringTextComponent("Enchantment " + i), "enchantment" + i, ForgeRegistries.ENCHANTMENTS, Enchantments.BINDING_CURSE));
             entries.add(new RegistryObjectValueContainerEntry<>(new StringTextComponent("Block " + i), "block" + i, ForgeRegistries.BLOCKS, Blocks.ACACIA_PLANKS));
+            entries.add(new RegistryObjectValueContainerEntry<>(new StringTextComponent("Sound Event " + i), "soundevent" + i, ForgeRegistries.SOUND_EVENTS, SoundEvents.BLOCK_BEEHIVE_DROP));
         }
     }
 

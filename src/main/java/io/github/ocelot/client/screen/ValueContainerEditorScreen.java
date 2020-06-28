@@ -14,6 +14,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,6 @@ public abstract class ValueContainerEditorScreen extends Screen
     private final BlockPos pos;
     private final List<ValueContainerEntry<?>> entries;
     private final String formattedTitle;
-    private final Map<ValueContainerEntry<?>, String> formattedEntryNames;
 
     public ValueContainerEditorScreen(ValueContainer container, BlockPos pos, Supplier<ITextComponent> defaultTitle)
     {
@@ -43,8 +43,6 @@ public abstract class ValueContainerEditorScreen extends Screen
         this.pos = pos;
         this.entries = container.getEntries(Minecraft.getInstance().world, pos);
         this.formattedTitle = this.getTitle().getFormattedText();
-        this.formattedEntryNames = new HashMap<>();
-        this.entries.forEach(entry -> this.formattedEntryNames.put(entry, entry.getDisplayName().getFormattedText()));
     }
 
     /**
@@ -213,13 +211,5 @@ public abstract class ValueContainerEditorScreen extends Screen
     public String getFormattedTitle()
     {
         return formattedTitle;
-    }
-
-    /**
-     * @return The map of cached entry names as raw text
-     */
-    public Map<ValueContainerEntry<?>, String> getFormattedEntryNames()
-    {
-        return formattedEntryNames;
     }
 }
