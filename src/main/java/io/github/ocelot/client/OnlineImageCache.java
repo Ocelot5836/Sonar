@@ -90,17 +90,6 @@ public class OnlineImageCache
         return !this.cacheFileData.has(hash) || (this.cacheFileData.get(hash).getAsLong() != -1 && System.currentTimeMillis() - this.cacheFileData.get(hash).getAsLong() > 0);
     }
 
-    private void deleteCache(String hash) throws IOException
-    {
-        Path imageFile = this.cacheFolder.resolve(hash);
-        if (!Files.exists(imageFile))
-            return;
-
-        LOGGER.debug("Deleting '" + hash + "' from cache.");
-        this.cacheFileData.remove(hash);
-        Files.delete(imageFile);
-    }
-
     private boolean loadCache(String hash, ResourceLocation location)
     {
         if (!Files.exists(this.cacheFolder))
@@ -115,7 +104,7 @@ public class OnlineImageCache
 
         SimpleResource.RESOURCE_IO_EXECUTOR.execute(() ->
         {
-            LOGGER.debug("Reading '" + hash + "' from cache.");
+            LOGGER.trace("Reading '" + hash + "' from cache.");
             try (FileInputStream is = new FileInputStream(imageFile.toFile()))
             {
                 NativeImage image = NativeImage.read(is);
@@ -130,7 +119,9 @@ public class OnlineImageCache
                 LOGGER.error("Failed to load image with hash '" + hash + "' from cache. Deleting", e);
                 try
                 {
-                    this.deleteCache(hash);
+                    LOGGER.trace("Deleting '" + hash + "' from cache.");
+                    this.cacheFileData.remove(hash);
+                    Files.delete(imageFile);
                 }
                 catch (IOException e1)
                 {
@@ -144,7 +135,7 @@ public class OnlineImageCache
 
     private void writeCache(String hash, NativeImage image, long expirationDate) throws IOException
     {
-        LOGGER.debug("Writing '" + hash + "' to cache.");
+        LOGGER.trace("Writing '" + hash + "' to cache.");
 
         if (!Files.exists(this.cacheFolder))
             Files.createDirectories(this.cacheFolder);
@@ -207,7 +198,7 @@ public class OnlineImageCache
             return null;
         }
 
-        LOGGER.debug("Requesting image from '" + hash + "'");
+        LOGGER.trace("Requesting image from '" + hash + "'");
         this.requested.add(hash);
         OnlineRequest.make(url, result ->
         {
@@ -252,7 +243,7 @@ public class OnlineImageCache
         {
             if (this.hasTextureExpired(hash))
             {
-                LOGGER.debug("Deleting '" + hash + "' texture.");
+                LOGGER.trace("Deleting '" + hash + "' texture.");
                 Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().deleteTexture(location));
             }
         });
