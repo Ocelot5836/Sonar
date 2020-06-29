@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.NativeImage;
+import net.minecraft.resources.SimpleResource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -32,10 +33,12 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * <p>Loads and caches images from the internet. The cache can be given an expiration time which allows for images to be redownloaded when required.</p>
+ * <p>Textures will also be deleted when not looked at for the specified texture cache time which can be disabled by passing <code>-1</code> as the <code>textureCacheTime</code> in the constructors.</p>
  *
  * @author Ocelot
  * @since 3.1.0
  */
+@SuppressWarnings("unused")
 public class OnlineImageCache
 {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -45,15 +48,24 @@ public class OnlineImageCache
     private final Map<String, ResourceLocation> cache;
     private final Set<String> errored;
     private final Set<String> requested;
+    private final Map<String, Long> textureCache;
+    private final long textureCacheTime;
     private JsonObject cacheFileData;
 
     public OnlineImageCache(String cacheFolderName)
+    {
+        this(cacheFolderName, -1, TimeUnit.MILLISECONDS);
+    }
+
+    public OnlineImageCache(String cacheFolderName, long textureCacheTime, TimeUnit unit)
     {
         this.cacheFolder = Minecraft.getInstance().gameDir.toPath().resolve(cacheFolderName);
         this.cacheFile = this.cacheFolder.resolve("cache.json");
         this.cache = new HashMap<>();
         this.errored = new HashSet<>();
         this.requested = new HashSet<>();
+        this.textureCache = new HashMap<>();
+        this.textureCacheTime = unit.toMillis(textureCacheTime);
 
         try (InputStreamReader is = new InputStreamReader(new FileInputStream(this.cacheFile.toFile())))
         {
@@ -66,6 +78,11 @@ public class OnlineImageCache
         }
 
         MinecraftForge.EVENT_BUS.register(this);
+    }
+
+    private boolean hasTextureExpired(String hash)
+    {
+        return this.textureCacheTime > 0 && !this.textureCache.containsKey(hash) || (System.currentTimeMillis() - this.textureCache.get(hash) > 0);
     }
 
     private boolean hasExpired(String hash)
@@ -84,30 +101,45 @@ public class OnlineImageCache
         Files.delete(imageFile);
     }
 
-    @Nullable
-    private NativeImage loadCache(String hash) throws IOException
+    private boolean loadCache(String hash, ResourceLocation location)
     {
         if (!Files.exists(this.cacheFolder))
-            return null;
+            return false;
 
         Path imageFile = this.cacheFolder.resolve(hash);
         if (!Files.exists(imageFile))
-            return null;
+            return false;
 
         if (this.hasExpired(hash))
-            return null;
+            return false;
 
-        LOGGER.debug("Reading '" + hash + "' from cache.");
-        try (FileInputStream is = new FileInputStream(imageFile.toFile()))
+        SimpleResource.RESOURCE_IO_EXECUTOR.execute(() ->
         {
-            return NativeImage.read(is);
-        }
-        catch (IOException e)
-        {
-            LOGGER.error("Failed to load image with hash '" + hash + "' from cache.", e);
-            this.deleteCache(hash);
-        }
-        return null;
+            LOGGER.debug("Reading '" + hash + "' from cache.");
+            try (FileInputStream is = new FileInputStream(imageFile.toFile()))
+            {
+                NativeImage image = NativeImage.read(is);
+                Minecraft.getInstance().execute(() ->
+                {
+                    Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
+                    this.requested.remove(hash);
+                });
+            }
+            catch (IOException e)
+            {
+                LOGGER.error("Failed to load image with hash '" + hash + "' from cache. Deleting", e);
+                try
+                {
+                    this.deleteCache(hash);
+                }
+                catch (IOException e1)
+                {
+                    LOGGER.error("Failed to delete image with hash '" + hash + "' from cache.", e1);
+                }
+                Minecraft.getInstance().execute(() -> this.requested.remove(hash));
+            }
+        });
+        return true;
     }
 
     private void writeCache(String hash, NativeImage image, long expirationDate) throws IOException
@@ -161,23 +193,18 @@ public class OnlineImageCache
 
         ResourceLocation location = this.cache.computeIfAbsent(hash, ResourceLocation::new);
         if (Minecraft.getInstance().getTextureManager().getTexture(location) != null)
+        {
+            this.textureCache.put(hash, System.currentTimeMillis() + this.textureCacheTime);
             return location;
+        }
 
         if (this.requested.contains(hash))
             return null;
 
-        try
+        if (this.loadCache(hash, location))
         {
-            NativeImage cachedImage = this.loadCache(hash);
-            if (cachedImage != null)
-            {
-                Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(cachedImage));
-                return location;
-            }
-        }
-        catch (IOException e)
-        {
-            LOGGER.error("Failed to load image with hash '" + hash + "' from cache.", e);
+            this.requested.add(hash);
+            return null;
         }
 
         LOGGER.debug("Requesting image from '" + hash + "'");
@@ -191,6 +218,7 @@ public class OnlineImageCache
                 Minecraft.getInstance().execute(() ->
                 {
                     Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
+                    this.textureCache.put(hash, System.currentTimeMillis() + this.textureCacheTime);
                     this.requested.remove(hash);
                 });
             }
@@ -219,13 +247,14 @@ public class OnlineImageCache
     @SubscribeEvent
     public void onEvent(TickEvent.ClientTickEvent event)
     {
+        this.cache.entrySet().removeIf(entry -> Minecraft.getInstance().getTextureManager().getTexture(entry.getValue()) == null);
         this.cache.forEach((hash, location) ->
         {
-            if (this.hasExpired(hash))
+            if (this.hasTextureExpired(hash))
             {
+                LOGGER.debug("Deleting '" + hash + "' texture.");
                 Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().deleteTexture(location));
             }
         });
-        this.cache.entrySet().removeIf(entry -> Minecraft.getInstance().getTextureManager().getTexture(entry.getValue()) == null);
     }
 }
