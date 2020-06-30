@@ -7,6 +7,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 import java.util.function.BiConsumer;
@@ -27,6 +28,19 @@ public class ValueContainerEditorItem extends Item
         this.packetSender = packetSender;
     }
 
+    /**
+     * Whether or not the specified player is permitted to use the value container editor.
+     *
+     * @param world  The world the player is in
+     * @param pos    The position the player clicked
+     * @param player The player to check
+     * @return Whether or not that player can use this container editor
+     */
+    protected boolean canPlayerUse(World world, BlockPos pos, PlayerEntity player)
+    {
+        return player.canUseCommandBlock();
+    }
+
     @Override
     public ActionResultType onItemUse(ItemUseContext context)
     {
@@ -38,7 +52,14 @@ public class ValueContainerEditorItem extends Item
             if (world.getTileEntity(pos) instanceof ValueContainer || world.getBlockState(pos).getBlock() instanceof ValueContainer)
             {
                 if (!world.isRemote())
+                {
+                    if (!this.canPlayerUse(world, pos, player))
+                    {
+                        player.sendStatusMessage(new TranslationTextComponent(this.getTranslationKey(context.getItem()) + ".cannot_edit"), false);
+                        return ActionResultType.SUCCESS;
+                    }
                     this.packetSender.accept((ServerPlayerEntity) player, pos);
+                }
                 return ActionResultType.SUCCESS;
             }
         }
