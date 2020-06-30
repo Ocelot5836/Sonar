@@ -1,7 +1,6 @@
 package io.github.ocelot.client.render;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import io.github.ocelot.client.ShapeRenderer;
 import io.github.ocelot.client.framebuffer.AdvancedFbo;
 import io.github.ocelot.tileentity.TestTileEntity;
 import net.minecraft.client.MainWindow;

@@ -1,7 +1,6 @@
 package io.github.ocelot.common.valuecontainer;
 
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.Constants;

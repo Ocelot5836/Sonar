@@ -3,9 +3,7 @@ package io.github.ocelot;
 import io.github.ocelot.common.OnlineRequest;
 import org.apache.commons.io.IOUtils;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 public class Test
 {

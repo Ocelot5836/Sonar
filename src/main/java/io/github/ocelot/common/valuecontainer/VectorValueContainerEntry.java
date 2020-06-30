@@ -1,18 +1,10 @@
 package io.github.ocelot.common.valuecontainer;
 
-import net.minecraft.dispenser.IPosition;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.Constants;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-
-import javax.annotation.Nullable;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Predicate;
 
 /**
  * <p>Specifies a {@link ValueContainerEntry} as being for a {@link Vec3d} type</p>

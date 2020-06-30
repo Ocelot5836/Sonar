@@ -1,7 +1,6 @@
 package io.github.ocelot.tileentity;
 
 import io.github.ocelot.TestMod;
-import io.github.ocelot.client.screen.ValueContainerEditorScreen;
 import io.github.ocelot.common.valuecontainer.*;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;

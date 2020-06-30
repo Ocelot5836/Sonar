@@ -5,10 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.Constants;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-
-import java.util.function.Predicate;
 
 /**
  * <p>Specifies a {@link ValueContainerEntry} as being for a {@link BlockPos} type</p>
