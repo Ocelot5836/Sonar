@@ -86,6 +86,6 @@ public interface ValueContainerEntry<T>
      */
     enum InputType
     {
-        TEXT_FIELD, TOGGLE, SLIDER
+        TEXT_FIELD, TOGGLE, SWITCH, SLIDER
     }
 }

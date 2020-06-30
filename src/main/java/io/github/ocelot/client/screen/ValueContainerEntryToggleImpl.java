@@ -18,13 +18,13 @@ import java.util.function.Predicate;
  */
 @SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
-public class ValueContainerEntryButtonImpl extends AbstractButton
+public class ValueContainerEntryToggleImpl extends AbstractButton
 {
     private final ValueContainerEntry<?> entry;
     private final ToggleEntry toggleEntry;
     private boolean toggled;
 
-    public ValueContainerEntryButtonImpl(ValueContainerEntry<?> entry, int x, int y, int width, int height)
+    public ValueContainerEntryToggleImpl(ValueContainerEntry<?> entry, int x, int y, int width, int height)
     {
         super(x, y, width, height, "");
         if (!(entry instanceof ToggleEntry))

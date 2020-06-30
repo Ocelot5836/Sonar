@@ -1,6 +1,7 @@
 package io.github.ocelot.tileentity;
 
 import io.github.ocelot.TestMod;
+import io.github.ocelot.client.screen.ValueContainerEditorScreen;
 import io.github.ocelot.common.valuecontainer.*;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -22,10 +23,7 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class TestTileEntity extends TileEntity implements ValueContainer
 {
@@ -72,6 +70,7 @@ public class TestTileEntity extends TileEntity implements ValueContainer
             entries.add(new RegistryObjectValueContainerEntry<>(new StringTextComponent("Enchantment " + i), "enchantment" + i, ForgeRegistries.ENCHANTMENTS, Enchantments.BINDING_CURSE));
             entries.add(new RegistryObjectValueContainerEntry<>(new StringTextComponent("Block " + i), "block" + i, ForgeRegistries.BLOCKS, Blocks.ACACIA_PLANKS));
             entries.add(new RegistryObjectValueContainerEntry<>(new StringTextComponent("Sound Event " + i), "soundevent" + i, ForgeRegistries.SOUND_EVENTS, SoundEvents.BLOCK_BEEHIVE_DROP));
+            entries.add(new ArrayValueContainerEntry<>(new StringTextComponent("Array " + i), "array" + i, ValueContainerEntry.InputType.values()).setDisplayGenerator(side -> side.name().toLowerCase(Locale.ROOT)));
         }
     }
 

@@ -107,7 +107,12 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
                 }
                 case TOGGLE:
                 {
-                    this.entryWidgets.add(new ValueContainerEntryButtonImpl(entry, 8, 22 + this.getMinecraft().fontRenderer.FONT_HEIGHT + i * VALUE_HEIGHT, 144, 20));
+                    this.entryWidgets.add(new ValueContainerEntryToggleImpl(entry, 8, 22 + this.getMinecraft().fontRenderer.FONT_HEIGHT + i * VALUE_HEIGHT, 144, 20));
+                    break;
+                }
+                case SWITCH:
+                {
+                    this.entryWidgets.add(new ValueContainerEntrySwitchImpl(entry, 8, 22 + this.getMinecraft().fontRenderer.FONT_HEIGHT + i * VALUE_HEIGHT, 144, 20));
                     break;
                 }
                 case SLIDER:

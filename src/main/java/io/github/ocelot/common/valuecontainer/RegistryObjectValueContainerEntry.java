@@ -8,7 +8,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -123,7 +122,7 @@ public class RegistryObjectValueContainerEntry<T extends IForgeRegistryEntry<T>>
     }
 
     /**
-     * Generates the default validator for boolean entries.
+     * Generates the default validator for registry object entries.
      *
      * @param entry The type of entry to use the validator for
      * @return A new predicate that will be used for text area parsing
