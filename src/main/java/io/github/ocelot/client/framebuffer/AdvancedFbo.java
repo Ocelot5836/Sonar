@@ -90,6 +90,19 @@ public class AdvancedFbo implements NativeResource
     }
 
     /**
+     * Clears the buffers in this framebuffer.
+     */
+    public void clear()
+    {
+        int mask = 0;
+        if (this.hasColorAttachment(0))
+            mask |= GL_COLOR_BUFFER_BIT;
+        if (this.hasDepthAttachment())
+            mask |= GL_DEPTH_BUFFER_BIT;
+        GlStateManager.clear(mask, Minecraft.IS_RUNNING_ON_MAC);
+    }
+
+    /**
      * Binds this framebuffer for read and draw requests.
      *
      * @param setViewport Whether or not to set the viewport to fit the bounds of this framebuffer
