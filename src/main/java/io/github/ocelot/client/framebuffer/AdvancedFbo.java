@@ -738,8 +738,9 @@ public class AdvancedFbo implements NativeResource
 
         private Wrapper(AdvancedFbo fbo)
         {
-            super(fbo.width, fbo.height, fbo.hasDepthAttachment(), false);
+            super(fbo.width, fbo.height, fbo.hasDepthAttachment(), Minecraft.IS_RUNNING_ON_MAC);
             this.fbo = fbo;
+            this.createBuffers(this.fbo.getWidth(), this.fbo.getHeight(), Minecraft.IS_RUNNING_ON_MAC);
         }
 
         @Override
