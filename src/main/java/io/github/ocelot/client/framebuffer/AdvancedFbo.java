@@ -549,10 +549,11 @@ public class AdvancedFbo implements NativeResource
         {
             for (int i = 0; i < parent.getColorAttachments(); i++)
                 this.colorAttachments.add(parent.getColorAttachment(i).createCopy());
+            this.validateColorSize();
             if (parent.hasDepthAttachment())
             {
                 Validate.isTrue(this.depthAttachment == null, "Only one depth attachment can be applied to an FBO.");
-                this.depthAttachment = parent.getDepthAttachment();
+                this.depthAttachment = parent.getDepthAttachment().createCopy();
             }
             return this;
         }
