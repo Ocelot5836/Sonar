@@ -97,7 +97,6 @@ public class ResourceLocationValueContainerEntry implements ValueContainerEntry<
         this.value = new ResourceLocation(data);
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public Optional<Predicate<String>> getValidator()
     {
@@ -109,7 +108,6 @@ public class ResourceLocationValueContainerEntry implements ValueContainerEntry<
      *
      * @param validator The new validator value or null for no validator
      */
-    @OnlyIn(Dist.CLIENT)
     public ResourceLocationValueContainerEntry setValidator(@Nullable Predicate<String> validator)
     {
         this.validator = validator;
@@ -121,7 +119,6 @@ public class ResourceLocationValueContainerEntry implements ValueContainerEntry<
      *
      * @return A new predicate that will be used for text area parsing
      */
-    @OnlyIn(Dist.CLIENT)
     public static Predicate<String> createDefaultValidator()
     {
         return ResourceLocation::isResouceNameValid;

@@ -108,7 +108,6 @@ public class ArrayValueContainerEntry<T> implements ValueContainerEntry<T>, Swit
         this.index = nbt.contains(this.getName(), Constants.NBT.TAG_ANY_NUMERIC) ? nbt.getInt(this.getName()) : this.previousIndex;
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public void parse(String data)
     {
@@ -118,13 +117,11 @@ public class ArrayValueContainerEntry<T> implements ValueContainerEntry<T>, Swit
     /**
      * @return The function used to create display names
      */
-    @OnlyIn(Dist.CLIENT)
     public Function<T, String> getDisplayGenerator()
     {
         return displayGenerator;
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public Optional<Predicate<String>> getValidator()
     {
@@ -136,7 +133,6 @@ public class ArrayValueContainerEntry<T> implements ValueContainerEntry<T>, Swit
      *
      * @param displayGenerator The function to create display names
      */
-    @OnlyIn(Dist.CLIENT)
     public ArrayValueContainerEntry<T> setDisplayGenerator(@Nullable Function<T, String> displayGenerator)
     {
         this.displayGenerator = displayGenerator;
@@ -148,7 +144,6 @@ public class ArrayValueContainerEntry<T> implements ValueContainerEntry<T>, Swit
      *
      * @param validator The new validator value or null for no validator
      */
-    @OnlyIn(Dist.CLIENT)
     public ArrayValueContainerEntry<T> setValidator(@Nullable Predicate<String> validator)
     {
         this.validator = validator;
@@ -160,7 +155,6 @@ public class ArrayValueContainerEntry<T> implements ValueContainerEntry<T>, Swit
      *
      * @return A new predicate that will be used for text area parsing
      */
-    @OnlyIn(Dist.CLIENT)
     public static Predicate<String> createDefaultValidator()
     {
         return s -> !StringUtils.isEmpty(s.trim()) && NumberUtils.isCreatable(s.trim());

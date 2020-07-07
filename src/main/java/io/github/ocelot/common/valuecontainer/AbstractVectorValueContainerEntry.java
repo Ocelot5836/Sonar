@@ -3,6 +3,7 @@ package io.github.ocelot.common.valuecontainer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.DistExecutor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -172,7 +173,6 @@ public abstract class AbstractVectorValueContainerEntry<T> implements ValueConta
         return this.getX(this.value) + "," + this.getY(this.value) + "," + this.getZ(this.value);
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public Optional<Predicate<String>> getValidator()
     {
@@ -184,7 +184,6 @@ public abstract class AbstractVectorValueContainerEntry<T> implements ValueConta
      *
      * @param validator The new validator value or null for no validator
      */
-    @OnlyIn(Dist.CLIENT)
     public AbstractVectorValueContainerEntry<T> setValidator(@Nullable Predicate<String> validator)
     {
         this.validator = validator;
@@ -198,7 +197,6 @@ public abstract class AbstractVectorValueContainerEntry<T> implements ValueConta
      * @param allowDecimals Whether or not decimal values are allowed
      * @return A new predicate that will be used for text area parsing
      */
-    @OnlyIn(Dist.CLIENT)
     public static Predicate<String> createDefaultValidator(ValueContainerEntry<?> entry, boolean allowDecimals)
     {
         return s ->

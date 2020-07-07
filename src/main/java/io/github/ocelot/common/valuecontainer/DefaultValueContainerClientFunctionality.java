@@ -45,6 +45,7 @@ public class DefaultValueContainerClientFunctionality
      * @param msg The message received
      * @param ctx The network context
      */
+    @OnlyIn(Dist.CLIENT)
     public static void handleOpenGuiMessage(OpenValueContainerMessage msg, Supplier<NetworkEvent.Context> ctx)
     {
         if (screenFactory == null)

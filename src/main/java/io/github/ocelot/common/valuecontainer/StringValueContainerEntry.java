@@ -90,14 +90,12 @@ public class StringValueContainerEntry implements ValueContainerEntry<String>
         this.value = nbt.contains(this.getName(), Constants.NBT.TAG_STRING) ? nbt.getString(this.getName()) : this.previousValue;
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public void parse(String data)
     {
         this.value = data;
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public Optional<Predicate<String>> getValidator()
     {
@@ -109,7 +107,6 @@ public class StringValueContainerEntry implements ValueContainerEntry<String>
      *
      * @param validator The new validator value or null for no validator
      */
-    @OnlyIn(Dist.CLIENT)
     public StringValueContainerEntry setValidator(@Nullable Predicate<String> validator)
     {
         this.validator = validator;

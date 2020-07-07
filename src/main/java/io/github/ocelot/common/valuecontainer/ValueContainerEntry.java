@@ -55,7 +55,6 @@ public interface ValueContainerEntry<T>
     /**
      * @return The validator or null for no validator to be used
      */
-    @OnlyIn(Dist.CLIENT)
     Optional<Predicate<String>> getValidator();
 
     /**

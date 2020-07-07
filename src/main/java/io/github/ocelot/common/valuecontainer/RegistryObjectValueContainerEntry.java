@@ -102,7 +102,6 @@ public class RegistryObjectValueContainerEntry<T extends IForgeRegistryEntry<T>>
         this.value = this.registry.getValue(new ResourceLocation(data));
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public Optional<Predicate<String>> getValidator()
     {
@@ -114,7 +113,6 @@ public class RegistryObjectValueContainerEntry<T extends IForgeRegistryEntry<T>>
      *
      * @param validator The new validator value or null for no validator
      */
-    @OnlyIn(Dist.CLIENT)
     public RegistryObjectValueContainerEntry<T> setValidator(@Nullable Predicate<String> validator)
     {
         this.validator = validator;
@@ -127,7 +125,6 @@ public class RegistryObjectValueContainerEntry<T extends IForgeRegistryEntry<T>>
      * @param entry The type of entry to use the validator for
      * @return A new predicate that will be used for text area parsing
      */
-    @OnlyIn(Dist.CLIENT)
     public static Predicate<String> createDefaultValidator(RegistryObjectValueContainerEntry<?> entry)
     {
         return s ->
