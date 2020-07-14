@@ -209,7 +209,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     public void removed()
     {
         super.removed();
-        this.getMinecraft().keyboardListener.enableRepeatEvents(true);
+        this.getMinecraft().keyboardListener.enableRepeatEvents(false);
     }
 
     @Override
@@ -309,8 +309,14 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int mouseButton, double deltaX, double deltaY)
     {
-        if (super.mouseDragged(mouseX, mouseY, mouseButton, deltaX, deltaY))
-            return true;
+        IGuiEventListener focused = this.getFocused();
+        if (focused != null && this.isDragging() && mouseButton == 0)
+        {
+            if (focused instanceof Widget && this.entryWidgets.contains(focused))
+                return focused.mouseDragged(mouseX - (this.width - this.xSize) / 2f, mouseY - (this.height - this.ySize) / 2f, mouseButton, deltaX, deltaY);
+            if (super.mouseDragged(mouseX, mouseY, mouseButton, deltaX, deltaY))
+                return true;
+        }
         if (this.scrollHandler.getMaxScroll() > 0 && this.scrolling)
             this.scrollHandler.setScroll(this.scrollHandler.getMaxScroll() * (float) MathHelper.clamp((mouseY - (this.height - this.ySize) / 2f - 25) / 128.0, 0.0, 1.0));
         return false;
@@ -321,23 +327,22 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     {
         if (super.mouseScrolled(mouseX, mouseY, amount))
             return true;
-        return this.getEventListenerForPos(mouseX, mouseY).filter(iguieventlistener -> iguieventlistener.mouseScrolled(mouseX, mouseY, amount)).isPresent() || this.scrollHandler.mouseScrolled(MAX_SCROLL, amount);
+        return this.getEventListenerForPos(mouseX, mouseY).filter(iguieventlistener -> iguieventlistener.mouseScrolled(mouseX - (this.width - this.xSize) / 2f, mouseY - (this.height - this.ySize) / 2f, amount)).isPresent() || this.scrollHandler.mouseScrolled(MAX_SCROLL, amount);
     }
 
     @Override
     public boolean changeFocus(boolean p_changeFocus_1_)
     {
         IGuiEventListener iguieventlistener = this.getFocused();
-        boolean flag = iguieventlistener != null;
-        if (flag && iguieventlistener.changeFocus(p_changeFocus_1_))
+        if (iguieventlistener != null && iguieventlistener.changeFocus(p_changeFocus_1_))
         {
             return true;
         }
         else
         {
-            if (changeFocus(p_changeFocus_1_, this.children(), iguieventlistener))
-                return true;
             if (changeFocus(p_changeFocus_1_, this.entryWidgets, iguieventlistener))
+                return true;
+            if (changeFocus(p_changeFocus_1_, this.children(), iguieventlistener))
                 return true;
 
             this.setFocused(null);

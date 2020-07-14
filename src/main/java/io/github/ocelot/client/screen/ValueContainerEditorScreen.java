@@ -148,14 +148,6 @@ public abstract class ValueContainerEditorScreen extends Screen
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int mouseButton)
-    {
-        if (!(this.getFocused() instanceof TextFieldWidget))
-            this.setFocused(null);
-        return super.mouseReleased(mouseX, mouseY, mouseButton);
-    }
-
-    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
     {
         if (!this.getEventListenerForPos(mouseX, mouseY).isPresent() || !super.mouseClicked(mouseX, mouseY, mouseButton))
