@@ -22,19 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class TestStateBlock extends BaseBlock implements IWaterLoggable, ValueContainer
+public class TestStateBlock extends BaseBlock implements ValueContainer
 {
-    private static final VoxelShape SHAPE = new VoxelShapeHelper.Builder().append(Block.makeCuboidShape(4, 0, 4, 12, 8, 12), Block.makeCuboidShape(5, 8, 5, 11, 16, 11)).rotate(Direction.NORTH).build();
-
     public TestStateBlock(Properties properties)
     {
         super(properties);
-    }
-
-    @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
-    {
-        builder.add(WATERLOGGED);
     }
 
     @Override
@@ -43,6 +35,7 @@ public class TestStateBlock extends BaseBlock implements IWaterLoggable, ValueCo
         entries.add(new VectorValueContainerEntry(new StringTextComponent("test"), "test", new Vec3d(0, 1, 0)));
         entries.add(new Vec3iValueContainerEntry(new StringTextComponent("test"), "test", new Vec3i(0, 1, 0)));
         entries.add(new BlockPosValueContainerEntry(new StringTextComponent("test"), "test", new Vec3i(0, 1, 0)));
+        entries.add(new IntValueContainerEntry(new StringTextComponent("test"), "test", 1, 0, 10));
     }
 
     @Override
