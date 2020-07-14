@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 /**
- * <p>Reduces the view of {@link Screen} to just the tooltip rendering portion.</p>
+ * <p>Reduces the view of {@link Screen} to just the tooltip rendering portion. Useful for implementations that wish to have a reduced tooltip rendering view.</p>
  *
  * @author Ocelot
  * @see Screen

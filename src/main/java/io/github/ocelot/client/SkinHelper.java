@@ -23,6 +23,7 @@ import java.util.function.Consumer;
  * @author Ocelot
  * @since 3.1.0
  */
+@SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
 public class SkinHelper
 {
