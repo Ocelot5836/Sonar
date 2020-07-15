@@ -9,6 +9,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -67,7 +68,10 @@ public interface TooltipRenderer
      * @param posY         The y position to render the tooltip at
      * @param fontRenderer The font to use when rendering the text
      */
-    void renderTooltip(String tooltip, int posX, int posY, FontRenderer fontRenderer);
+    default void renderTooltip(String tooltip, int posX, int posY, FontRenderer fontRenderer)
+    {
+        this.renderTooltip(Collections.singletonList(tooltip), posX, posY, fontRenderer);
+    }
 
     /**
      * Renders a tooltip using the specified strings.
