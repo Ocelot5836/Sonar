@@ -29,6 +29,25 @@ public class SlabfishInventory implements IInventory
         this.listeners = null;
     }
 
+    private int getNextEmptySlot()
+    {
+        for (int i = 1; i < this.getSizeInventory(); i++)
+            if (this.inventory.getOrDefault(i, ItemStack.EMPTY).isEmpty())
+                return i;
+        return -1;
+    }
+
+    private void mergeStacks(ItemStack stack, ItemStack stackInSlot)
+    {
+        int maxStackSize = Math.min(this.getInventoryStackLimit(), stackInSlot.getMaxStackSize());
+        int addAmount = Math.min(stack.getCount(), maxStackSize - stackInSlot.getCount());
+        if (addAmount > 0)
+        {
+            stackInSlot.grow(addAmount);
+            stack.shrink(addAmount);
+        }
+    }
+
     /**
      * Adds the specified inventory changed listener.
      *
@@ -55,25 +74,6 @@ public class SlabfishInventory implements IInventory
             this.listeners = null;
     }
 
-    private int getNextEmptySlot()
-    {
-        for (int i = 1; i < this.getSizeInventory(); i++)
-            if (this.inventory.getOrDefault(i, ItemStack.EMPTY).isEmpty())
-                return i;
-        return -1;
-    }
-
-    private void mergeStacks(ItemStack stack, ItemStack stackInSlot)
-    {
-        int maxStackSize = Math.min(this.getInventoryStackLimit(), stackInSlot.getMaxStackSize());
-        int addAmount = Math.min(stack.getCount(), maxStackSize - stackInSlot.getCount());
-        if (addAmount > 0)
-        {
-            stackInSlot.grow(addAmount);
-            stack.shrink(addAmount);
-        }
-    }
-
     /**
      * Adds the specified item to the inventory.
      *
@@ -86,7 +86,7 @@ public class SlabfishInventory implements IInventory
         for (int i = 1; i < this.getSizeInventory(); i++)
         {
             ItemStack stackInSlot = this.getStackInSlot(i);
-            if (ItemStack.areItemsEqual(stackInSlot, copy))
+            if (ItemStack.areItemsEqual(stackInSlot, copy) && ItemStack.areItemStackTagsEqual(stackInSlot, copy))
             {
                 this.mergeStacks(copy, stackInSlot);
                 if (copy.isEmpty())
