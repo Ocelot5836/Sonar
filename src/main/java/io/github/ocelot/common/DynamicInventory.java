@@ -188,12 +188,6 @@ public abstract class DynamicInventory implements IInventory
             listener.onInventoryChanged(this);
     }
 
-    @Override
-    public boolean isItemValidForSlot(int index, ItemStack stack)
-    {
-        return index >= 0 && index < this.getSizeInventory();
-    }
-
     /**
      * Same as {@link IInventory#getInventoryStackLimit()} but used to determine if a stack can be added on a per slot basis.
      *
