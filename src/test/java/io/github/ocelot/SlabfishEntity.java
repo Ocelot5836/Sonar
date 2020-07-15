@@ -1,6 +1,5 @@
 package io.github.ocelot;
 
-import com.google.common.collect.Sets;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.DyeColor;
@@ -10,9 +9,7 @@ import net.minecraft.network.IPacket;
 import net.minecraft.world.World;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class SlabfishEntity extends Entity
 {

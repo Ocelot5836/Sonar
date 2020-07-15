@@ -1,15 +1,15 @@
 package io.github.ocelot;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.IInventoryChangedListener;
-import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.NonNullList;
+import net.minecraft.nbt.ListNBT;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <p>A dynamic inventory that contains items.</p>
@@ -19,13 +19,13 @@ import java.util.List;
 public class SlabfishInventory implements IInventory
 {
     private final SlabfishEntity slabfish;
-    private final NonNullList<ItemStack> inventory;
-    private List<IInventoryChangedListener> listeners;
+    private final Int2ObjectOpenHashMap<ItemStack> inventory;
+    private Set<IInventoryChangedListener> listeners;
 
     public SlabfishInventory(SlabfishEntity slabfish)
     {
         this.slabfish = slabfish;
-        this.inventory = NonNullList.from(ItemStack.EMPTY);
+        this.inventory = new Int2ObjectOpenHashMap<>();
         this.listeners = null;
     }
 
@@ -37,7 +37,7 @@ public class SlabfishInventory implements IInventory
     public void addListener(IInventoryChangedListener listener)
     {
         if (this.listeners == null)
-            this.listeners = new ArrayList<>();
+            this.listeners = new HashSet<>();
         this.listeners.add(listener);
     }
 
@@ -58,7 +58,7 @@ public class SlabfishInventory implements IInventory
     private int getNextEmptySlot()
     {
         for (int i = 1; i < this.getSizeInventory(); i++)
-            if (this.inventory.get(i).isEmpty())
+            if (this.inventory.getOrDefault(i, ItemStack.EMPTY).isEmpty())
                 return i;
         return -1;
     }
@@ -102,11 +102,11 @@ public class SlabfishInventory implements IInventory
         {
             if (copy.getCount() > this.getInventoryStackLimit())
             {
-                this.inventory.set(index, copy.split(this.getInventoryStackLimit()));
+                this.inventory.put(index, copy.split(this.getInventoryStackLimit()));
             }
             else
             {
-                this.inventory.set(index, copy.copy());
+                this.inventory.put(index, copy.copy());
                 copy = ItemStack.EMPTY;
             }
         }
@@ -126,24 +126,21 @@ public class SlabfishInventory implements IInventory
     @Override
     public boolean isEmpty()
     {
-        for (ItemStack stack : this.inventory)
-            if (stack.isEmpty())
-                return false;
-        return true;
+        return this.inventory.isEmpty();
     }
 
     @Override
     public ItemStack getStackInSlot(int index)
     {
-        return index < 0 || index >= this.getSizeInventory() ? ItemStack.EMPTY : this.inventory.get(index);
+        return this.inventory.getOrDefault(index, ItemStack.EMPTY);
     }
 
     @Override
     public ItemStack decrStackSize(int index, int count)
     {
-        if (index < 0 || index >= this.getSizeInventory() || this.inventory.get(index).isEmpty() || count <= 0)
+        if (this.inventory.getOrDefault(index, ItemStack.EMPTY).isEmpty() || count <= 0)
             return ItemStack.EMPTY;
-        ItemStack stack = this.inventory.get(index).split(count);
+        ItemStack stack = this.inventory.getOrDefault(index, ItemStack.EMPTY).split(count);
         this.markDirty();
         return stack;
     }
@@ -151,14 +148,15 @@ public class SlabfishInventory implements IInventory
     @Override
     public ItemStack removeStackFromSlot(int index)
     {
-        ItemStack stack = this.inventory.get(index);
+        if (this.inventory.getOrDefault(index, ItemStack.EMPTY).isEmpty())
+            return ItemStack.EMPTY;
+        ItemStack stack = this.inventory.remove(index);
         if (stack.isEmpty())
         {
             return ItemStack.EMPTY;
         }
         else
         {
-            this.inventory.set(index, ItemStack.EMPTY);
             this.markDirty();
             return stack;
         }
@@ -167,7 +165,9 @@ public class SlabfishInventory implements IInventory
     @Override
     public void setInventorySlotContents(int index, ItemStack stack)
     {
-        this.inventory.set(index, stack);
+        if (index < 0 || index >= this.getSizeInventory())
+            return;
+        this.inventory.put(index, stack);
         if (!stack.isEmpty() && stack.getCount() > this.getInventoryStackLimit())
             stack.setCount(this.getInventoryStackLimit());
         this.markDirty();
@@ -209,7 +209,19 @@ public class SlabfishInventory implements IInventory
      */
     public void write(CompoundNBT nbt)
     {
-        ItemStackHelper.saveAllItems(nbt, this.inventory);
+        ListNBT list = new ListNBT();
+        for (int i = 0; i < this.getSizeInventory(); ++i)
+        {
+            ItemStack stack = this.inventory.getOrDefault(i, ItemStack.EMPTY);
+            if (!stack.isEmpty())
+            {
+                CompoundNBT slotNbt = new CompoundNBT();
+                slotNbt.putByte("Slot", (byte) i);
+                stack.write(slotNbt);
+                list.add(slotNbt);
+            }
+        }
+        nbt.put("Items", list);
     }
 
     /**
@@ -219,6 +231,17 @@ public class SlabfishInventory implements IInventory
      */
     public void read(CompoundNBT nbt)
     {
-        ItemStackHelper.loadAllItems(nbt, this.inventory);
+        this.clear();
+
+        ListNBT list = nbt.getList("Items", 10);
+        for (int i = 0; i < list.size(); ++i)
+        {
+            CompoundNBT slotNbt = list.getCompound(i);
+            int index = slotNbt.getByte("Slot") & 255;
+            if (index < this.getSizeInventory())
+            {
+                this.inventory.put(index, ItemStack.read(slotNbt));
+            }
+        }
     }
 }
