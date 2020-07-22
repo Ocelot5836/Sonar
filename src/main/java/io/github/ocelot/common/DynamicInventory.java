@@ -28,9 +28,9 @@ public abstract class DynamicInventory implements IInventory
         this.listeners = null;
     }
 
-    private int getNextEmptySlot(ItemStack stack)
+    private int getNextEmptySlot(ItemStack stack, int loopStart, int loopEnd)
     {
-        for (int i = 0; i < this.getSizeInventory(); i++)
+        for (int i = loopStart; i < loopEnd; i++)
             if (this.isItemValidForSlot(i, stack) && this.inventory.getOrDefault(i, ItemStack.EMPTY).isEmpty())
                 return i;
         return -1;
@@ -94,8 +94,10 @@ public abstract class DynamicInventory implements IInventory
      */
     public ItemStack addItem(ItemStack stack, int startIndex, int endIndex)
     {
+        int loopStart = Math.max(0, startIndex);
+        int loopEnd = Math.min(this.getSizeInventory(), endIndex);
         ItemStack copy = stack.copy();
-        for (int i = Math.max(0, startIndex); i < Math.min(this.getSizeInventory(), endIndex); i++)
+        for (int i = loopStart; i < loopEnd; i++)
         {
             ItemStack stackInSlot = this.getStackInSlot(i);
             if (this.isItemValidForSlot(i, stack) && ItemStack.areItemsEqual(stackInSlot, copy) && ItemStack.areItemStackTagsEqual(stackInSlot, copy))
@@ -110,7 +112,7 @@ public abstract class DynamicInventory implements IInventory
         }
 
         int index;
-        while (!copy.isEmpty() && (index = this.getNextEmptySlot(copy)) >= 0)
+        while (!copy.isEmpty() && (index = this.getNextEmptySlot(copy, loopStart, loopEnd)) >= 0)
         {
             if (copy.getCount() > this.getSlotStackLimit(index))
             {
