@@ -2,10 +2,17 @@ package io.github.ocelot.common.network;
 
 import io.github.ocelot.common.network.message.FishMessage;
 import io.github.ocelot.common.network.message.LoginFishMessage;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SDisconnectPacket;
 import net.minecraft.util.LazyValue;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -20,6 +27,7 @@ import java.util.function.Supplier;
  */
 public class FishNetworkManager
 {
+    private static final Logger LOGGER = LogManager.getLogger();
     private final SimpleChannel channel;
     private final LazyValue<Supplier<Object>> clientMessageHandler;
     private final LazyValue<Supplier<Object>> serverMessageHandler;
@@ -42,8 +50,27 @@ public class FishNetworkManager
             return msg;
         }).consumer((message, ctx) ->
         {
-            message.processPacket((T) (ctx.get().getDirection().getReceptionSide().isClient() ? this.clientMessageHandler.getValue().get() : this.serverMessageHandler.getValue().get()), ctx.get());
-            return true;
+            try
+            {
+                message.processPacket((T) (ctx.get().getDirection().getReceptionSide().isClient() ? this.clientMessageHandler.getValue().get() : this.serverMessageHandler.getValue().get()), ctx.get());
+                return true;
+            }
+            catch (Exception e)
+            {
+                LOGGER.error("Failed to process packet for class: " + clazz.getName(), e);
+                if (ctx.get().getDirection().getReceptionSide().isServer())
+                {
+                    ServerPlayerEntity player = ctx.get().getSender();
+                    if (player != null)
+                    {
+                        ITextComponent textComponent = new TranslationTextComponent("disconnect.genericReason", "Internal Exception: " + e);
+                        NetworkManager networkManager = ctx.get().getNetworkManager();
+                        networkManager.sendPacket(new SDisconnectPacket(textComponent), future -> networkManager.closeChannel(textComponent));
+                        networkManager.disableAutoRead();
+                    }
+                }
+                return false;
+            }
         });
     }
 

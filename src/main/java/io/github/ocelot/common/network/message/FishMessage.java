@@ -27,7 +27,7 @@ public interface FishMessage<T>
     void writePacketData(PacketBuffer buf);
 
     /**
-     * Passes this message into the specified {@link IFishMessageHandler} to process the message.
+     * Passes this message into the specified handler to process the message.
      *
      * @param handler The handler to process the message
      * @param ctx     The context of the message
