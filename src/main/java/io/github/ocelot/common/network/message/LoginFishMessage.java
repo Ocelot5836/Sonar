@@ -1,7 +1,5 @@
 package io.github.ocelot.common.network.message;
 
-import io.github.ocelot.common.network.IFishMessageHandler;
-
 import java.util.function.IntSupplier;
 
 /**
@@ -11,7 +9,7 @@ import java.util.function.IntSupplier;
  * @author Ocelot
  * @since 3.2.0
  */
-public interface LoginFishMessage<T extends IFishMessageHandler> extends FishMessage<T>, IntSupplier
+public interface LoginFishMessage<T> extends FishMessage<T>, IntSupplier
 {
     /**
      * Sets the index for the login message. Should not usually be called.

@@ -1,6 +1,5 @@
 package io.github.ocelot.common.network.message;
 
-import io.github.ocelot.common.network.IFishMessageHandler;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -11,7 +10,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
  * @author Ocelot
  * @since 3.2.0
  */
-public interface FishMessage<T extends IFishMessageHandler>
+public interface FishMessage<T>
 {
     /**
      * Reads the raw message data from the data stream.
