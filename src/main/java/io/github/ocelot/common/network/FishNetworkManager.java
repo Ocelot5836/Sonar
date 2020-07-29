@@ -1,7 +1,7 @@
 package io.github.ocelot.common.network;
 
+import io.github.ocelot.common.network.message.FishLoginMessage;
 import io.github.ocelot.common.network.message.FishMessage;
-import io.github.ocelot.common.network.message.LoginFishMessage;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SDisconnectPacket;
@@ -18,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -43,11 +44,11 @@ public class FishNetworkManager
     }
 
     @SuppressWarnings("unchecked")
-    private <MSG extends FishMessage<T>, T> boolean processMessage(MSG msg, Supplier<NetworkEvent.Context> ctx)
+    private <MSG extends FishMessage<T>, T> boolean processMessage(MSG msg, Supplier<NetworkEvent.Context> ctx, BiConsumer<T, NetworkEvent.Context> handler)
     {
         try
         {
-            msg.processPacket((T) (ctx.get().getDirection().getReceptionSide().isClient() ? this.clientMessageHandler.getValue().get() : this.serverMessageHandler.getValue().get()), ctx.get());
+            handler.accept((T) (ctx.get().getDirection().getReceptionSide().isClient() ? this.clientMessageHandler.getValue().get() : this.serverMessageHandler.getValue().get()), ctx.get());
             return true;
         }
         catch (Exception e)
@@ -68,14 +69,14 @@ public class FishNetworkManager
         }
     }
 
-    private <MSG extends FishMessage<T>, T> SimpleChannel.MessageBuilder<MSG> getMessageBuilder(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
+    private <MSG extends FishMessage<T>, T> SimpleChannel.MessageBuilder<MSG> getMessageBuilder(Class<MSG> clazz, Supplier<MSG> generator, Function<MSG, BiConsumer<T, NetworkEvent.Context>> handler, @Nullable NetworkDirection direction)
     {
         return this.channel.messageBuilder(clazz, this.nextId++, direction).encoder(FishMessage::writePacketData).decoder(buf ->
         {
             MSG msg = generator.get();
             msg.readPacketData(buf);
             return msg;
-        }).consumer((SimpleChannel.MessageBuilder.ToBooleanBiFunction<MSG, Supplier<NetworkEvent.Context>>) this::processMessage);
+        }).consumer((SimpleChannel.MessageBuilder.ToBooleanBiFunction<MSG, Supplier<NetworkEvent.Context>>) (msg, ctx) -> this.processMessage(msg, ctx, handler.apply(msg)));
     }
 
     /**
@@ -89,7 +90,7 @@ public class FishNetworkManager
      */
     public <MSG extends FishMessage<T>, T> void register(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
     {
-        getMessageBuilder(clazz, generator, direction).add();
+        getMessageBuilder(clazz, generator, msg -> msg::processPacket, direction).add();
     }
 
     /**
@@ -101,7 +102,7 @@ public class FishNetworkManager
      * @param <MSG>     The type of message to be sent
      * @param <T>       The handler that will process the message. Should be an interface to avoid loading client classes on server
      */
-    public <MSG extends LoginFishMessage<T>, T> void registerLoginReply(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
+    public <MSG extends FishLoginMessage<T>, T> void registerLoginReply(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
     {
         this.channel.messageBuilder(clazz, this.nextId++, direction).encoder(FishMessage::writePacketData).decoder(buf ->
         {
@@ -109,8 +110,8 @@ public class FishNetworkManager
             msg.readPacketData(buf);
             return msg;
         })
-                .consumer(FMLHandshakeHandler.indexFirst((__, msg, ctx) -> ctx.get().setPacketHandled(this.processMessage(msg, ctx))))
-                .loginIndex(LoginFishMessage::getAsInt, LoginFishMessage::setLoginIndex)
+                .consumer(FMLHandshakeHandler.indexFirst((__, msg, ctx) -> ctx.get().setPacketHandled(this.processMessage(msg, ctx, msg::processLoginPacket))))
+                .loginIndex(FishLoginMessage::getAsInt, FishLoginMessage::setLoginIndex)
                 .add();
     }
 
@@ -123,10 +124,10 @@ public class FishNetworkManager
      * @param <MSG>     The type of message to be sent
      * @param <T>       The handler that will process the message. Should be an interface to avoid loading client classes on server
      */
-    public <MSG extends LoginFishMessage<T>, T> void registerLogin(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
+    public <MSG extends FishLoginMessage<T>, T> void registerLogin(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
     {
-        getMessageBuilder(clazz, generator, direction)
-                .loginIndex(LoginFishMessage::getAsInt, LoginFishMessage::setLoginIndex)
+        getMessageBuilder(clazz, generator, msg -> msg::processLoginPacket, direction)
+                .loginIndex(FishLoginMessage::getAsInt, FishLoginMessage::setLoginIndex)
                 .markAsLoginPacket()
                 .add();
     }
@@ -141,10 +142,10 @@ public class FishNetworkManager
      * @param <MSG>                 The type of message to be sent
      * @param <T>                   The handler that will process the message. Should be an interface to avoid loading client classes on server
      */
-    public <MSG extends LoginFishMessage<T>, T> void registerLogin(Class<MSG> clazz, Supplier<MSG> generator, Function<Boolean, List<Pair<String, MSG>>> loginPacketGenerators, @Nullable NetworkDirection direction)
+    public <MSG extends FishLoginMessage<T>, T> void registerLogin(Class<MSG> clazz, Supplier<MSG> generator, Function<Boolean, List<Pair<String, MSG>>> loginPacketGenerators, @Nullable NetworkDirection direction)
     {
-        getMessageBuilder(clazz, generator, direction)
-                .loginIndex(LoginFishMessage::getAsInt, LoginFishMessage::setLoginIndex)
+        getMessageBuilder(clazz, generator, msg -> msg::processLoginPacket, direction)
+                .loginIndex(FishLoginMessage::getAsInt, FishLoginMessage::setLoginIndex)
                 .buildLoginPacketList(loginPacketGenerators)
                 .add();
     }

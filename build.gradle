@@ -104,6 +104,7 @@ jar {
     }
 }
 
+// TODO remove api jar since it's identical to the normal jar
 task apiJar(type: Jar) {
     classifier = "api"
     from sourceSets.main.output
