@@ -3,6 +3,7 @@ package io.github.ocelot;
 import io.github.ocelot.block.TestBlock;
 import io.github.ocelot.block.TestStateBlock;
 import io.github.ocelot.client.TestClientInit;
+import io.github.ocelot.client.tooltip.TooltipColorManager;
 import io.github.ocelot.common.item.ValueContainerEditorItem;
 import io.github.ocelot.common.valuecontainer.OpenValueContainerMessage;
 import io.github.ocelot.network.TestMessageHandler;
@@ -56,6 +57,7 @@ public class TestMod
     public TestMod()
     {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+        TooltipColorManager.register(modBus);
         BLOCKS.register(modBus);
         TILE_ENTITIES.register(modBus);
         ITEMS.register(modBus);
