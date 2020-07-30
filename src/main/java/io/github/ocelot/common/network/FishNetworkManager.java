@@ -8,7 +8,6 @@ import net.minecraft.network.play.server.SDisconnectPacket;
 import net.minecraft.util.LazyValue;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.network.FMLHandshakeHandler;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
@@ -18,7 +17,6 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -28,6 +26,7 @@ import java.util.function.Supplier;
  * @author Ocelot
  * @since 3.2.0
  */
+@SuppressWarnings("unused")
 public class FishNetworkManager
 {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -44,11 +43,11 @@ public class FishNetworkManager
     }
 
     @SuppressWarnings("unchecked")
-    private <MSG extends FishMessage<T>, T> boolean processMessage(MSG msg, Supplier<NetworkEvent.Context> ctx, BiConsumer<T, NetworkEvent.Context> handler)
+    private <MSG extends FishMessage<T>, T> boolean processMessage(MSG msg, Supplier<NetworkEvent.Context> ctx)
     {
         try
         {
-            handler.accept((T) (ctx.get().getDirection().getReceptionSide().isClient() ? this.clientMessageHandler.getValue().get() : this.serverMessageHandler.getValue().get()), ctx.get());
+            msg.processPacket((T) (ctx.get().getDirection().getReceptionSide().isClient() ? this.clientMessageHandler.getValue().get() : this.serverMessageHandler.getValue().get()), ctx.get());
             return true;
         }
         catch (Exception e)
@@ -69,14 +68,14 @@ public class FishNetworkManager
         }
     }
 
-    private <MSG extends FishMessage<T>, T> SimpleChannel.MessageBuilder<MSG> getMessageBuilder(Class<MSG> clazz, Supplier<MSG> generator, Function<MSG, BiConsumer<T, NetworkEvent.Context>> handler, @Nullable NetworkDirection direction)
+    private <MSG extends FishMessage<T>, T> SimpleChannel.MessageBuilder<MSG> getMessageBuilder(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
     {
         return this.channel.messageBuilder(clazz, this.nextId++, direction).encoder(FishMessage::writePacketData).decoder(buf ->
         {
             MSG msg = generator.get();
             msg.readPacketData(buf);
             return msg;
-        }).consumer((SimpleChannel.MessageBuilder.ToBooleanBiFunction<MSG, Supplier<NetworkEvent.Context>>) (msg, ctx) -> this.processMessage(msg, ctx, handler.apply(msg)));
+        }).consumer((SimpleChannel.MessageBuilder.ToBooleanBiFunction<MSG, Supplier<NetworkEvent.Context>>) this::processMessage);
     }
 
     /**
@@ -90,7 +89,7 @@ public class FishNetworkManager
      */
     public <MSG extends FishMessage<T>, T> void register(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
     {
-        getMessageBuilder(clazz, generator, msg -> msg::processPacket, direction).add();
+        getMessageBuilder(clazz, generator, direction).add();
     }
 
     /**
@@ -104,13 +103,7 @@ public class FishNetworkManager
      */
     public <MSG extends FishLoginMessage<T>, T> void registerLoginReply(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
     {
-        this.channel.messageBuilder(clazz, this.nextId++, direction).encoder(FishMessage::writePacketData).decoder(buf ->
-        {
-            MSG msg = generator.get();
-            msg.readPacketData(buf);
-            return msg;
-        })
-                .consumer(FMLHandshakeHandler.indexFirst((__, msg, ctx) -> ctx.get().setPacketHandled(this.processMessage(msg, ctx, msg::processLoginPacket))))
+        getMessageBuilder(clazz, generator, direction)
                 .loginIndex(FishLoginMessage::getAsInt, FishLoginMessage::setLoginIndex)
                 .add();
     }
@@ -126,7 +119,7 @@ public class FishNetworkManager
      */
     public <MSG extends FishLoginMessage<T>, T> void registerLogin(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
     {
-        getMessageBuilder(clazz, generator, msg -> msg::processLoginPacket, direction)
+        getMessageBuilder(clazz, generator, direction)
                 .loginIndex(FishLoginMessage::getAsInt, FishLoginMessage::setLoginIndex)
                 .markAsLoginPacket()
                 .add();
@@ -144,7 +137,7 @@ public class FishNetworkManager
      */
     public <MSG extends FishLoginMessage<T>, T> void registerLogin(Class<MSG> clazz, Supplier<MSG> generator, Function<Boolean, List<Pair<String, MSG>>> loginPacketGenerators, @Nullable NetworkDirection direction)
     {
-        getMessageBuilder(clazz, generator, msg -> msg::processLoginPacket, direction)
+        getMessageBuilder(clazz, generator, direction)
                 .loginIndex(FishLoginMessage::getAsInt, FishLoginMessage::setLoginIndex)
                 .buildLoginPacketList(loginPacketGenerators)
                 .add();

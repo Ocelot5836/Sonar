@@ -1,8 +1,5 @@
 package io.github.ocelot.common.network.message;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
-
 import java.util.function.IntSupplier;
 
 /**
@@ -14,37 +11,6 @@ import java.util.function.IntSupplier;
  */
 public interface FishLoginMessage<T> extends FishMessage<T>, IntSupplier
 {
-    /**
-     * Reads the raw message data from the data stream.
-     *
-     * @param buf The buffer to read from
-     */
-    default void readLoginPacketData(PacketBuffer buf)
-    {
-        this.readPacketData(buf);
-    }
-
-    /**
-     * Writes the raw message data to the data stream.
-     *
-     * @param buf The buffer to write to
-     */
-    default void writeLoginPacketData(PacketBuffer buf)
-    {
-        this.writePacketData(buf);
-    }
-
-    /**
-     * Passes this message into the specified handler to process the message.
-     *
-     * @param handler The handler to process the message
-     * @param ctx     The context of the message
-     */
-    default void processLoginPacket(T handler, NetworkEvent.Context ctx)
-    {
-        this.processPacket(handler, ctx);
-    }
-
     /**
      * Sets the index for the login message. Should not usually be called.
      *
