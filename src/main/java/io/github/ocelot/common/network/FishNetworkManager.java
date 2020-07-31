@@ -114,7 +114,7 @@ public class FishNetworkManager
                 .loginIndex(FishLoginMessage::getAsInt, FishLoginMessage::setLoginIndex)
                 .add();
     }
-    
+
     /**
      * Registers a message intended to be sent during the login network phase.
      *
