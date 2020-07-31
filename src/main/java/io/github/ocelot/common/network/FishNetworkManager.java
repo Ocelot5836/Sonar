@@ -8,6 +8,7 @@ import net.minecraft.network.play.server.SDisconnectPacket;
 import net.minecraft.util.LazyValue;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.fml.network.FMLHandshakeHandler;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
@@ -103,11 +104,17 @@ public class FishNetworkManager
      */
     public <MSG extends FishLoginMessage<T>, T> void registerLoginReply(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
     {
-        getMessageBuilder(clazz, generator, direction)
+        this.channel.messageBuilder(clazz, this.nextId++, direction).encoder(FishMessage::writePacketData).decoder(buf ->
+        {
+            MSG msg = generator.get();
+            msg.readPacketData(buf);
+            return msg;
+        })
+                .consumer(FMLHandshakeHandler.indexFirst((__, msg, ctx) -> ctx.get().setPacketHandled(this.processMessage(msg, ctx))))
                 .loginIndex(FishLoginMessage::getAsInt, FishLoginMessage::setLoginIndex)
                 .add();
     }
-
+    
     /**
      * Registers a message intended to be sent during the login network phase.
      *
