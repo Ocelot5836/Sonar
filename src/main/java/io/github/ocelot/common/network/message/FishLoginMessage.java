@@ -12,6 +12,12 @@ import java.util.function.IntSupplier;
 public interface FishLoginMessage<T> extends FishMessage<T>, IntSupplier
 {
     /**
+     * @return The index of this login message.
+     */
+    @Override
+    int getAsInt();
+
+    /**
      * Sets the index for the login message. Should not usually be called.
      *
      * @param index The new login index
