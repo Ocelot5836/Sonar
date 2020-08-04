@@ -74,8 +74,6 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft "net.minecraftforge:forge:${project.minecraft}-${project.forge}"
 
-    testImplementation "junit:junit:4.13"
-
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
     // compile "some.group:artifact:version"
@@ -102,21 +100,6 @@ jar {
                 'FMLModType': 'LIBRARY'
         )
     }
-}
-
-// TODO remove api jar since it's identical to the normal jar
-task apiJar(type: Jar) {
-    classifier = "api"
-    from sourceSets.main.output
-
-    // TODO: when FG bug is fixed, remove allJava from the api jar.
-    // https://github.com/MinecraftForge/ForgeGradle/issues/369
-    // Gradle should be able to pull them from the -sources jar.
-    from sourceSets.main.allJava
-}
-
-artifacts {
-    archives apiJar
 }
 
 // Example configuration to allow publishing using the maven-publish task
