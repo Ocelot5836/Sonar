@@ -1,6 +1,6 @@
 package io.github.ocelot.client.tooltip;
 
-import io.github.ocelot.FishLib;
+import io.github.ocelot.Sonar;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
@@ -53,7 +53,7 @@ public class TooltipColorManager
 
     private static void registerRegistries(RegistryEvent.NewRegistry event)
     {
-        TOOLTIP_COLORS = new RegistryBuilder<TooltipColor.RegistryWrapper>().setName(new ResourceLocation(FishLib.DOMAIN, "tooltip_colors")).setType(TooltipColor.RegistryWrapper.class).create();
+        TOOLTIP_COLORS = new RegistryBuilder<TooltipColor.RegistryWrapper>().setName(new ResourceLocation(Sonar.DOMAIN, "tooltip_colors")).setType(TooltipColor.RegistryWrapper.class).create();
     }
 
     @SubscribeEvent
