@@ -4,19 +4,13 @@ General 1.15 Mod utilties in one spot so they can be added to future mods withou
 
 # How to add to your workspace
 
-Make sure to update your gradle version to 5.+ to use shadow.
-Add the shadow plugin classpath to the buildscript block underneath the forge gradle classpath.
+## Note: Verify your gradle version is 5.+ to use shadow.
+Insert the `plugins` block just below `buildscript`.
 
 ```gradle
-classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
-classpath "com.github.jengelman.gradle.plugins:shadow:5.2.0"
-```
-
-Insert the shadow plugin underneath the forge gradle plugin.
-
-```gradle
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'com.github.johnrengelman.shadow'
+plugins {
+    id 'com.github.johnrengelman.shadow' version "5.2.0"
+}
 ```
 
 Add the shade configuration, repository, and the sonar dependency. Note `runtimeOnly` and `compileOnly` are used to allow sources to attach properly.
