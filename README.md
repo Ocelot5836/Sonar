@@ -28,9 +28,9 @@ repositories {
 }
 
 dependencies {
-    runtimeOnly fg.deobf("com.github.Ocelot5836:Sonar:SonarVersion")
-    compileOnly "com.github.Ocelot5836:Sonar:SonarVersion"
-    shade "com.github.Ocelot5836:Sonar:SonarVersion"
+    runtimeOnly fg.deobf("com.github.Ocelot5836:Sonar:${project.sonar}")
+    compileOnly "com.github.Ocelot5836:Sonar:${project.sonar}"
+    shade "com.github.Ocelot5836:Sonar:${project.sonar}"
 }
 ```
 
@@ -51,4 +51,10 @@ artifacts {
 }
 
 build.dependsOn reobfShadowJar
+```
+
+Finally, choose the version of Sonar you wish to use and add the following to the `gradle.properties`
+
+```properties
+sonar=SonarVersion
 ```
