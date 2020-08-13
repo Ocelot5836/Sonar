@@ -119,6 +119,6 @@ public class ResourceLocationValueContainerEntry implements ValueContainerEntry<
      */
     public static Predicate<String> createDefaultValidator()
     {
-        return ResourceLocation::isResouceNameValid;
+        return value -> ResourceLocation.tryCreate(value) != null;
     }
 }
