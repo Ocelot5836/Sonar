@@ -58,3 +58,14 @@ Finally, choose the version of Sonar you wish to use and add the following to th
 ```properties
 sonar=SonarVersion
 ```
+
+## Optional
+
+If you want, you can add this so Sonar will be compiled into a different package to allow better compatibility.
+
+```gradle
+shadowJar {
+    configurations = [project.configurations.shade]
+    relocate 'io.github.ocelot', 'your.project.lib.ocelot'
+}
+```
