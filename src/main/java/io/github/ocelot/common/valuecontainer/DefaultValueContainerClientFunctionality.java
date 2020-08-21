@@ -34,7 +34,6 @@ public class DefaultValueContainerClientFunctionality
      *
      * @param channel The channel to send the packet
      * @param screen  The screen to sync data with
-     * @deprecated TODO remove in 4.0.0
      */
     public static void sendDataToServer(SimpleChannel channel, ValueContainerEditorScreen screen)
     {
