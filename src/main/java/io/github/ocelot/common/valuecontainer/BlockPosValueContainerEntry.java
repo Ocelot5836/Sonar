@@ -13,7 +13,6 @@ import org.apache.commons.lang3.math.NumberUtils;
  * @author Ocelot
  * @since 3.1.0
  */
-@SuppressWarnings("unused")
 public class BlockPosValueContainerEntry extends AbstractVectorValueContainerEntry<BlockPos>
 {
     public BlockPosValueContainerEntry(ITextComponent displayName, String name, Vector3i value)

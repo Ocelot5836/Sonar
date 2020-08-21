@@ -10,7 +10,6 @@ import static java.util.concurrent.TimeUnit.*;
  * @author Ocelot
  * @since 3.0.0
  */
-@SuppressWarnings("unused")
 public final class TimeUtils
 {
     /**

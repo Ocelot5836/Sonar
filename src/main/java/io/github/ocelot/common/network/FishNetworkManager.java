@@ -27,7 +27,6 @@ import java.util.function.Supplier;
  * @author Ocelot
  * @since 3.2.0
  */
-@SuppressWarnings("unused")
 public class FishNetworkManager
 {
     private static final Logger LOGGER = LogManager.getLogger();

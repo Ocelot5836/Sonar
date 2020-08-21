@@ -10,7 +10,6 @@ import net.minecraftforge.common.util.Constants;
  * @author Ocelot
  * @since 2.1.0
  */
-@SuppressWarnings("unused")
 public class ByteValueContainerEntry extends NumberValueContainerEntry<Byte>
 {
     private final ITextComponent displayName;

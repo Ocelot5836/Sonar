@@ -19,7 +19,6 @@ import java.util.Optional;
  * @author Ocelot
  * @since 2.8.0
  */
-@SuppressWarnings("unused")
 public class SpawnEggItemBase<T extends Entity> extends SpawnEggItem
 {
     private final boolean addToMisc;

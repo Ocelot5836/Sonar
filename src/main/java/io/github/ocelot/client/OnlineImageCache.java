@@ -8,9 +8,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.NativeImage;
-import net.minecraft.resources.SimpleResource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -39,6 +40,7 @@ import java.util.concurrent.TimeUnit;
  * @author Ocelot
  * @since 3.1.0
  */
+@OnlyIn(Dist.CLIENT)
 public class OnlineImageCache
 {
     private static final Logger LOGGER = LogManager.getLogger();

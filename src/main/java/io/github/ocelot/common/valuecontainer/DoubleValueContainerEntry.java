@@ -10,7 +10,6 @@ import net.minecraftforge.common.util.Constants;
  * @author Ocelot
  * @since 2.1.0
  */
-@SuppressWarnings("unused")
 public class DoubleValueContainerEntry extends NumberValueContainerEntry<Double>
 {
     private final ITextComponent displayName;

@@ -15,7 +15,6 @@ import java.util.function.Predicate;
  * @author Ocelot
  * @since 2.1.0
  */
-@SuppressWarnings("unused")
 public class ResourceLocationValueContainerEntry implements ValueContainerEntry<ResourceLocation>
 {
     private final ITextComponent displayName;
