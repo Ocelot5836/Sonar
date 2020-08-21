@@ -22,6 +22,7 @@ import java.util.function.Supplier;
  *
  * @author Ocelot
  * @since 3.1.0
+ * @deprecated Use {@link IValueContainerClientHandler} instead TODO remove in 4.0.0
  */
 public class DefaultValueContainerClientFunctionality
 {
@@ -33,6 +34,7 @@ public class DefaultValueContainerClientFunctionality
      *
      * @param channel The channel to send the packet
      * @param screen  The screen to sync data with
+     * @deprecated TODO remove in 4.0.0
      */
     public static void sendDataToServer(SimpleChannel channel, ValueContainerEditorScreen screen)
     {

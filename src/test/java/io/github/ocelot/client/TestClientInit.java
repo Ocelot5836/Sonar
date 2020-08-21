@@ -8,6 +8,7 @@ import io.github.ocelot.network.TestMessageHandler;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.network.PacketDistributor;
 
 public class TestClientInit
 {
@@ -27,7 +28,7 @@ public class TestClientInit
             @Override
             protected void sendDataToServer()
             {
-                DefaultValueContainerClientFunctionality.sendDataToServer(TestMessageHandler.INSTANCE, this);
+                TestMessageHandler.PLAY.send(PacketDistributor.SERVER.noArg(), this.createSyncMessage());
             }
         });
     }
