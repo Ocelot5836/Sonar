@@ -15,12 +15,12 @@ public class TestMessageHandler
 {
     public static final String VERSION = "1.0";
     public static final SimpleChannel PLAY = NetworkRegistry.newSimpleChannel(new ResourceLocation(TestMod.MOD_ID, "play"), () -> VERSION, VERSION::equals, VERSION::equals);
-
-    private static final FishNetworkManager PLAY_NETWOR_MANAGER = new FishNetworkManager(PLAY, () -> TestClientPlayerHandler::new, () -> TestServerPlayHandler::new);
+    
+    private static final FishNetworkManager PLAY_NETWORK_MANAGER = new FishNetworkManager(PLAY, () -> TestClientPlayerHandler::new, () -> TestServerPlayHandler::new);
 
     public static void init()
     {
-        PLAY_NETWOR_MANAGER.register(OpenValueContainerMessage.class, OpenValueContainerMessage::new, NetworkDirection.PLAY_TO_CLIENT);
-        PLAY_NETWOR_MANAGER.register(SyncValueContainerMessage.class, SyncValueContainerMessage::new, NetworkDirection.PLAY_TO_SERVER);
+        PLAY_NETWORK_MANAGER.register(OpenValueContainerMessage.class, OpenValueContainerMessage::new, NetworkDirection.PLAY_TO_CLIENT);
+        PLAY_NETWORK_MANAGER.register(SyncValueContainerMessage.class, SyncValueContainerMessage::new, NetworkDirection.PLAY_TO_SERVER);
     }
 }

@@ -31,7 +31,6 @@ import org.apache.logging.log4j.Logger;
 public class TestMod
 {
     public static final String MOD_ID = "examplemod";
-    public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
     public static final ItemGroup TEST_GROUP = new ItemGroup(MOD_ID)
     {

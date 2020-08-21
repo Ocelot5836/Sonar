@@ -22,6 +22,7 @@ import java.util.function.Supplier;
  *
  * @author Ocelot
  * @since 3.1.0
+ * @deprecated Use {@link IValueContainerClientHandler} instead TODO remove in 4.0.0
  */
 public class DefaultValueContainerClientFunctionality
 {

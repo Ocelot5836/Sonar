@@ -1,5 +1,7 @@
 package io.github.ocelot.network.handler;
 
-public interface ITestServerPlayHandler
+import io.github.ocelot.common.valuecontainer.IValueContainerServerHandler;
+
+public interface ITestServerPlayHandler extends IValueContainerServerHandler
 {
 }
