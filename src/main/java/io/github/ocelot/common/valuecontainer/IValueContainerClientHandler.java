@@ -57,13 +57,10 @@ public interface IValueContainerClientHandler
     /**
      * Creates a new screen instance for the specified value container.
      *
-     * @param valueContainer The container to set the screen for
-     * @param pos            The position of the container
+     * @param container The container to set the screen for
+     * @param pos       The position of the container
      * @return The new screen or null if no screen is requested
      */
     @Nullable
-    default Screen createValueContainerScreen(ValueContainer valueContainer, BlockPos pos)
-    {
-        return null;
-    }
+    Screen createValueContainerScreen(ValueContainer container, BlockPos pos);
 }
