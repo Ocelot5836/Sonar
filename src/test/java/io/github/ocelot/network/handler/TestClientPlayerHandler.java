@@ -1,5 +1,6 @@
 package io.github.ocelot.network.handler;
 
+import io.github.ocelot.TestMod;
 import io.github.ocelot.client.screen.ValueContainerEditorScreenImpl;
 import io.github.ocelot.common.valuecontainer.ValueContainer;
 import io.github.ocelot.network.TestMessageHandler;
@@ -11,7 +12,7 @@ import net.minecraftforge.fml.network.PacketDistributor;
 
 public class TestClientPlayerHandler implements ITestClientPlayHandler
 {
-    private static final ResourceLocation BACKGROUND_LOCATION = new ResourceLocation("examplemod", "textures/gui/value_container_editor.png");
+    private static final ResourceLocation BACKGROUND_LOCATION = new ResourceLocation(TestMod.MOD_ID, "textures/gui/value_container_editor.png");
 
     @Override
     public Screen createValueContainerScreen(ValueContainer container, BlockPos pos)
@@ -21,7 +22,7 @@ public class TestClientPlayerHandler implements ITestClientPlayHandler
             @Override
             public ResourceLocation getBackgroundTextureLocation()
             {
-                return BACKGROUND_LOCATION;
+                return TestClientPlayerHandler.BACKGROUND_LOCATION;
             }
 
             @Override
