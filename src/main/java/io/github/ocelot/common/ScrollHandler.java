@@ -14,7 +14,6 @@ import javax.annotation.Nullable;
  * @author Ocelot
  * @since 2.2.0
  */
-@SuppressWarnings("unused")
 public final class ScrollHandler implements INBTSerializable<CompoundNBT>
 {
     public static final float DEFAULT_SCROLL_SPEED = 5;

@@ -14,7 +14,6 @@ import java.util.function.Predicate;
  * @author Ocelot
  * @since 2.1.0
  */
-@SuppressWarnings("unused")
 public class BooleanValueContainerEntry implements ValueContainerEntry<Boolean>, ToggleEntry
 {
     private final ITextComponent displayName;

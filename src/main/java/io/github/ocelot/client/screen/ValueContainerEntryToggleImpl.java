@@ -16,7 +16,6 @@ import java.util.function.Predicate;
  * @author Ocelot
  * @since 2.2.0
  */
-@SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
 public class ValueContainerEntryToggleImpl extends AbstractButton
 {

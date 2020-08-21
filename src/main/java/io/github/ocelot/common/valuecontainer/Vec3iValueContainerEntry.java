@@ -12,7 +12,6 @@ import org.apache.commons.lang3.math.NumberUtils;
  * @author Ocelot
  * @since 3.1.0
  */
-@SuppressWarnings("unused")
 public class Vec3iValueContainerEntry extends AbstractVectorValueContainerEntry<Vec3i>
 {
     public Vec3iValueContainerEntry(ITextComponent displayName, String name, Vec3i value)

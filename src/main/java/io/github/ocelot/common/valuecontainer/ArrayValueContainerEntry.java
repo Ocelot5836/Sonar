@@ -18,7 +18,6 @@ import java.util.function.Predicate;
  * @author Ocelot
  * @since 3.1.0
  */
-@SuppressWarnings("unused")
 public class ArrayValueContainerEntry<T> implements ValueContainerEntry<T>, SwitchEntry
 {
     private final ITextComponent displayName;

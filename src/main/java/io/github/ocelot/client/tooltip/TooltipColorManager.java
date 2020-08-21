@@ -30,7 +30,6 @@ import java.util.Set;
  * @author Ocelot
  * @since 3.2.0
  */
-@SuppressWarnings("unused")
 public class TooltipColorManager
 {
     private static final Logger LOGGER = LogManager.getLogger();

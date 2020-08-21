@@ -9,7 +9,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author Ocelot
  * @since 2.4.0
  */
-@SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
 public interface AdvancedFboTextureAttachment extends AdvancedFboAttachment
 {

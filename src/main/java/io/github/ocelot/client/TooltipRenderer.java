@@ -19,7 +19,6 @@ import java.util.List;
  * @see Screen
  * @since 2.0.0
  */
-@SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
 public interface TooltipRenderer
 {

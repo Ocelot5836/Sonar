@@ -18,7 +18,6 @@ import java.util.function.Predicate;
  * @author Ocelot
  * @since 3.1.0
  */
-@SuppressWarnings("unused")
 public class RegistryObjectValueContainerEntry<T extends IForgeRegistryEntry<T>> implements ValueContainerEntry<ResourceLocation>
 {
     private final ITextComponent displayName;

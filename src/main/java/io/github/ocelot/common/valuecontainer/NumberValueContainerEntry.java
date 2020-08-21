@@ -15,7 +15,6 @@ import java.util.function.Predicate;
  * @author Ocelot
  * @since 2.1.0
  */
-@SuppressWarnings("unused")
 public abstract class NumberValueContainerEntry<T extends Number> implements ValueContainerEntry<T>, SliderEntry
 {
     private final String name;

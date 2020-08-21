@@ -31,6 +31,7 @@ import javax.annotation.Nonnull;
  * @author Ocelot
  * @since 2.3.0
  */
+@SuppressWarnings("deprecation")
 public class BaseBlock extends Block
 {
     public static final DirectionProperty HORIZONTAL_FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -42,7 +43,6 @@ public class BaseBlock extends Block
         super(properties);
     }
 
-    @Deprecated
     @Override
     public int getComparatorInputOverride(BlockState state, World world, BlockPos pos)
     {
@@ -76,7 +76,6 @@ public class BaseBlock extends Block
         return 0;
     }
 
-    @Deprecated
     @Override
     public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving)
     {
@@ -105,7 +104,6 @@ public class BaseBlock extends Block
         super.onReplaced(state, world, pos, newState, isMoving);
     }
 
-    @Nonnull
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context)
     {
@@ -125,7 +123,6 @@ public class BaseBlock extends Block
         return state;
     }
 
-    @Deprecated
     @Override
     public BlockState rotate(BlockState state, Rotation rotation)
     {
@@ -140,7 +137,6 @@ public class BaseBlock extends Block
         return state;
     }
 
-    @Deprecated
     @Override
     public BlockState mirror(BlockState state, Mirror mirror)
     {
@@ -155,7 +151,6 @@ public class BaseBlock extends Block
         return state;
     }
 
-    @Deprecated
     @Override
     public IFluidState getFluidState(BlockState state)
     {

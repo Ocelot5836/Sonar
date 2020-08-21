@@ -25,7 +25,6 @@ import java.util.function.Consumer;
  * @see Future
  * @since 2.0.0
  */
-@SuppressWarnings("unused")
 public final class OnlineRequest
 {
     private static final ExecutorService POOL = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), task -> new Thread(task, "Online Request Pool"));

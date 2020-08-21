@@ -19,7 +19,6 @@ import java.util.function.Function;
  * @see VoxelShape
  * @since 2.0.0
  */
-@SuppressWarnings("unused")
 public final class VoxelShapeHelper
 {
     private VoxelShapeHelper()

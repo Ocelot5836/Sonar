@@ -11,7 +11,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @see FontRenderer
  * @since 2.2.0
  */
-@SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
 public final class FontHelper
 {
