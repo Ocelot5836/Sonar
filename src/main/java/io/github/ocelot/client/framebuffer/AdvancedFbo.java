@@ -22,7 +22,6 @@ import static org.lwjgl.opengl.GL30.*;
  * @author Ocelot
  * @since 2.4.0
  */
-@SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
 public class AdvancedFbo implements NativeResource
 {

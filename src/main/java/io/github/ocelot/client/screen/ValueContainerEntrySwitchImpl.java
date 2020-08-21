@@ -4,6 +4,7 @@ import io.github.ocelot.common.valuecontainer.SwitchEntry;
 import io.github.ocelot.common.valuecontainer.ValueContainerEntry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.AbstractButton;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -13,7 +14,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author Ocelot
  * @since 3.1.0
  */
-@SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
 public class ValueContainerEntrySwitchImpl extends AbstractButton
 {
@@ -22,11 +22,12 @@ public class ValueContainerEntrySwitchImpl extends AbstractButton
 
     public ValueContainerEntrySwitchImpl(ValueContainerEntry<?> entry, int x, int y, int width, int height)
     {
-        super(x, y, width, height, entry.getDisplay());
+        super(x, y, width, height, entry.getDisplayName());
         if (!(entry instanceof SwitchEntry))
             throw new IllegalStateException("Entry '" + entry + "' needs to implement ToggleEntry in order to use the SWITCH type");
         this.switchEntry = (SwitchEntry) entry;
         this.entry = entry;
+        this.setMessage(new StringTextComponent(this.entry.getDisplay()));
     }
 
     private void onPress(int mouseButton)
@@ -35,7 +36,7 @@ public class ValueContainerEntrySwitchImpl extends AbstractButton
             this.switchEntry.showNext();
         if (mouseButton == 1)
             this.switchEntry.showPrevious();
-        this.setMessage(this.entry.getDisplay());
+        this.setMessage(new StringTextComponent(this.entry.getDisplay()));
     }
 
     @Override

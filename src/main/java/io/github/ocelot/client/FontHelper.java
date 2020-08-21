@@ -1,5 +1,6 @@
 package io.github.ocelot.client;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -18,6 +19,7 @@ public final class FontHelper
     /**
      * Draws the specified string of text.
      *
+     * @param matrixStack  The stack of transformations used for positioning
      * @param fontRenderer The font renderer to use
      * @param text         The text to trim
      * @param x            The x position of the text
@@ -25,17 +27,18 @@ public final class FontHelper
      * @param color        The color of the text
      * @param shadow       Whether or not to draw a shadow
      */
-    public static void drawString(FontRenderer fontRenderer, String text, float x, float y, int color, boolean shadow)
+    public static void drawString(MatrixStack matrixStack, FontRenderer fontRenderer, String text, float x, float y, int color, boolean shadow)
     {
         if (shadow)
-            fontRenderer.drawStringWithShadow(text, x, y, color);
+            fontRenderer.drawStringWithShadow(matrixStack, text, x, y, color);
         else
-            fontRenderer.drawString(text, x, y, color);
+            fontRenderer.drawString(matrixStack, text, x, y, color);
     }
 
     /**
      * Draws the specified string of text to fit within the specified width.
      *
+     * @param matrixStack  The stack of transformations used for positioning
      * @param fontRenderer The font renderer to use
      * @param text         The text to trim
      * @param x            The x position of the text
@@ -44,9 +47,9 @@ public final class FontHelper
      * @param color        The color of the text
      * @param shadow       Whether or not to draw a shadow
      */
-    public static void drawStringClipped(FontRenderer fontRenderer, String text, float x, float y, int width, int color, boolean shadow)
+    public static void drawStringClipped(MatrixStack matrixStack, FontRenderer fontRenderer, String text, float x, float y, int width, int color, boolean shadow)
     {
-        drawString(fontRenderer, clipStringToWidth(fontRenderer, text, width), x, y, color, shadow);
+        drawString(matrixStack, fontRenderer, clipStringToWidth(fontRenderer, text, width), x, y, color, shadow);
     }
 
     /**
@@ -59,7 +62,7 @@ public final class FontHelper
      */
     public static String clipStringToWidth(FontRenderer fontRenderer, String text, int width)
     {
-        return fontRenderer.getStringWidth(text) > width ? fontRenderer.trimStringToWidth(text, width - fontRenderer.getStringWidth("...")) + "..." : text;
+        return fontRenderer.getStringWidth(text) > width ? fontRenderer.func_238412_a_(text, width - fontRenderer.getStringWidth("...")) + "..." : text;
     }
 
     /**

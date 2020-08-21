@@ -2,7 +2,7 @@ package io.github.ocelot.common.valuecontainer;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.Constants;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -16,12 +16,12 @@ import org.apache.commons.lang3.math.NumberUtils;
 @SuppressWarnings("unused")
 public class BlockPosValueContainerEntry extends AbstractVectorValueContainerEntry<BlockPos>
 {
-    public BlockPosValueContainerEntry(ITextComponent displayName, String name, Vec3i value)
+    public BlockPosValueContainerEntry(ITextComponent displayName, String name, Vector3i value)
     {
         this(displayName, name, value, null, null);
     }
 
-    public BlockPosValueContainerEntry(ITextComponent displayName, String name, Vec3i value, Vec3i minValue, Vec3i maxValue)
+    public BlockPosValueContainerEntry(ITextComponent displayName, String name, Vector3i value, Vector3i minValue, Vector3i maxValue)
     {
         super(displayName, name, new BlockPos(value), minValue == null ? null : new BlockPos(minValue), maxValue == null ? null : new BlockPos(maxValue), false);
     }

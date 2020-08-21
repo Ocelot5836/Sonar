@@ -4,6 +4,7 @@ import io.github.ocelot.common.valuecontainer.ToggleEntry;
 import io.github.ocelot.common.valuecontainer.ValueContainerEntry;
 import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -16,7 +17,6 @@ import java.util.function.Predicate;
  * @author Ocelot
  * @since 2.2.0
  */
-@SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
 public class ValueContainerEntryToggleImpl extends AbstractButton
 {
@@ -26,7 +26,7 @@ public class ValueContainerEntryToggleImpl extends AbstractButton
 
     public ValueContainerEntryToggleImpl(ValueContainerEntry<?> entry, int x, int y, int width, int height)
     {
-        super(x, y, width, height, "");
+        super(x, y, width, height, entry.getDisplayName());
         if (!(entry instanceof ToggleEntry))
             throw new IllegalStateException("Entry '" + entry + "' needs to implement ToggleEntry in order to use the TOGGLE type");
         this.toggleEntry = (ToggleEntry) entry;
@@ -78,6 +78,6 @@ public class ValueContainerEntryToggleImpl extends AbstractButton
     public void setToggled(boolean toggled)
     {
         this.toggled = toggled;
-        this.setMessage(toggled ? I18n.format("gui.yes") : I18n.format("gui.no"));
+        this.setMessage(toggled ? new TranslationTextComponent("gui.yes") : new TranslationTextComponent("gui.no"));
     }
 }

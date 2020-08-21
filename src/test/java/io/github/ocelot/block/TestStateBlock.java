@@ -3,8 +3,8 @@ package io.github.ocelot.block;
 import io.github.ocelot.common.BaseBlock;
 import io.github.ocelot.common.valuecontainer.*;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
@@ -25,9 +25,9 @@ public class TestStateBlock extends BaseBlock implements ValueContainer
     @Override
     public void getEntries(World world, BlockPos pos, List<ValueContainerEntry<?>> entries)
     {
-        entries.add(new VectorValueContainerEntry(new StringTextComponent("test"), "test", new Vec3d(0, 1, 0)));
-        entries.add(new Vec3iValueContainerEntry(new StringTextComponent("test"), "test", new Vec3i(0, 1, 0)));
-        entries.add(new BlockPosValueContainerEntry(new StringTextComponent("test"), "test", new Vec3i(0, 1, 0)));
+        entries.add(new VectorValueContainerEntry(new StringTextComponent("test"), "test", new Vector3d(0, 1, 0)));
+        entries.add(new Vec3iValueContainerEntry(new StringTextComponent("test"), "test", new Vector3i(0, 1, 0)));
+        entries.add(new BlockPosValueContainerEntry(new StringTextComponent("test"), "test", new Vector3i(0, 1, 0)));
         entries.add(new IntValueContainerEntry(new StringTextComponent("test"), "test", 1, 0, 10));
     }
 
@@ -40,6 +40,6 @@ public class TestStateBlock extends BaseBlock implements ValueContainer
     @Override
     public Optional<ITextComponent> getTitle(World world, BlockPos pos)
     {
-        return Optional.of(this.getNameTextComponent());
+        return Optional.of(this.getTranslatedName());
     }
 }

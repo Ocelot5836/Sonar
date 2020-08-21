@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.resources.SimpleResource;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -38,7 +39,6 @@ import java.util.concurrent.TimeUnit;
  * @author Ocelot
  * @since 3.1.0
  */
-@SuppressWarnings("unused")
 public class OnlineImageCache
 {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -102,7 +102,7 @@ public class OnlineImageCache
         if (this.hasExpired(hash))
             return false;
 
-        SimpleResource.RESOURCE_IO_EXECUTOR.execute(() ->
+        Util.getRenderingService().execute(() ->
         {
             LOGGER.trace("Reading '" + hash + "' from cache.");
             try (FileInputStream is = new FileInputStream(imageFile.toFile()))
@@ -234,7 +234,6 @@ public class OnlineImageCache
         return null;
     }
 
-    @SuppressWarnings("unused")
     @SubscribeEvent
     public void onEvent(TickEvent.ClientTickEvent event)
     {

@@ -3,8 +3,8 @@ package io.github.ocelot.common;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.IWaterLoggable;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.fluid.IFluidState;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.inventory.container.Container;
@@ -23,14 +23,13 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-import javax.annotation.Nonnull;
-
 /**
  * <p>Adds common functionality to blocks that use waterlogging or facing properties. To properly be able to waterlog a block, implement {@link IWaterLoggable} on the implementation.</p>
  *
  * @author Ocelot
  * @since 2.3.0
  */
+@SuppressWarnings("deprecation")
 public class BaseBlock extends Block
 {
     public static final DirectionProperty HORIZONTAL_FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -42,7 +41,6 @@ public class BaseBlock extends Block
         super(properties);
     }
 
-    @Deprecated
     @Override
     public int getComparatorInputOverride(BlockState state, World world, BlockPos pos)
     {
@@ -76,7 +74,6 @@ public class BaseBlock extends Block
         return 0;
     }
 
-    @Deprecated
     @Override
     public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving)
     {
@@ -105,60 +102,56 @@ public class BaseBlock extends Block
         super.onReplaced(state, world, pos, newState, isMoving);
     }
 
-    @Nonnull
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context)
     {
         BlockState state = this.getDefaultState();
-        if (state.has(HORIZONTAL_FACING))
+        if (state.hasProperty(HORIZONTAL_FACING))
         {
             state = state.with(HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
         }
-        if (state.has(FACING))
+        if (state.hasProperty(FACING))
         {
             state = state.with(FACING, context.getNearestLookingDirection().getOpposite());
         }
-        if (state.has(WATERLOGGED))
+        if (state.hasProperty(WATERLOGGED))
         {
             state = state.with(WATERLOGGED, context.getWorld().getFluidState(context.getPos()).getFluid() == Fluids.WATER);
         }
         return state;
     }
 
-    @Deprecated
     @Override
     public BlockState rotate(BlockState state, Rotation rotation)
     {
-        if (state.has(HORIZONTAL_FACING))
+        if (state.hasProperty(HORIZONTAL_FACING))
         {
             state = state.with(HORIZONTAL_FACING, rotation.rotate(state.get(HORIZONTAL_FACING)));
         }
-        if (state.has(FACING))
+        if (state.hasProperty(FACING))
         {
             state = state.with(FACING, rotation.rotate(state.get(FACING)));
         }
         return state;
     }
 
-    @Deprecated
     @Override
     public BlockState mirror(BlockState state, Mirror mirror)
     {
-        if (state.has(HORIZONTAL_FACING))
+        if (state.hasProperty(HORIZONTAL_FACING))
         {
             state.rotate(mirror.toRotation(state.get(HORIZONTAL_FACING)));
         }
-        if (state.has(FACING))
+        if (state.hasProperty(FACING))
         {
             state.rotate(mirror.toRotation(state.get(FACING)));
         }
         return state;
     }
 
-    @Deprecated
     @Override
-    public IFluidState getFluidState(BlockState state)
+    public FluidState getFluidState(BlockState state)
     {
-        return state.has(WATERLOGGED) && state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
+        return state.hasProperty(WATERLOGGED) && state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
     }
 }

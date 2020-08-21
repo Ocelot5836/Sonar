@@ -1,5 +1,6 @@
 package io.github.ocelot.client.screen;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import io.github.ocelot.common.valuecontainer.SyncValueContainerMessage;
 import io.github.ocelot.common.valuecontainer.ValueContainer;
 import io.github.ocelot.common.valuecontainer.ValueContainerEntry;
@@ -15,6 +16,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -24,7 +26,6 @@ import java.util.function.Supplier;
  * @see ValueContainer
  * @since 2.2.0
  */
-@SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
 public abstract class ValueContainerEditorScreen extends Screen
 {
@@ -35,11 +36,11 @@ public abstract class ValueContainerEditorScreen extends Screen
 
     public ValueContainerEditorScreen(ValueContainer container, BlockPos pos, Supplier<ITextComponent> defaultTitle)
     {
-        super(container.getTitle(Minecraft.getInstance().world, pos).orElseGet(defaultTitle));
+        super(container.getTitle(Objects.requireNonNull(Minecraft.getInstance().world), pos).orElseGet(defaultTitle));
         this.container = container;
         this.pos = pos;
         this.entries = container.getEntries(Minecraft.getInstance().world, pos);
-        this.formattedTitle = this.getTitle().getFormattedText();
+        this.formattedTitle = this.getTitle().getString();
     }
 
     /**
@@ -50,20 +51,22 @@ public abstract class ValueContainerEditorScreen extends Screen
     /**
      * Draws the background of the screen and any elements that should be drawn behind buttons.
      *
+     * @param matrixStack  The stack of transformations used for positioning
      * @param mouseX       The x position of the mouse
      * @param mouseY       The y position of the mouse
      * @param partialTicks The percentage from last tick and this tick
      */
-    protected abstract void renderBackground(int mouseX, int mouseY, float partialTicks);
+    protected abstract void renderBackground(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks);
 
     /**
      * Draws the foreground of the screen and any elements that should be drawn in front of buttons.
      *
+     * @param matrixStack  The stack of transformations used for positioning
      * @param mouseX       The x position of the mouse
      * @param mouseY       The y position of the mouse
      * @param partialTicks The percentage from last tick and this tick
      */
-    protected abstract void renderForeground(int mouseX, int mouseY, float partialTicks);
+    protected abstract void renderForeground(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks);
 
     /**
      * Ticks the specified child element if it needs ticking.
@@ -101,7 +104,7 @@ public abstract class ValueContainerEditorScreen extends Screen
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks)
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         if (this.minecraft == null)
             return;
@@ -109,22 +112,22 @@ public abstract class ValueContainerEditorScreen extends Screen
         // Fixes the partial ticks actually being the tick length
         partialTicks = this.getMinecraft().getRenderPartialTicks();
 
-        super.renderBackground();
-        this.renderBackground(mouseX, mouseY, partialTicks);
-        this.renderWidgets(mouseX, mouseY, partialTicks);
-        this.renderForeground(mouseX, mouseY, partialTicks);
+        super.renderBackground(matrixStack);
+        this.renderBackground(matrixStack, mouseX, mouseY, partialTicks);
+        this.renderWidgets(matrixStack, mouseX, mouseY, partialTicks);
+        this.renderForeground(matrixStack, mouseX, mouseY, partialTicks);
     }
 
-    public void renderWidgets(int mouseX, int mouseY, float partialTicks)
+    public void renderWidgets(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         for (Widget button : this.buttons)
         {
-            button.render(mouseX, mouseY, partialTicks);
+            button.render(matrixStack, mouseX, mouseY, partialTicks);
         }
     }
 
     @Override
-    public void removed()
+    public void onClose()
     {
         this.sendDataToServer();
     }
@@ -134,7 +137,7 @@ public abstract class ValueContainerEditorScreen extends Screen
     {
         if (this.minecraft == null || this.minecraft.player == null)
             return super.keyPressed(keyCode, scanCode, modifiers);
-        if (super.keyPressed(keyCode, scanCode, modifiers) || this.getFocused() != null)
+        if (super.keyPressed(keyCode, scanCode, modifiers) || this.getListener() != null)
             return true;
 
         InputMappings.Input mouseKey = InputMappings.getInputByCode(keyCode, scanCode);
@@ -152,9 +155,9 @@ public abstract class ValueContainerEditorScreen extends Screen
     {
         if (!this.getEventListenerForPos(mouseX, mouseY).isPresent() || !super.mouseClicked(mouseX, mouseY, mouseButton))
         {
-            if (this.getFocused() != null && !this.getFocused().isMouseOver(mouseX, mouseY))
+            if (this.getListener() != null && !this.getListener().isMouseOver(mouseX, mouseY))
             {
-                this.setFocused(null);
+                this.setListener(null);
                 return true;
             }
             return false;

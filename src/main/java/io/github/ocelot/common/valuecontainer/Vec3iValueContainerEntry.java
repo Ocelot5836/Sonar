@@ -1,50 +1,51 @@
 package io.github.ocelot.common.valuecontainer;
 
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.Constants;
 import org.apache.commons.lang3.math.NumberUtils;
 
 /**
- * <p>Specifies a {@link ValueContainerEntry} as being for a {@link Vec3i} type</p>
+ * <p>Specifies a {@link ValueContainerEntry} as being for a {@link Vector3i} type</p>
  *
  * @author Ocelot
  * @since 3.1.0
+ * TODO rename to Vector3iValueContainerEntry in 4.0.0
  */
 @SuppressWarnings("unused")
-public class Vec3iValueContainerEntry extends AbstractVectorValueContainerEntry<Vec3i>
+public class Vec3iValueContainerEntry extends AbstractVectorValueContainerEntry<Vector3i>
 {
-    public Vec3iValueContainerEntry(ITextComponent displayName, String name, Vec3i value)
+    public Vec3iValueContainerEntry(ITextComponent displayName, String name, Vector3i value)
     {
         this(displayName, name, value, null, null);
     }
 
-    public Vec3iValueContainerEntry(ITextComponent displayName, String name, Vec3i value, Vec3i minValue, Vec3i maxValue)
+    public Vec3iValueContainerEntry(ITextComponent displayName, String name, Vector3i value, Vector3i minValue, Vector3i maxValue)
     {
         super(displayName, name, value, minValue, maxValue, false);
     }
 
     @Override
-    protected Vec3i create(Number x, Number y, Number z)
+    protected Vector3i create(Number x, Number y, Number z)
     {
-        return new Vec3i(x.intValue(), y.intValue(), z.intValue());
+        return new Vector3i(x.intValue(), y.intValue(), z.intValue());
     }
 
     @Override
-    protected Number getX(Vec3i value)
+    protected Number getX(Vector3i value)
     {
         return value.getX();
     }
 
     @Override
-    protected Number getY(Vec3i value)
+    protected Number getY(Vector3i value)
     {
         return value.getY();
     }
 
     @Override
-    protected Number getZ(Vec3i value)
+    protected Number getZ(Vector3i value)
     {
         return value.getZ();
     }
@@ -65,11 +66,11 @@ public class Vec3iValueContainerEntry extends AbstractVectorValueContainerEntry<
         if (nbt.contains(this.getName(), Constants.NBT.TAG_COMPOUND))
         {
             CompoundNBT valueNbt = nbt.getCompound(this.getName());
-            this.value = new Vec3i(valueNbt.getInt("x"), valueNbt.getInt("y"), valueNbt.getInt("z"));
+            this.value = new Vector3i(valueNbt.getInt("x"), valueNbt.getInt("y"), valueNbt.getInt("z"));
         }
         else
         {
-            this.value = new Vec3i(0, 0, 0);
+            this.value = new Vector3i(0, 0, 0);
         }
     }
 
@@ -80,6 +81,6 @@ public class Vec3iValueContainerEntry extends AbstractVectorValueContainerEntry<
         Number x = NumberUtils.createNumber(tokens[0].trim());
         Number y = NumberUtils.createNumber(tokens[1].trim());
         Number z = NumberUtils.createNumber(tokens[2].trim());
-        this.value = this.clamp(new Vec3i(x.intValue(), y.intValue(), z.intValue()), this.getMinValue(), this.getMaxValue());
+        this.value = this.clamp(new Vector3i(x.intValue(), y.intValue(), z.intValue()), this.getMinValue(), this.getMaxValue());
     }
 }
