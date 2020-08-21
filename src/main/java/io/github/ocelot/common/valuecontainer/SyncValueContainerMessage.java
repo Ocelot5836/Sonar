@@ -55,32 +55,6 @@ public class SyncValueContainerMessage implements FishMessage<IValueContainerSer
     }
 
     /**
-     * Encodes the provided message into the specified buffer.
-     *
-     * @param msg The message to serialize
-     * @param buf The buffer to write into
-     * @deprecated TODO remove in 4.0.0
-     */
-    public static void encode(SyncValueContainerMessage msg, PacketBuffer buf)
-    {
-        msg.writePacketData(buf);
-    }
-
-    /**
-     * Decodes a new {@link SyncValueContainerMessage} from the provided buffer.
-     *
-     * @param buf The buffer to read from
-     * @return A new, deserialized message
-     * @deprecated TODO remove in 4.0.0
-     */
-    public static SyncValueContainerMessage decode(PacketBuffer buf)
-    {
-        SyncValueContainerMessage msg = new SyncValueContainerMessage();
-        msg.readPacketData(buf);
-        return msg;
-    }
-
-    /**
      * @return The position of the container
      */
     public BlockPos getPos()

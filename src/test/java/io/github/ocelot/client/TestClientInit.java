@@ -27,7 +27,7 @@ public class TestClientInit
             @Override
             protected void sendDataToServer()
             {
-                DefaultValueContainerClientFunctionality.sendDataToServer(TestMessageHandler.INSTANCE, this);
+                DefaultValueContainerClientFunctionality.sendDataToServer(TestMessageHandler.PLAY, this);
             }
         });
     }

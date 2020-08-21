@@ -11,17 +11,15 @@ import org.apache.commons.lang3.math.NumberUtils;
  *
  * @author Ocelot
  * @since 3.1.0
- * TODO rename to Vector3iValueContainerEntry in 4.0.0
  */
-@SuppressWarnings("unused")
-public class Vec3iValueContainerEntry extends AbstractVectorValueContainerEntry<Vector3i>
+public class Vector3iValueContainerEntry extends AbstractVectorValueContainerEntry<Vector3i>
 {
-    public Vec3iValueContainerEntry(ITextComponent displayName, String name, Vector3i value)
+    public Vector3iValueContainerEntry(ITextComponent displayName, String name, Vector3i value)
     {
         this(displayName, name, value, null, null);
     }
 
-    public Vec3iValueContainerEntry(ITextComponent displayName, String name, Vector3i value, Vector3i minValue, Vector3i maxValue)
+    public Vector3iValueContainerEntry(ITextComponent displayName, String name, Vector3i value, Vector3i minValue, Vector3i maxValue)
     {
         super(displayName, name, value, minValue, maxValue, false);
     }

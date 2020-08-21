@@ -50,7 +50,7 @@ public class TestMod
     public static final RegistryObject<TestStateBlock> TEST_STATE_BLOCK = BLOCKS.register("test_state", () -> new TestStateBlock(Block.Properties.from(Blocks.IRON_BLOCK)));
     public static final RegistryObject<BlockItem> TEST_BLOCK_ITEM = ITEMS.register("test", () -> new BlockItem(TEST_BLOCK.get(), new Item.Properties().group(TEST_GROUP)));
     public static final RegistryObject<BlockItem> TEST_STATE_BLOCK_ITEM = ITEMS.register("test_state", () -> new BlockItem(TEST_STATE_BLOCK.get(), new Item.Properties().group(TEST_GROUP)));
-    public static final RegistryObject<Item> TEST_EDITOR_ITEM = ITEMS.register("test_value_container_editor", () -> new ValueContainerEditorItem(new Item.Properties().group(TEST_GROUP), (player, pos) -> TestMessageHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new OpenValueContainerMessage(pos))));
+    public static final RegistryObject<Item> TEST_EDITOR_ITEM = ITEMS.register("test_value_container_editor", () -> new ValueContainerEditorItem(new Item.Properties().group(TEST_GROUP), (player, pos) -> TestMessageHandler.PLAY.send(PacketDistributor.PLAYER.with(() -> player), new OpenValueContainerMessage(pos))));
 
     public static final RegistryObject<TileEntityType<TestTileEntity>> TEST_TILE_ENTITY = TILE_ENTITIES.register("test", () -> TileEntityType.Builder.create(TestTileEntity::new, TEST_BLOCK.get()).build(null));
 
