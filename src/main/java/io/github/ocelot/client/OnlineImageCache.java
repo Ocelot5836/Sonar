@@ -69,13 +69,20 @@ public class OnlineImageCache
         this.textureCache = new HashMap<>();
         this.textureCacheTime = unit.toMillis(textureCacheTime);
 
-        try (InputStreamReader is = new InputStreamReader(new FileInputStream(this.cacheFile.toFile())))
+        if (Files.exists(this.cacheFile))
         {
-            this.cacheFileData = new JsonParser().parse(is).getAsJsonObject();
+            try (InputStreamReader is = new InputStreamReader(new FileInputStream(this.cacheFile.toFile())))
+            {
+                this.cacheFileData = new JsonParser().parse(is).getAsJsonObject();
+            }
+            catch (Exception e)
+            {
+                LOGGER.error("Failed to load cache from '" + this.cacheFile + "'", e);
+                this.cacheFileData = new JsonObject();
+            }
         }
-        catch (Exception e)
+        else
         {
-            LOGGER.error("Failed to load cache from '" + this.cacheFile + "'", e);
             this.cacheFileData = new JsonObject();
         }
 
