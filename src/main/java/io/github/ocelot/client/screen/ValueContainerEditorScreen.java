@@ -129,7 +129,8 @@ public abstract class ValueContainerEditorScreen extends Screen
     @Override
     public void onClose()
     {
-        this.sendDataToServer();
+        if (this.entries.stream().anyMatch(ValueContainerEntry::isDirty))
+            this.sendDataToServer();
     }
 
     @Override
@@ -167,6 +168,7 @@ public abstract class ValueContainerEditorScreen extends Screen
 
     /**
      * @return A new message that can be sent to the client to sync value container entries
+     * @deprecated Redundant TODO remove in 4.0.0
      */
     public SyncValueContainerMessage createSyncMessage()
     {
