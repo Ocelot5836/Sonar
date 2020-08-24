@@ -15,6 +15,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -24,7 +25,6 @@ import java.util.function.Supplier;
  * @see ValueContainer
  * @since 2.2.0
  */
-@SuppressWarnings("unused")
 @OnlyIn(Dist.CLIENT)
 public abstract class ValueContainerEditorScreen extends Screen
 {
@@ -35,7 +35,7 @@ public abstract class ValueContainerEditorScreen extends Screen
 
     public ValueContainerEditorScreen(ValueContainer container, BlockPos pos, Supplier<ITextComponent> defaultTitle)
     {
-        super(container.getTitle(Minecraft.getInstance().world, pos).orElseGet(defaultTitle));
+        super(container.getTitle(Objects.requireNonNull(Minecraft.getInstance().world), pos).orElseGet(defaultTitle));
         this.container = container;
         this.pos = pos;
         this.entries = container.getEntries(Minecraft.getInstance().world, pos);
@@ -126,7 +126,8 @@ public abstract class ValueContainerEditorScreen extends Screen
     @Override
     public void removed()
     {
-        this.sendDataToServer();
+        if (this.entries.stream().anyMatch(ValueContainerEntry::isDirty))
+            this.sendDataToServer();
     }
 
     @Override
@@ -164,6 +165,7 @@ public abstract class ValueContainerEditorScreen extends Screen
 
     /**
      * @return A new message that can be sent to the client to sync value container entries
+     * @deprecated Redundant TODO remove in 4.0.0
      */
     public SyncValueContainerMessage createSyncMessage()
     {

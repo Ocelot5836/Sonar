@@ -2,6 +2,7 @@ package io.github.ocelot.network.handler;
 
 import io.github.ocelot.TestMod;
 import io.github.ocelot.client.screen.ValueContainerEditorScreenImpl;
+import io.github.ocelot.common.valuecontainer.SyncValueContainerMessage;
 import io.github.ocelot.common.valuecontainer.ValueContainer;
 import io.github.ocelot.network.TestMessageHandler;
 import net.minecraft.client.gui.screen.Screen;
@@ -28,7 +29,8 @@ public class TestClientPlayerHandler implements ITestClientPlayHandler
             @Override
             protected void sendDataToServer()
             {
-                TestMessageHandler.PLAY.send(PacketDistributor.SERVER.noArg(), this.createSyncMessage());
+                System.out.println("Packet Sent!");
+                TestMessageHandler.PLAY.send(PacketDistributor.SERVER.noArg(), new SyncValueContainerMessage(this.getPos(), this.getEntries()));
             }
         };
     }
