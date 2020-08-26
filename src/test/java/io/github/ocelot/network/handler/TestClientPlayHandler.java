@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fml.network.PacketDistributor;
 
-public class TestClientPlayerHandler implements ITestClientPlayHandler
+public class TestClientPlayHandler implements ITestClientPlayHandler
 {
     private static final ResourceLocation BACKGROUND_LOCATION = new ResourceLocation(TestMod.MOD_ID, "textures/gui/value_container_editor.png");
 
@@ -23,7 +23,7 @@ public class TestClientPlayerHandler implements ITestClientPlayHandler
             @Override
             public ResourceLocation getBackgroundTextureLocation()
             {
-                return TestClientPlayerHandler.BACKGROUND_LOCATION;
+                return TestClientPlayHandler.BACKGROUND_LOCATION;
             }
 
             @Override
