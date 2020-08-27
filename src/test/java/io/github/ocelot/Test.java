@@ -1,29 +1,35 @@
 package io.github.ocelot;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
+import io.github.ocelot.common.OnlineRequest;
+import org.apache.logging.log4j.LogManager;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class Test
 {
-    public static void main(String[] args) throws Exception
+    private static long runPhase(boolean async)
     {
-        BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-        for (int i = 0; i < 16; ++i)
+        long startTime = System.currentTimeMillis();
+        List<CompletableFuture<?>> futures = new ArrayList<>();
+        for (int i = 0; i < 16; i++)
+            futures.add(OnlineRequest.request("https://cdn.discordapp.com/attachments/683471388434366490/748648773659656284/unknown.png"));
+        if (async)
         {
-            for (int j = 0; j < 16; ++j)
-            {
-                if (i < 8)
-                {
-                    image.setRGB(j, i, 0xFFB20000);
-                }
-                else
-                {
-                    int k = (int) ((1.0F - (float) j / 15.0F * 0.75F) * 255.0F);
-                    image.setRGB(j, i, k << 24 | 16777215);
-                }
-            }
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
         }
-        ImageIO.write(image, "PNG", new File("overlay.png"));
+        else
+        {
+            for (CompletableFuture<?> future : futures)
+                future.join();
+        }
+        return System.currentTimeMillis() - startTime;
+    }
+
+    public static void main(String[] args)
+    {
+        System.out.println("Took " + runPhase(false) + "ms");
     }
 }
