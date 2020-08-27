@@ -24,14 +24,6 @@ public class SpawnEggItemBase<T extends Entity> extends SpawnEggItem
     private final boolean addToMisc;
     private final RegistryObject<EntityType<T>> type;
 
-    /**
-     * @deprecated Use alternate constructor. TODO remove in 4.0.0
-     */
-    public SpawnEggItemBase(RegistryObject<EntityType<T>> type, int primaryColor, int secondaryColor, Properties builder)
-    {
-        this(type, primaryColor, secondaryColor, false, builder);
-    }
-
     public SpawnEggItemBase(RegistryObject<EntityType<T>> type, int primaryColor, int secondaryColor, boolean addToMisc, Properties builder)
     {
         super(EntityType.OCELOT, primaryColor, secondaryColor, builder);

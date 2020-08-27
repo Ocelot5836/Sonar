@@ -25,7 +25,7 @@ public class ValueContainerEntryToggleImpl extends AbstractButton
 
     public ValueContainerEntryToggleImpl(ValueContainerEntry<?> entry, int x, int y, int width, int height)
     {
-        super(x, y, width, height, "");
+        super(x, y, width, height, entry.getDisplay());
         if (!(entry instanceof ToggleEntry))
             throw new IllegalStateException("Entry '" + entry + "' needs to implement ToggleEntry in order to use the TOGGLE type");
         this.toggleEntry = (ToggleEntry) entry;

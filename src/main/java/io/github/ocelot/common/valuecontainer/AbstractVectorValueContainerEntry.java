@@ -25,7 +25,7 @@ public abstract class AbstractVectorValueContainerEntry<T> implements ValueConta
     protected T value;
     private Predicate<String> validator;
 
-    public AbstractVectorValueContainerEntry(ITextComponent displayName, String name, T value, T minValue, T maxValue, boolean allowDecimals)
+    public AbstractVectorValueContainerEntry(ITextComponent displayName, String name, T value, @Nullable T minValue, @Nullable T maxValue, boolean allowDecimals)
     {
         this.displayName = displayName;
         this.name = name;

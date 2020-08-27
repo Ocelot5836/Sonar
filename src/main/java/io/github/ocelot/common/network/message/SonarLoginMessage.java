@@ -3,13 +3,13 @@ package io.github.ocelot.common.network.message;
 import java.util.function.IntSupplier;
 
 /**
- * <p>An implementation of {@link FishMessage} intended for login messages.</p>
+ * <p>An implementation of {@link SonarMessage} intended for login messages.</p>
  *
  * @param <T> The interface that should handle this message
  * @author Ocelot
  * @since 3.2.0
  */
-public interface FishLoginMessage<T> extends FishMessage<T>, IntSupplier
+public interface SonarLoginMessage<T> extends SonarMessage<T>, IntSupplier
 {
     /**
      * @return The index of this login message.

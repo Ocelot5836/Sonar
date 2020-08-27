@@ -10,7 +10,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
  * @author Ocelot
  * @since 3.2.0
  */
-public interface FishMessage<T>
+public interface SonarMessage<T>
 {
     /**
      * Reads the raw message data from the data stream.

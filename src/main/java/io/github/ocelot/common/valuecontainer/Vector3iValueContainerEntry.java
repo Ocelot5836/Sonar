@@ -12,14 +12,14 @@ import org.apache.commons.lang3.math.NumberUtils;
  * @author Ocelot
  * @since 3.1.0
  */
-public class Vec3iValueContainerEntry extends AbstractVectorValueContainerEntry<Vec3i>
+public class Vector3iValueContainerEntry extends AbstractVectorValueContainerEntry<Vec3i>
 {
-    public Vec3iValueContainerEntry(ITextComponent displayName, String name, Vec3i value)
+    public Vector3iValueContainerEntry(ITextComponent displayName, String name, Vec3i value)
     {
         this(displayName, name, value, null, null);
     }
 
-    public Vec3iValueContainerEntry(ITextComponent displayName, String name, Vec3i value, Vec3i minValue, Vec3i maxValue)
+    public Vector3iValueContainerEntry(ITextComponent displayName, String name, Vec3i value, Vec3i minValue, Vec3i maxValue)
     {
         super(displayName, name, value, minValue, maxValue, false);
     }

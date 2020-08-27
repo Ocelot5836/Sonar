@@ -1,6 +1,6 @@
 package io.github.ocelot.common.valuecontainer;
 
-import io.github.ocelot.common.network.message.FishMessage;
+import io.github.ocelot.common.network.message.SonarMessage;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
@@ -14,7 +14,7 @@ import java.util.List;
  * @author Ocelot
  * @since 2.1.0
  */
-public class SyncValueContainerMessage implements FishMessage<IValueContainerServerHandler>
+public class SyncValueContainerMessage implements SonarMessage<IValueContainerServerHandler>
 {
     private BlockPos pos;
     private CompoundNBT data;
@@ -52,32 +52,6 @@ public class SyncValueContainerMessage implements FishMessage<IValueContainerSer
     public void processPacket(IValueContainerServerHandler handler, NetworkEvent.Context ctx)
     {
         handler.handleSyncValueContainerMessage(this, ctx);
-    }
-
-    /**
-     * Encodes the provided message into the specified buffer.
-     *
-     * @param msg The message to serialize
-     * @param buf The buffer to write into
-     * @deprecated TODO remove in 4.0.0
-     */
-    public static void encode(SyncValueContainerMessage msg, PacketBuffer buf)
-    {
-        msg.writePacketData(buf);
-    }
-
-    /**
-     * Decodes a new {@link SyncValueContainerMessage} from the provided buffer.
-     *
-     * @param buf The buffer to read from
-     * @return A new, deserialized message
-     * @deprecated TODO remove in 4.0.0
-     */
-    public static SyncValueContainerMessage decode(PacketBuffer buf)
-    {
-        SyncValueContainerMessage msg = new SyncValueContainerMessage();
-        msg.readPacketData(buf);
-        return msg;
     }
 
     /**

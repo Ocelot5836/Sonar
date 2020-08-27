@@ -25,8 +25,8 @@ public class TestStateBlock extends BaseBlock implements ValueContainer
     @Override
     public void getEntries(World world, BlockPos pos, List<ValueContainerEntry<?>> entries)
     {
-        entries.add(new VectorValueContainerEntry(new StringTextComponent("test"), "test", new Vec3d(0, 1, 0)));
-        entries.add(new Vec3iValueContainerEntry(new StringTextComponent("test"), "test", new Vec3i(0, 1, 0)));
+        entries.add(new Vector3dValueContainerEntry(new StringTextComponent("test"), "test", new Vec3d(0, 1, 0)));
+        entries.add(new Vector3iValueContainerEntry(new StringTextComponent("test"), "test", new Vec3i(0, 1, 0)));
         entries.add(new BlockPosValueContainerEntry(new StringTextComponent("test"), "test", new Vec3i(0, 1, 0)));
         entries.add(new IntValueContainerEntry(new StringTextComponent("test"), "test", 1, 0, 10));
     }

@@ -23,8 +23,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-import javax.annotation.Nonnull;
-
 /**
  * <p>Adds common functionality to blocks that use waterlogging or facing properties. To properly be able to waterlog a block, implement {@link IWaterLoggable} on the implementation.</p>
  *

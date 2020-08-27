@@ -6,20 +6,22 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.Constants;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import javax.annotation.Nullable;
+
 /**
  * <p>Specifies a {@link ValueContainerEntry} as being for a {@link Vec3d} type</p>
  *
  * @author Ocelot
  * @since 2.1.0
  */
-public class VectorValueContainerEntry extends AbstractVectorValueContainerEntry<Vec3d>
+public class Vector3dValueContainerEntry extends AbstractVectorValueContainerEntry<Vec3d>
 {
-    public VectorValueContainerEntry(ITextComponent displayName, String name, Vec3d value)
+    public Vector3dValueContainerEntry(ITextComponent displayName, String name, Vec3d value)
     {
         this(displayName, name, value, null, null);
     }
 
-    public VectorValueContainerEntry(ITextComponent displayName, String name, Vec3d value, Vec3d minValue, Vec3d maxValue)
+    public Vector3dValueContainerEntry(ITextComponent displayName, String name, Vec3d value, @Nullable Vec3d minValue,@Nullable Vec3d maxValue)
     {
         super(displayName, name, value, minValue, maxValue, true);
     }

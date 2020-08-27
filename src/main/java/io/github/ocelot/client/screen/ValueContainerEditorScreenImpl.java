@@ -1,5 +1,6 @@
 package io.github.ocelot.client.screen;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.ocelot.client.FontHelper;
 import io.github.ocelot.client.ScissorHelper;
@@ -20,6 +21,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -183,7 +185,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
         float screenX = (this.width - this.xSize) / 2f;
         float screenY = (this.height - this.ySize) / 2f;
         this.getMinecraft().getTextureManager().bindTexture(this.getBackgroundTextureLocation());
-        ShapeRenderer.drawRectWithTexture(screenX, screenY, 0, 0, this.xSize, this.ySize);
+        ShapeRenderer.drawRectWithTexture(new MatrixStack(), screenX, screenY, 0, 0, this.xSize, this.ySize);
     }
 
     @Override
@@ -194,7 +196,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
         this.getMinecraft().getTextureManager().bindTexture(this.getBackgroundTextureLocation());
         boolean hasScroll = this.scrollHandler.getMaxScroll() > 0;
         float scrollbarY = hasScroll ? 127 * (this.scrollHandler.getInterpolatedScroll(partialTicks) / this.scrollHandler.getMaxScroll()) : 0;
-        ShapeRenderer.drawRectWithTexture(158, 18 + scrollbarY, hasScroll ? 176 : 188, 0, 12, 15);
+        ShapeRenderer.drawRectWithTexture(new MatrixStack(), 158, 18 + scrollbarY, hasScroll ? 176 : 188, 0, 12, 15);
     }
 
     @Override
@@ -350,7 +352,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
         }
     }
 
-    private boolean changeFocus(boolean p_changeFocus_1_, List<? extends IGuiEventListener> list, IGuiEventListener focused)
+    private boolean changeFocus(boolean p_changeFocus_1_, List<? extends IGuiEventListener> list, @Nullable IGuiEventListener focused)
     {
         int j = list.indexOf(focused);
         int i;

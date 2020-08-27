@@ -1,6 +1,6 @@
 package io.github.ocelot.common.valuecontainer;
 
-import io.github.ocelot.common.network.message.FishMessage;
+import io.github.ocelot.common.network.message.SonarMessage;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
@@ -13,13 +13,9 @@ import net.minecraftforge.fml.network.NetworkEvent;
  * @author Ocelot
  * @since 3.1.0
  */
-public class OpenValueContainerMessage implements FishMessage<IValueContainerClientHandler>
+public class OpenValueContainerMessage implements SonarMessage<IValueContainerClientHandler>
 {
     private BlockPos pos;
-
-    public OpenValueContainerMessage()
-    {
-    }
 
     public OpenValueContainerMessage(BlockPos pos)
     {
@@ -42,32 +38,6 @@ public class OpenValueContainerMessage implements FishMessage<IValueContainerCli
     public void processPacket(IValueContainerClientHandler handler, NetworkEvent.Context ctx)
     {
         handler.handleOpenValueContainerMessage(this, ctx);
-    }
-
-    /**
-     * Encodes the provided message into the specified buffer.
-     *
-     * @param msg The message to serialize
-     * @param buf The buffer to write into
-     * @deprecated TODO remove in 4.0.0
-     */
-    public static void encode(OpenValueContainerMessage msg, PacketBuffer buf)
-    {
-        msg.writePacketData(buf);
-    }
-
-    /**
-     * Decodes a new {@link OpenValueContainerMessage} from the provided buffer.
-     *
-     * @param buf The buffer to read from
-     * @return A new deserialized message
-     * @deprecated TODO remove in 4.0.0
-     */
-    public static OpenValueContainerMessage decode(PacketBuffer buf)
-    {
-        OpenValueContainerMessage msg = new OpenValueContainerMessage();
-        msg.readPacketData(buf);
-        return msg;
     }
 
     /**

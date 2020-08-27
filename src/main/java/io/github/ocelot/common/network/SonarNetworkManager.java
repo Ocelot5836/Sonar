@@ -1,7 +1,7 @@
 package io.github.ocelot.common.network;
 
-import io.github.ocelot.common.network.message.FishLoginMessage;
-import io.github.ocelot.common.network.message.FishMessage;
+import io.github.ocelot.common.network.message.SonarLoginMessage;
+import io.github.ocelot.common.network.message.SonarMessage;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SDisconnectPacket;
@@ -27,7 +27,7 @@ import java.util.function.Supplier;
  * @author Ocelot
  * @since 3.2.0
  */
-public class FishNetworkManager
+public class SonarNetworkManager
 {
     private static final Logger LOGGER = LogManager.getLogger();
     private final SimpleChannel channel;
@@ -35,7 +35,7 @@ public class FishNetworkManager
     private final LazyValue<Supplier<Object>> serverMessageHandler;
     private int nextId;
 
-    public FishNetworkManager(SimpleChannel channel, Supplier<Supplier<Object>> clientSupplier, Supplier<Supplier<Object>> serverSupplier)
+    public SonarNetworkManager(SimpleChannel channel, Supplier<Supplier<Object>> clientSupplier, Supplier<Supplier<Object>> serverSupplier)
     {
         this.channel = channel;
         this.clientMessageHandler = new LazyValue<>(clientSupplier);
@@ -43,7 +43,7 @@ public class FishNetworkManager
     }
 
     @SuppressWarnings("unchecked")
-    private <MSG extends FishMessage<T>, T> boolean processMessage(MSG msg, Supplier<NetworkEvent.Context> ctx)
+    private <MSG extends SonarMessage<T>, T> boolean processMessage(MSG msg, Supplier<NetworkEvent.Context> ctx)
     {
         try
         {
@@ -68,9 +68,9 @@ public class FishNetworkManager
         }
     }
 
-    private <MSG extends FishMessage<T>, T> SimpleChannel.MessageBuilder<MSG> getMessageBuilder(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
+    private <MSG extends SonarMessage<T>, T> SimpleChannel.MessageBuilder<MSG> getMessageBuilder(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
     {
-        return this.channel.messageBuilder(clazz, this.nextId++, direction).encoder(FishMessage::writePacketData).decoder(buf ->
+        return this.channel.messageBuilder(clazz, this.nextId++, direction).encoder(SonarMessage::writePacketData).decoder(buf ->
         {
             MSG msg = generator.get();
             msg.readPacketData(buf);
@@ -87,7 +87,7 @@ public class FishNetworkManager
      * @param <MSG>     The type of message to be sent
      * @param <T>       The handler that will process the message. Should be an interface to avoid loading client classes on server
      */
-    public <MSG extends FishMessage<T>, T> void register(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
+    public <MSG extends SonarMessage<T>, T> void register(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
     {
         getMessageBuilder(clazz, generator, direction).add();
     }
@@ -101,16 +101,16 @@ public class FishNetworkManager
      * @param <MSG>     The type of message to be sent
      * @param <T>       The handler that will process the message. Should be an interface to avoid loading client classes on server
      */
-    public <MSG extends FishLoginMessage<T>, T> void registerLoginReply(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
+    public <MSG extends SonarLoginMessage<T>, T> void registerLoginReply(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
     {
-        this.channel.messageBuilder(clazz, this.nextId++, direction).encoder(FishMessage::writePacketData).decoder(buf ->
+        this.channel.messageBuilder(clazz, this.nextId++, direction).encoder(SonarMessage::writePacketData).decoder(buf ->
         {
             MSG msg = generator.get();
             msg.readPacketData(buf);
             return msg;
         })
                 .consumer(FMLHandshakeHandler.indexFirst((__, msg, ctx) -> ctx.get().setPacketHandled(this.processMessage(msg, ctx))))
-                .loginIndex(FishLoginMessage::getAsInt, FishLoginMessage::setLoginIndex)
+                .loginIndex(SonarLoginMessage::getAsInt, SonarLoginMessage::setLoginIndex)
                 .add();
     }
 
@@ -123,10 +123,10 @@ public class FishNetworkManager
      * @param <MSG>     The type of message to be sent
      * @param <T>       The handler that will process the message. Should be an interface to avoid loading client classes on server
      */
-    public <MSG extends FishLoginMessage<T>, T> void registerLogin(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
+    public <MSG extends SonarLoginMessage<T>, T> void registerLogin(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
     {
         getMessageBuilder(clazz, generator, direction)
-                .loginIndex(FishLoginMessage::getAsInt, FishLoginMessage::setLoginIndex)
+                .loginIndex(SonarLoginMessage::getAsInt, SonarLoginMessage::setLoginIndex)
                 .markAsLoginPacket()
                 .add();
     }
@@ -141,10 +141,10 @@ public class FishNetworkManager
      * @param <MSG>                 The type of message to be sent
      * @param <T>                   The handler that will process the message. Should be an interface to avoid loading client classes on server
      */
-    public <MSG extends FishLoginMessage<T>, T> void registerLogin(Class<MSG> clazz, Supplier<MSG> generator, Function<Boolean, List<Pair<String, MSG>>> loginPacketGenerators, @Nullable NetworkDirection direction)
+    public <MSG extends SonarLoginMessage<T>, T> void registerLogin(Class<MSG> clazz, Supplier<MSG> generator, Function<Boolean, List<Pair<String, MSG>>> loginPacketGenerators, @Nullable NetworkDirection direction)
     {
         getMessageBuilder(clazz, generator, direction)
-                .loginIndex(FishLoginMessage::getAsInt, FishLoginMessage::setLoginIndex)
+                .loginIndex(SonarLoginMessage::getAsInt, SonarLoginMessage::setLoginIndex)
                 .buildLoginPacketList(loginPacketGenerators)
                 .add();
     }
