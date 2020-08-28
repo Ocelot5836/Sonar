@@ -209,7 +209,7 @@ public class OnlineImageCache
 
         LOGGER.trace("Requesting image from '" + hash + "'");
         this.requested.add(hash);
-        OnlineRequest.make(url, result ->
+        OnlineRequest.request(url).thenAcceptAsync(result ->
         {
             try
             {
@@ -231,14 +231,6 @@ public class OnlineImageCache
                     this.requested.remove(hash);
                 });
             }
-        }, e ->
-        {
-            LOGGER.error("Failed to load online texture from '" + url + "'. Using missing texture sprite.", e);
-            Minecraft.getInstance().execute(() ->
-            {
-                this.errored.add(hash);
-                this.requested.remove(hash);
-            });
         });
         return null;
     }

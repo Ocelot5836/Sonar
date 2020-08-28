@@ -1,7 +1,6 @@
 package io.github.ocelot.client.screen;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import io.github.ocelot.common.valuecontainer.SyncValueContainerMessage;
 import io.github.ocelot.common.valuecontainer.ValueContainer;
 import io.github.ocelot.common.valuecontainer.ValueContainerEntry;
 import net.minecraft.client.Minecraft;
@@ -164,15 +163,6 @@ public abstract class ValueContainerEditorScreen extends Screen
             return false;
         }
         return true;
-    }
-
-    /**
-     * @return A new message that can be sent to the client to sync value container entries
-     * @deprecated Redundant TODO remove in 4.0.0
-     */
-    public SyncValueContainerMessage createSyncMessage()
-    {
-        return new SyncValueContainerMessage(this.pos, this.entries);
     }
 
     /**

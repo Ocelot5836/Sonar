@@ -1,10 +1,10 @@
 package io.github.ocelot.network;
 
-import io.github.ocelot.common.network.message.FishLoginMessage;
+import io.github.ocelot.common.network.message.SonarLoginMessage;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
-public class TestLoginMessage implements FishLoginMessage<Object>
+public class TestLoginMessage implements SonarLoginMessage<Object>
 {
     private int loginIndex;
 

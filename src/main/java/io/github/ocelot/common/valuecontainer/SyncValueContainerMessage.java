@@ -1,6 +1,6 @@
 package io.github.ocelot.common.valuecontainer;
 
-import io.github.ocelot.common.network.message.FishMessage;
+import io.github.ocelot.common.network.message.SonarMessage;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
@@ -14,7 +14,7 @@ import java.util.List;
  * @author Ocelot
  * @since 2.1.0
  */
-public class SyncValueContainerMessage implements FishMessage<IValueContainerServerHandler>
+public class SyncValueContainerMessage implements SonarMessage<IValueContainerServerHandler>
 {
     private BlockPos pos;
     private CompoundNBT data;

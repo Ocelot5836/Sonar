@@ -1,112 +1,124 @@
 package io.github.ocelot.common;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.CountingInputStream;
+import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.EofSensorInputStream;
+import org.apache.http.conn.EofSensorWatcher;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 /**
  * <p>An asynchronous way to make requests to the internet.</p>
- * <p>{@link #make(String, Consumer, Consumer)} can be used to make a request and return a {@link Request} with the current status of the request.</p>
+ * <p>{@link #get(String)} can be used to open a new stream to the internet. <b><i>NOTE: THIS STREAM CANNOT BE KEPT OPEN AND IS NOT OFF-THREAD!</i></b></p>
+ * <p>{@link #request(String)} and {@link #request(String, Executor)} can be used instead to fetch all data on another thread.</p>
  *
  * @author Ocelot
- * @see Consumer
- * @see Future
+ * @see CompletableFuture
  * @since 2.0.0
  */
-public final class OnlineRequest
+public class OnlineRequest
 {
-    private static final ExecutorService POOL = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), task -> new Thread(task, "Online Request Pool"));
+    private static final Logger LOGGER = LogManager.getLogger();
     private static String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
 
-    static
+    /**
+     * <p>Fetches data from the specified url.</p>
+     * <p>This method is not asynchronous and will block code execution until the value has been received.</p>
+     *
+     * @param url The url to get the data from
+     * @return An open stream to the internet
+     */
+    public static InputStream get(String url) throws IOException
     {
-        Runtime.getRuntime().addShutdownHook(new Thread(POOL::shutdown));
-    }
-
-    private OnlineRequest()
-    {
-    }
-
-    private static void request(Request request) throws Exception
-    {
-        if (request.isCancelled())
-            return;
-
-        try (CloseableHttpClient client = HttpClients.custom().setUserAgent(USER_AGENT).build())
+        HttpGet get = new HttpGet(url);
+        CloseableHttpClient client = HttpClients.custom().setUserAgent(USER_AGENT).build();
+        CloseableHttpResponse response = client.execute(get);
+        StatusLine statusLine = response.getStatusLine();
+        if (statusLine.getStatusCode() != 200)
         {
-            HttpGet get = new HttpGet(request.getUrl());
-            try (CloseableHttpResponse response = client.execute(get))
-            {
-                String contentLength = response.getFirstHeader("Content-Length").getValue();
-                if (contentLength != null)
-                    request.setFileSize(Long.parseLong(contentLength));
-                try (CancellableInputStream countingInputStream = new CancellableInputStream(request, new CountingInputStream(response.getEntity().getContent())
-                {
-                    @Override
-                    public synchronized long skip(long length) throws IOException
-                    {
-                        long skip = super.skip(length);
-                        request.setReceived(this.getByteCount());
-                        return skip;
-                    }
-
-                    @Override
-                    protected synchronized void afterRead(int n)
-                    {
-                        super.afterRead(n);
-                        request.setReceived(this.getByteCount());
-                    }
-                }))
-                {
-                    request.setValue(countingInputStream);
-                    get.releaseConnection();
-                }
-            }
+            client.close();
+            response.close();
+            throw new IOException("Failed to connect to '" + url + "'. " + statusLine.getStatusCode() + " " + statusLine.getReasonPhrase());
         }
+        return new EofSensorInputStream(response.getEntity().getContent(), new EofSensorWatcher()
+        {
+            @Override
+            public boolean eofDetected(InputStream wrapped) throws IOException
+            {
+                response.close();
+                return true;
+            }
+
+            @Override
+            public boolean streamClosed(InputStream wrapped) throws IOException
+            {
+                response.close();
+                return true;
+            }
+
+            @Override
+            public boolean streamAbort(InputStream wrapped) throws IOException
+            {
+                response.close();
+                return true;
+            }
+        });
     }
 
     /**
-     * <p>Adds a new request to the queue.</p>
-     * <p>The supplied callback will be called when a result is received and no error is thrown.</p>
-     * <p>If the stream needs to be saved for later, use {@link IOUtils#toBufferedInputStream(InputStream)} to make a copy. The stream <b><i>WILL NOT PERSIST AFTER THE CALLBACK IS CALLED!</i></b></p>
-     * <p>The data may be incomplete if {@link Request#cancel()} was called</p>
-     * <p>If the error callback is not null and an error is thrown, the callback <b><i>WILL NOT BE CALLED</i></b> and the exception will be passed into the error callback.</p>
+     * <p>Fetches data from the specified url on the specified executor.</p>
+     * <p>This method is asynchronous and the received value is indicated to exist at some point in the future.</p>
      *
-     * @param url           the URL to make a request to
-     * @param callback      the response callback for the request
-     * @param errorCallback The callback to use when an error occurs or null to ignore errors
-     * @return The result and statistics about the request
+     * @param url      The url to get the data from
+     * @param executor The executor to run the request on
+     * @return A copy of the data read from the specified URL
      */
-    public static Request make(String url, Consumer<InputStream> callback, @Nullable Consumer<Exception> errorCallback)
+    public static CompletableFuture<InputStream> request(String url, Executor executor)
     {
-        Request request = new Request(url, callback);
-        POOL.execute(() ->
+        return CompletableFuture.supplyAsync(() ->
         {
-            try
+            try (InputStream stream = get(url))
             {
-                request(request);
+                return IOUtils.toBufferedInputStream(stream);
             }
-            catch (Exception e)
+            catch (IOException e)
             {
-                if (errorCallback != null)
-                {
-                    errorCallback.accept(e);
-                }
+                LOGGER.error("Failed to fully read stream from '" + url + "'", e);
+                return null;
+            }
+        }, executor);
+    }
+
+    /**
+     * <p>Fetches data from the specified url.</p>
+     * <p>This method is asynchronous and the received value is indicated to exist at some point in the future.</p>
+     *
+     * @param url The url to get the data from
+     * @return A copy of the data read from the specified URL
+     */
+    public static CompletableFuture<InputStream> request(String url)
+    {
+        return CompletableFuture.supplyAsync(() ->
+        {
+            try (InputStream stream = get(url))
+            {
+                return IOUtils.toBufferedInputStream(stream);
+            }
+            catch (IOException e)
+            {
+                LOGGER.error("Failed to fully read stream from '" + url + "'", e);
+                return null;
             }
         });
-        return request;
     }
 
     /**
@@ -117,180 +129,5 @@ public final class OnlineRequest
     public static void setUserAgent(String userAgent)
     {
         USER_AGENT = userAgent;
-    }
-
-    /**
-     * <p>A request made to the internet that contains request stats and progress.</p>
-     *
-     * @author Ocelot
-     * @since 3.0.0
-     */
-    public static class Request
-    {
-        private final String url;
-        private final Consumer<InputStream> listener;
-        private volatile long fileSize;
-        private volatile long bytesReceived;
-        private volatile long startTime;
-        private volatile boolean cancelled;
-
-        private Request(String url, Consumer<InputStream> listener)
-        {
-            this.url = url;
-            this.listener = listener;
-            this.fileSize = 0;
-            this.bytesReceived = 0;
-            this.startTime = 0;
-            this.cancelled = false;
-        }
-
-        /**
-         * Cancels the HTTP operation before is starts or cancels byte reading if already being processed.
-         */
-        public synchronized void cancel()
-        {
-            this.cancelled = true;
-        }
-
-        /**
-         * @return The url the request was made to
-         */
-        public String getUrl()
-        {
-            return url;
-        }
-
-        /**
-         * @return The total size of the file being downloaded or 0 if it has not been set yet
-         */
-        public long getFileSize()
-        {
-            return fileSize;
-        }
-
-        /**
-         * @return The amount of bytes received
-         */
-        public long getBytesReceived()
-        {
-            return bytesReceived;
-        }
-
-        /**
-         * @return A percentage of how complete the download is
-         */
-        public double getDownloadPercentage()
-        {
-            return this.fileSize > 0 ? (double) this.bytesReceived / (double) this.fileSize : 0;
-        }
-
-        /**
-         * @return The time the download started
-         */
-        public long getStartTime()
-        {
-            return startTime;
-        }
-
-        /**
-         * @return Whether or not all bytes have been read from the download
-         */
-        public boolean isDownloaded()
-        {
-            return this.fileSize > 0 && this.bytesReceived >= this.fileSize;
-        }
-
-        /**
-         * @return Whether or not this operation has been cancelled
-         */
-        public boolean isCancelled()
-        {
-            return cancelled;
-        }
-
-        /* Internal methods */
-
-        private synchronized void setFileSize(long fileSize)
-        {
-            this.fileSize = fileSize;
-        }
-
-        private synchronized void setReceived(long bytesReceived)
-        {
-            this.bytesReceived = bytesReceived;
-            if (this.startTime == 0)
-                this.startTime = System.nanoTime();
-        }
-
-        private synchronized void setValue(InputStream stream)
-        {
-            this.listener.accept(stream);
-        }
-    }
-
-    private static class CancellableInputStream extends InputStream
-    {
-        private final Request request;
-        private final InputStream parent;
-
-        private CancellableInputStream(Request request, InputStream parent)
-        {
-            this.request = request;
-            this.parent = parent;
-        }
-
-        @Override
-        public int read() throws IOException
-        {
-            return this.request.isCancelled() ? -1 : this.parent.read();
-        }
-
-        @Override
-        public int read(@Nonnull byte[] b) throws IOException
-        {
-            return this.request.isCancelled() ? -1 : this.parent.read(b);
-        }
-
-        @Override
-        public int read(@Nonnull byte[] b, int off, int len) throws IOException
-        {
-            return this.request.isCancelled() ? -1 : this.parent.read(b, off, len);
-        }
-
-        @Override
-        public long skip(long n) throws IOException
-        {
-            return this.request.isCancelled() ? -1 : this.parent.skip(n);
-        }
-
-        @Override
-        public int available() throws IOException
-        {
-            return this.request.isCancelled() ? -1 : this.parent.available();
-        }
-
-        @Override
-        public void close() throws IOException
-        {
-            this.parent.close();
-        }
-
-        @Override
-        public synchronized void mark(int readlimit)
-        {
-            this.parent.mark(readlimit);
-        }
-
-        @Override
-        public synchronized void reset() throws IOException
-        {
-            this.parent.reset();
-        }
-
-        @Override
-        public boolean markSupported()
-        {
-            return this.parent.markSupported();
-        }
     }
 }

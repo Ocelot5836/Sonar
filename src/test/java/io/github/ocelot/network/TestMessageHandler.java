@@ -1,7 +1,7 @@
 package io.github.ocelot.network;
 
 import io.github.ocelot.TestMod;
-import io.github.ocelot.common.network.FishNetworkManager;
+import io.github.ocelot.common.network.SonarNetworkManager;
 import io.github.ocelot.common.valuecontainer.SyncValueContainerMessage;
 import io.github.ocelot.network.handler.TestClientLoginHandler;
 import io.github.ocelot.network.handler.TestClientPlayHandler;
@@ -18,8 +18,8 @@ public class TestMessageHandler
     public static final SimpleChannel LOGIN = NetworkRegistry.newSimpleChannel(new ResourceLocation(TestMod.MOD_ID, "login"), () -> VERSION, VERSION::equals, VERSION::equals);
     public static final SimpleChannel PLAY = NetworkRegistry.newSimpleChannel(new ResourceLocation(TestMod.MOD_ID, "play"), () -> VERSION, VERSION::equals, VERSION::equals);
 
-    private static final FishNetworkManager LOGIN_NETWORK_MANAGER = new FishNetworkManager(LOGIN, () -> TestClientLoginHandler::new, () -> TestServerLoginHandler::new);
-    private static final FishNetworkManager PLAY_NETWORK_MANAGER = new FishNetworkManager(PLAY, () -> TestClientPlayHandler::new, () -> TestServerPlayHandler::new);
+    private static final SonarNetworkManager LOGIN_NETWORK_MANAGER = new SonarNetworkManager(LOGIN, () -> TestClientLoginHandler::new, () -> TestServerLoginHandler::new);
+    private static final SonarNetworkManager PLAY_NETWORK_MANAGER = new SonarNetworkManager(PLAY, () -> TestClientPlayHandler::new, () -> TestServerPlayHandler::new);
 
     public static void init()
     {
