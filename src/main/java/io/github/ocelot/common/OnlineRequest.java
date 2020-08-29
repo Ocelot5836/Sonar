@@ -90,7 +90,7 @@ public class OnlineRequest
             {
                 return IOUtils.toBufferedInputStream(stream);
             }
-            catch (IOException e)
+            catch (Exception e)
             {
                 LOGGER.error("Failed to fully read stream from '" + url + "'", e);
                 return null;
@@ -113,7 +113,7 @@ public class OnlineRequest
             {
                 return IOUtils.toBufferedInputStream(stream);
             }
-            catch (IOException e)
+            catch (Exception e)
             {
                 LOGGER.error("Failed to fully read stream from '" + url + "'", e);
                 return null;
