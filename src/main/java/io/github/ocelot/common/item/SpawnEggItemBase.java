@@ -26,7 +26,7 @@ public class SpawnEggItemBase<T extends Entity> extends SpawnEggItem
 
     public SpawnEggItemBase(RegistryObject<EntityType<T>> type, int primaryColor, int secondaryColor, boolean addToMisc, Properties builder)
     {
-        super(EntityType.OCELOT, primaryColor, secondaryColor, builder);
+        super(null, primaryColor, secondaryColor, builder);
         this.type = type;
         this.addToMisc = addToMisc;
     }
