@@ -23,7 +23,7 @@ public class TestMessageHandler
 
     public static void init()
     {
-        LOGIN_NETWORK_MANAGER.registerLoginReply(TestLoginReplyMessage.class, TestLoginReplyMessage::new, NetworkDirection.LOGIN_TO_CLIENT);
+        LOGIN_NETWORK_MANAGER.registerLoginReply(TestLoginReplyMessage.class, TestLoginReplyMessage::new, NetworkDirection.LOGIN_TO_SERVER);
         LOGIN_NETWORK_MANAGER.registerLogin(TestLoginMessage.class, TestLoginMessage::new, NetworkDirection.LOGIN_TO_CLIENT);
         PLAY_NETWORK_MANAGER.register(SyncValueContainerMessage.class, SyncValueContainerMessage::new, NetworkDirection.PLAY_TO_SERVER);
         PLAY_NETWORK_MANAGER.register(SyncValueContainerMessage.class, SyncValueContainerMessage::new, NetworkDirection.PLAY_TO_SERVER);

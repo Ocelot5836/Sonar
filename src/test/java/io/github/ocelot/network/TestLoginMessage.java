@@ -21,7 +21,7 @@ public class TestLoginMessage implements SonarLoginMessage<Object>
     @Override
     public void processPacket(Object handler, NetworkEvent.Context ctx)
     {
-        throw new RuntimeException("Lol");
+        TestMessageHandler.LOGIN.reply(new TestLoginReplyMessage(), ctx);
     }
 
     @Override
