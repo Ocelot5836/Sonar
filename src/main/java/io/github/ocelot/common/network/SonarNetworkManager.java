@@ -2,7 +2,6 @@ package io.github.ocelot.common.network;
 
 import io.github.ocelot.common.network.message.SonarLoginMessage;
 import io.github.ocelot.common.network.message.SonarMessage;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SDisconnectPacket;
 import net.minecraft.util.LazyValue;
@@ -55,14 +54,10 @@ public class SonarNetworkManager
             LOGGER.error("Failed to process packet for class: " + msg.getClass().getName(), e);
             if (ctx.get().getDirection().getReceptionSide().isServer())
             {
-                ServerPlayerEntity player = ctx.get().getSender();
-                if (player != null)
-                {
-                    ITextComponent textComponent = new TranslationTextComponent("disconnect.genericReason", "Internal Exception: " + e);
-                    NetworkManager networkManager = ctx.get().getNetworkManager();
-                    networkManager.sendPacket(new SDisconnectPacket(textComponent), future -> networkManager.closeChannel(textComponent));
-                    networkManager.disableAutoRead();
-                }
+                ITextComponent textComponent = new TranslationTextComponent("disconnect.genericReason", "Internal Exception: " + e);
+                NetworkManager networkManager = ctx.get().getNetworkManager();
+                networkManager.sendPacket(new SDisconnectPacket(textComponent), future -> networkManager.closeChannel(textComponent));
+                networkManager.disableAutoRead();
             }
             return false;
         }
