@@ -28,8 +28,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly "com.github.Ocelot5836:Sonar:${project.sonar}"
-    runtimeOnly fg.deobf("com.github.Ocelot5836:Sonar:${project.sonar}")
+    compileOnly fg.deobf("com.github.Ocelot5836:Sonar:${project.sonar}")
+    runtimeOnly "com.github.Ocelot5836:Sonar:${project.sonar}"
     shade fg.deobf("com.github.Ocelot5836:Sonar:${project.sonar}")
 }
 ```
