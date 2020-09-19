@@ -4,12 +4,11 @@ General 1.15 Mod utilties in one spot so they can be added to future mods withou
 
 # How to add to your workspace
 
-## Note: Verify your gradle version is 5.+ to use shadow.
 Insert the `plugins` block just below `buildscript`.
 
 ```gradle
 plugins {
-    id 'com.github.johnrengelman.shadow' version "5.2.0"
+    id 'com.github.johnrengelman.shadow' version "4.0.4"
 }
 ```
 

@@ -14,7 +14,7 @@ apply plugin: 'eclipse'
 
 version = "${project.minecraft}-${project.modVersion}"
 group = 'io.github.ocelot' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'FishLib'
+archivesBaseName = 'sonar'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
