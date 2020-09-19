@@ -1,7 +1,6 @@
 package io.github.ocelot.sonar.tileentity;
 
 import io.github.ocelot.sonar.TestMod;
-import io.github.ocelot.common.valuecontainer.*;
 import io.github.ocelot.sonar.common.valuecontainer.*;
 import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.Enchantments;
