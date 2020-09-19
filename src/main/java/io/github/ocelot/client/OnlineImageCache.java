@@ -182,7 +182,7 @@ public class OnlineImageCache
      * @param url            The url to get the image from
      * @param timeUnit       The unit of time to use
      * @param expirationTime The amount of time to keep the image around for or -1 for infinite
-     * @return The location of the texture downloaded or null if it is currently being processed
+     * @return The location of the texture downloaded or <code>null</code> if it is currently being processed
      */
     @Nullable
     public ResourceLocation getTextureLocation(String url, TimeUnit timeUnit, long expirationTime)
