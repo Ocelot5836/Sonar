@@ -35,7 +35,9 @@ public final class ScissorHelper
      */
     public static double framebufferScale = 0;
 
-    private ScissorHelper() {}
+    private ScissorHelper()
+    {
+    }
 
     private static void applyScissor()
     {
@@ -46,7 +48,7 @@ public final class ScissorHelper
             double scale = framebufferScale == 0 ? window.getGuiScaleFactor() : framebufferScale;
             int frameHeight = framebufferHeight == 0 ? window.getFramebufferHeight() : framebufferHeight;
             enableScissorInternal();
-            glScissor((int) (entry.x * scale), (int) (frameHeight - (entry.y + entry.height) * scale), (int) Math.max(0, entry.width * scale), (int) Math.max(0, entry.height * scale));
+            glScissor((int) (entry.getYMin() * scale), (int) (frameHeight - entry.getYMax() * scale), (int) Math.max(0, entry.getWidth() * scale), (int) Math.max(0, entry.getHeight() * scale));
         }
         else
         {
@@ -85,7 +87,7 @@ public final class ScissorHelper
     {
         Validate.isTrue(width >= 0, "Scissor width cannot be negative");
         Validate.isTrue(height >= 0, "Scissor height cannot be negative");
-        stack.push(new ScissorHelper.Entry(stack.isEmpty() ? null : stack.peek(), x, y, width, height));
+        stack.push(new ScissorHelper.Entry(stack.isEmpty() ? null : stack.peek(), x, y, x + width, y + height));
         applyScissor();
     }
 
@@ -133,33 +135,49 @@ public final class ScissorHelper
      */
     public static class Entry
     {
-        private final float x;
-        private final float y;
-        private final float width;
-        private final float height;
+        private final float xMin;
+        private final float yMin;
+        private final float xMax;
+        private final float yMax;
 
-        private Entry(@Nullable Entry parent, float x, float y, float width, float height)
+        private Entry(@Nullable Entry parent, float xMin, float yMin, float xMax, float yMax)
         {
-            this.x = parent == null ? x : Math.max(parent.x, x);
-            this.y = parent == null ? y : Math.max(parent.y, y);
-            this.width = parent == null ? width : Math.min(parent.width - x, width);
-            this.height = parent == null ? height : Math.min(parent.height - y, height);
+            this.xMin = parent == null ? xMin : Math.max(parent.xMin, xMin);
+            this.yMin = parent == null ? yMin : Math.max(parent.yMin, yMin);
+            this.xMax = parent == null ? xMax : Math.min(parent.xMax, xMax);
+            this.yMax = parent == null ? yMax : Math.min(parent.yMax, yMax);
         }
 
         /**
          * @return The x position of the rectangle starting from the left of the screen
          */
-        public float getX()
+        public float getXMin()
         {
-            return x;
+            return xMin;
         }
 
         /**
          * @return The y position of the rectangle starting from the top of the screen
          */
-        public float getY()
+        public float getYMin()
         {
-            return y;
+            return yMin;
+        }
+
+        /**
+         * @return The right x position of the rectangle
+         */
+        public float getXMax()
+        {
+            return xMax;
+        }
+
+        /**
+         * @return The bottom y position of the rectangle
+         */
+        public float getYMax()
+        {
+            return yMax;
         }
 
         /**
@@ -167,7 +185,7 @@ public final class ScissorHelper
          */
         public float getWidth()
         {
-            return width;
+            return this.xMax - this.xMin;
         }
 
         /**
@@ -175,7 +193,7 @@ public final class ScissorHelper
          */
         public float getHeight()
         {
-            return height;
+            return this.yMax - this.yMin;
         }
     }
 }
