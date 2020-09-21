@@ -142,8 +142,8 @@ public final class ScissorHelper
         {
             this.x = parent == null ? x : Math.max(parent.x, x);
             this.y = parent == null ? y : Math.max(parent.y, y);
-            this.width = parent == null ? width : Math.max(parent.width, width);
-            this.height = parent == null ? height : Math.max(parent.height, height);
+            this.width = parent == null ? width : Math.min(parent.width, width);
+            this.height = parent == null ? height : Math.min(parent.height, height);
         }
 
         /**
