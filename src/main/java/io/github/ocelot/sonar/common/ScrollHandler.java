@@ -60,10 +60,22 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
             {
                 this.scroll += delta * this.transitionSpeed;
             }
+
             if (this.scroll < 0)
-                this.setScroll(0);
+            {
+                this.scroll = 0;
+                this.nextScroll = 0;
+                if (this.markDirty != null)
+                    this.markDirty.run();
+            }
+
             if (this.scroll >= this.getMaxScroll())
-                this.setScroll(this.getMaxScroll());
+            {
+                this.scroll = this.getMaxScroll();
+                this.nextScroll = this.getMaxScroll();
+                if (this.markDirty != null)
+                    this.markDirty.run();
+            }
         }
     }
 
@@ -202,6 +214,7 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
     {
         this.scroll = MathHelper.clamp(scroll, 0, this.height - this.visibleHeight);
         this.nextScroll = this.scroll;
+        this.lastScroll = this.scroll;
         if (this.markDirty != null)
             this.markDirty.run();
         return this;

@@ -7,6 +7,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.Validate;
 import org.lwjgl.opengl.GL11C;
 
+import javax.annotation.Nullable;
 import java.util.EmptyStackException;
 import java.util.Stack;
 
@@ -84,7 +85,7 @@ public final class ScissorHelper
     {
         Validate.isTrue(width >= 0, "Scissor width cannot be negative");
         Validate.isTrue(height >= 0, "Scissor height cannot be negative");
-        stack.push(new ScissorHelper.Entry(x, y, width, height));
+        stack.push(new ScissorHelper.Entry(stack.isEmpty() ? null : stack.peek(), x, y, width, height));
         applyScissor();
     }
 
@@ -137,12 +138,12 @@ public final class ScissorHelper
         private final float width;
         private final float height;
 
-        private Entry(float x, float y, float width, float height)
+        private Entry(@Nullable Entry parent, float x, float y, float width, float height)
         {
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
+            this.x = parent == null ? x : Math.max(parent.x, x);
+            this.y = parent == null ? y : Math.max(parent.y, y);
+            this.width = parent == null ? width : Math.max(parent.width, width);
+            this.height = parent == null ? height : Math.max(parent.height, height);
         }
 
         /**
