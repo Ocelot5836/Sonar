@@ -518,19 +518,13 @@ public class AdvancedFbo implements NativeResource
 
         public Builder(AdvancedFbo parent)
         {
-            this.width = parent.getWidth();
-            this.height = parent.getHeight();
-            this.colorAttachments = new ArrayList<>();
-            this.depthAttachment = parent.getDepthAttachment();
+            this(parent.getWidth(), parent.getHeight());
             this.addAttachments(parent);
         }
 
         public Builder(Framebuffer parent)
         {
-            this.width = parent.framebufferWidth;
-            this.height = parent.framebufferHeight;
-            this.colorAttachments = new ArrayList<>();
-            this.depthAttachment = null;
+            this(parent.framebufferWidth, parent.framebufferHeight);
             this.addAttachments(parent);
         }
 
@@ -578,7 +572,7 @@ public class AdvancedFbo implements NativeResource
          */
         public Builder addColorTextureBuffer()
         {
-            this.addColorTextureBuffer(this.width, this.height, 1);
+            this.addColorTextureBuffer(this.width, this.height, 0);
             return this;
         }
 
@@ -649,7 +643,7 @@ public class AdvancedFbo implements NativeResource
          */
         public Builder setDepthTextureBuffer()
         {
-            this.setDepthTextureBuffer(this.width, this.height, 1);
+            this.setDepthTextureBuffer(this.width, this.height, 0);
             return this;
         }
 

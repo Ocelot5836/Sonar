@@ -15,7 +15,8 @@ public interface AdvancedFboTextureAttachment extends AdvancedFboAttachment
     @Override
     default void attach(int target, int attachment)
     {
-        this.attach(target, attachment, 0);
+        for (int i = 0; i < this.getMipmapLevels(); i++)
+            this.attach(target, attachment, i);
     }
 
     /**
