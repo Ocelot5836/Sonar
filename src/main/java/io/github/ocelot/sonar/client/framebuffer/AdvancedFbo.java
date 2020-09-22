@@ -13,6 +13,7 @@ import org.lwjgl.system.NativeResource;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.lwjgl.opengl.GL30.*;
 
@@ -462,7 +463,7 @@ public class AdvancedFbo implements NativeResource
     {
         RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
         Validate.isTrue(this.hasDepthAttachment(), "Depth attachment does not exist.");
-        return this.depthAttachment;
+        return Objects.requireNonNull(this.depthAttachment);
     }
 
     /**
