@@ -90,10 +90,18 @@ public final class ScissorHelper
         if (!stack.isEmpty())
         {
             Entry parent = stack.peek();
+
             if (x < parent.getX())
+            {
                 x = parent.getX();
+                width -= parent.getX() - x;
+            }
             if (y < parent.getY())
+            {
                 y = parent.getY();
+                height -= parent.getY() - y;
+            }
+
             if (x + width > parent.getX() + parent.getWidth())
                 width = parent.getX() + parent.getWidth() - x;
             if (y + height > parent.getY() + parent.getHeight())

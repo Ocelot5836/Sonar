@@ -13,6 +13,7 @@ import org.lwjgl.system.NativeResource;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.lwjgl.opengl.GL30.*;
 
@@ -462,7 +463,7 @@ public class AdvancedFbo implements NativeResource
     {
         RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
         Validate.isTrue(this.hasDepthAttachment(), "Depth attachment does not exist.");
-        return this.depthAttachment;
+        return Objects.requireNonNull(this.depthAttachment);
     }
 
     /**
@@ -518,19 +519,13 @@ public class AdvancedFbo implements NativeResource
 
         public Builder(AdvancedFbo parent)
         {
-            this.width = parent.getWidth();
-            this.height = parent.getHeight();
-            this.colorAttachments = new ArrayList<>();
-            this.depthAttachment = parent.getDepthAttachment();
+            this(parent.getWidth(), parent.getHeight());
             this.addAttachments(parent);
         }
 
         public Builder(Framebuffer parent)
         {
-            this.width = parent.framebufferWidth;
-            this.height = parent.framebufferHeight;
-            this.colorAttachments = new ArrayList<>();
-            this.depthAttachment = null;
+            this(parent.framebufferWidth, parent.framebufferHeight);
             this.addAttachments(parent);
         }
 
@@ -578,7 +573,7 @@ public class AdvancedFbo implements NativeResource
          */
         public Builder addColorTextureBuffer()
         {
-            this.addColorTextureBuffer(this.width, this.height, 1);
+            this.addColorTextureBuffer(this.width, this.height, 0);
             return this;
         }
 
@@ -649,7 +644,7 @@ public class AdvancedFbo implements NativeResource
          */
         public Builder setDepthTextureBuffer()
         {
-            this.setDepthTextureBuffer(this.width, this.height, 1);
+            this.setDepthTextureBuffer(this.width, this.height, 0);
             return this;
         }
 
