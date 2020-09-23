@@ -93,13 +93,13 @@ public final class ScissorHelper
 
             if (x < parent.getX())
             {
-                x = parent.getX();
                 width -= parent.getX() - x;
+                x = parent.getX();
             }
             if (y < parent.getY())
             {
-                y = parent.getY();
                 height -= parent.getY() - y;
+                y = parent.getY();
             }
 
             if (x + width > parent.getX() + parent.getWidth())
