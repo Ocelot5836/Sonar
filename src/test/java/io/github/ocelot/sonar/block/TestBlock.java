@@ -1,7 +1,7 @@
 package io.github.ocelot.sonar.block;
 
-import io.github.ocelot.sonar.common.BaseBlock;
-import io.github.ocelot.sonar.common.VoxelShapeHelper;
+import io.github.ocelot.sonar.common.block.BaseBlock;
+import io.github.ocelot.sonar.common.util.VoxelShapeHelper;
 import io.github.ocelot.sonar.tileentity.TestTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

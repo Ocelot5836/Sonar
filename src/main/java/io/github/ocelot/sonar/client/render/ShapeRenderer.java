@@ -1,4 +1,4 @@
-package io.github.ocelot.sonar.client;
+package io.github.ocelot.sonar.client.render;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;

@@ -1,4 +1,4 @@
-package io.github.ocelot.sonar.client;
+package io.github.ocelot.sonar.client.util;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraftforge.api.distmarker.Dist;

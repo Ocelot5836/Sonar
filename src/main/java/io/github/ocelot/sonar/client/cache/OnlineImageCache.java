@@ -1,9 +1,10 @@
-package io.github.ocelot.sonar.client;
+package io.github.ocelot.sonar.client.cache;
 
 import com.google.common.base.Charsets;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import io.github.ocelot.sonar.common.OnlineRequest;
+import io.github.ocelot.sonar.Sonar;
+import io.github.ocelot.sonar.common.util.OnlineRequest;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.MissingTextureSprite;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -54,9 +56,19 @@ public class OnlineImageCache
     private final long textureCacheTime;
     private JsonObject cacheFileData;
 
+    public OnlineImageCache()
+    {
+        this(Sonar.DOMAIN, -1, TimeUnit.MILLISECONDS);
+    }
+
     public OnlineImageCache(String cacheFolderName)
     {
         this(cacheFolderName, -1, TimeUnit.MILLISECONDS);
+    }
+
+    public OnlineImageCache(long textureCacheTime, TimeUnit unit)
+    {
+        this(Sonar.DOMAIN, textureCacheTime, unit);
     }
 
     public OnlineImageCache(String cacheFolderName, long textureCacheTime, TimeUnit unit)
@@ -91,12 +103,12 @@ public class OnlineImageCache
 
     private boolean hasTextureExpired(String hash)
     {
-        return this.textureCacheTime > 0 && !this.textureCache.containsKey(hash) || (System.currentTimeMillis() - this.textureCache.get(hash) > 0);
+        return this.textureCacheTime > 0 && (!this.textureCache.containsKey(hash) || System.currentTimeMillis() - this.textureCache.get(hash) > 0);
     }
 
     private boolean hasExpired(String hash)
     {
-        return !this.cacheFileData.has(hash) || (this.cacheFileData.get(hash).getAsLong() != -1 && System.currentTimeMillis() - this.cacheFileData.get(hash).getAsLong() > 0);
+        return !this.cacheFileData.has(hash) || (this.cacheFileData.get(hash).getAsLong() != -1 && Instant.now().toEpochMilli() - this.cacheFileData.get(hash).getAsLong() > 0);
     }
 
     private boolean loadCache(String hash, ResourceLocation location)
@@ -113,7 +125,7 @@ public class OnlineImageCache
 
         SimpleResource.RESOURCE_IO_EXECUTOR.execute(() ->
         {
-            LOGGER.trace("Reading '" + hash + "' from cache.");
+            LOGGER.debug("Reading '" + hash + "' from cache.");
             try (FileInputStream is = new FileInputStream(imageFile.toFile()))
             {
                 NativeImage image = NativeImage.read(is);
@@ -128,7 +140,7 @@ public class OnlineImageCache
                 LOGGER.error("Failed to load image with hash '" + hash + "' from cache. Deleting", e);
                 try
                 {
-                    LOGGER.trace("Deleting '" + hash + "' from cache.");
+                    LOGGER.debug("Deleting '" + hash + "' from cache.");
                     this.cacheFileData.remove(hash);
                     Files.delete(imageFile);
                 }
@@ -144,7 +156,7 @@ public class OnlineImageCache
 
     private void writeCache(String hash, NativeImage image, long expirationDate) throws IOException
     {
-        LOGGER.trace("Writing '" + hash + "' to cache.");
+        LOGGER.debug("Writing '" + hash + "' to cache.");
 
         if (!Files.exists(this.cacheFolder))
             Files.createDirectories(this.cacheFolder);
@@ -173,20 +185,6 @@ public class OnlineImageCache
     @Nullable
     public ResourceLocation getTextureLocation(String url)
     {
-        return this.getTextureLocation(url, TimeUnit.MILLISECONDS, -1);
-    }
-
-    /**
-     * Fetches an image from the specified url and caches the result for the specified amount of time before redownloading.
-     *
-     * @param url            The url to get the image from
-     * @param timeUnit       The unit of time to use
-     * @param expirationTime The amount of time to keep the image around for or -1 for infinite
-     * @return The location of the texture downloaded or <code>null</code> if it is currently being processed
-     */
-    @Nullable
-    public ResourceLocation getTextureLocation(String url, TimeUnit timeUnit, long expirationTime)
-    {
         String hash = DigestUtils.md5Hex(url);
         if (this.errored.contains(hash))
             return MissingTextureSprite.getLocation();
@@ -207,14 +205,14 @@ public class OnlineImageCache
             return null;
         }
 
-        LOGGER.trace("Requesting image from '" + hash + "'");
+        LOGGER.debug("Requesting image from '" + hash + "'");
         this.requested.add(hash);
         OnlineRequest.request(url).thenAcceptAsync(result ->
         {
             try
             {
                 NativeImage image = NativeImage.read(result);
-                this.writeCache(hash, image, expirationTime == -1 ? -1 : System.currentTimeMillis() + timeUnit.toMillis(expirationTime));
+                this.writeCache(hash, image, Instant.now().toEpochMilli() + this.textureCacheTime);
                 Minecraft.getInstance().execute(() ->
                 {
                     Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
@@ -243,7 +241,7 @@ public class OnlineImageCache
         {
             if (this.hasTextureExpired(hash))
             {
-                LOGGER.trace("Deleting '" + hash + "' texture.");
+                LOGGER.debug("Deleting '" + hash + "' texture.");
                 Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().deleteTexture(location));
             }
         });

@@ -1,4 +1,4 @@
-package io.github.ocelot.sonar.common;
+package io.github.ocelot.sonar.common.util;
 
 import java.util.concurrent.TimeUnit;
 

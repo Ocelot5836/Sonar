@@ -1,6 +1,6 @@
 package io.github.ocelot.sonar;
 
-import io.github.ocelot.sonar.common.DynamicInventory;
+import io.github.ocelot.sonar.common.util.DynamicInventory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
