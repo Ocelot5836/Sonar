@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 @Mod.EventBusSubscriber(modid = TestMod.MOD_ID, value = Dist.CLIENT)
 public class RenderEvents
 {
-    private static final OnlineImageCache CACHE = new OnlineImageCache(TestMod.MOD_ID + "-texture-cache", 10, TimeUnit.SECONDS);
+    private static final OnlineImageCache CACHE = new OnlineImageCache(10, TimeUnit.SECONDS);
 
     @SubscribeEvent
     public static void onEvent(RenderGameOverlayEvent event)
