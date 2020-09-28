@@ -1,7 +1,7 @@
 package io.github.ocelot.sonar.client;
 
 import io.github.ocelot.sonar.TestMod;
-import io.github.ocelot.sonar.client.cache.OnlineImageCache;
+import io.github.ocelot.sonar.client.util.OnlineImageCache;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

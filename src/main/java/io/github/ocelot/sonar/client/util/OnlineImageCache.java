@@ -1,4 +1,4 @@
-package io.github.ocelot.sonar.client.cache;
+package io.github.ocelot.sonar.client.util;
 
 import com.google.common.base.Charsets;
 import com.google.gson.JsonObject;
@@ -58,22 +58,12 @@ public class OnlineImageCache
 
     public OnlineImageCache()
     {
-        this(Sonar.DOMAIN, -1, TimeUnit.MILLISECONDS);
-    }
-
-    public OnlineImageCache(String cacheFolderName)
-    {
-        this(cacheFolderName, -1, TimeUnit.MILLISECONDS);
+        this(-1, TimeUnit.MILLISECONDS);
     }
 
     public OnlineImageCache(long textureCacheTime, TimeUnit unit)
     {
-        this(Sonar.DOMAIN, textureCacheTime, unit);
-    }
-
-    public OnlineImageCache(String cacheFolderName, long textureCacheTime, TimeUnit unit)
-    {
-        this.cacheFolder = Minecraft.getInstance().gameDir.toPath().resolve(cacheFolderName);
+        this.cacheFolder = Minecraft.getInstance().gameDir.toPath().resolve(Sonar.DOMAIN + "-online-image-cache");
         this.cacheFile = this.cacheFolder.resolve("cache.json");
         this.cache = new HashMap<>();
         this.errored = new HashSet<>();
