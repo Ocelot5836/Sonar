@@ -1,4 +1,4 @@
-package io.github.ocelot.sonar.common;
+package io.github.ocelot.sonar.common.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

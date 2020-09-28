@@ -1,4 +1,4 @@
-package io.github.ocelot.sonar.client;
+package io.github.ocelot.sonar.client.util;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.FontRenderer;

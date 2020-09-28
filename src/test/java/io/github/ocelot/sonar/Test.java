@@ -1,6 +1,6 @@
 package io.github.ocelot.sonar;
 
-import io.github.ocelot.sonar.common.OnlineRequest;
+import io.github.ocelot.sonar.common.util.OnlineRequest;
 
 import java.util.ArrayList;
 import java.util.List;

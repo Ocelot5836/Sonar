@@ -715,6 +715,21 @@ public class AdvancedFbo implements NativeResource
          */
         public AdvancedFbo build()
         {
+            if (this.colorAttachments.isEmpty())
+                throw new IllegalArgumentException("Framebuffer needs at least one color attachment to be complete.");
+            int samples = -1;
+            for (AdvancedFboAttachment attachment : this.colorAttachments)
+            {
+                if (samples == -1)
+                {
+                    samples = attachment.getSamples();
+                    continue;
+                }
+                if (attachment.getSamples() != samples)
+                    throw new IllegalArgumentException("Framebuffer attachments need to have the same number of samples to be complete.");
+            }
+            if (this.depthAttachment != null && this.depthAttachment.getSamples() != samples)
+                throw new IllegalArgumentException("Framebuffer attachments need to have the same number of samples to be complete.");
             return new AdvancedFbo(this.width, this.height, this.colorAttachments.toArray(new AdvancedFboAttachment[0]), this.depthAttachment);
         }
     }

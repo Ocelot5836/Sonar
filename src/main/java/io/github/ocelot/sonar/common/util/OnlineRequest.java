@@ -1,4 +1,4 @@
-package io.github.ocelot.sonar.common;
+package io.github.ocelot.sonar.common.util;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.StatusLine;

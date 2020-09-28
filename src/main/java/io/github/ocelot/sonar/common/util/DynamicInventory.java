@@ -1,4 +1,4 @@
-package io.github.ocelot.sonar.common;
+package io.github.ocelot.sonar.common.util;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.inventory.IInventory;

@@ -1,6 +1,6 @@
 package io.github.ocelot.sonar.block;
 
-import io.github.ocelot.sonar.common.BaseBlock;
+import io.github.ocelot.sonar.common.block.BaseBlock;
 import io.github.ocelot.sonar.common.valuecontainer.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;

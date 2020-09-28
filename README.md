@@ -12,7 +12,7 @@ plugins {
 }
 ```
 
-Add the shade configuration, repository, and the sonar dependency. Note `runtimeOnly` and `compileOnly` are used to allow sources to attach properly.
+Add the shade configuration, repository, and the sonar dependency.
 
 ```gradle
 configurations {
@@ -27,9 +27,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly "com.github.Ocelot5836:Sonar:${project.sonar}"
-    runtimeOnly fg.deobf("com.github.Ocelot5836:Sonar:${project.sonar}")
-    shade fg.deobf("com.github.Ocelot5836:Sonar:${project.sonar}")
+    implementation fg.deobf("com.github.Ocelot5836:Sonar:${project.sonar}")
+    shade "com.github.Ocelot5836:Sonar:${project.sonar}"
 }
 ```
 

@@ -1,4 +1,4 @@
-package io.github.ocelot.sonar.client;
+package io.github.ocelot.sonar.client.util;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
