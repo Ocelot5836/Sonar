@@ -6,10 +6,14 @@ package io.github.ocelot.sonar;
  * @author Ocelot
  * @since 3.2.0
  */
-public class Sonar
+public final class Sonar
 {
     /**
      * The domain (modid) used for resource locations.
      */
     public static final String DOMAIN = "sonar";
+
+    private Sonar()
+    {
+    }
 }
