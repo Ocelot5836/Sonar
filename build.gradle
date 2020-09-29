@@ -104,7 +104,7 @@ jar {
 
 task apiJar(type: Jar) {
     classifier = "api"
-    from sourceSets.main.allJava
+    from sourceSets.main
 }
 
 artifacts {
