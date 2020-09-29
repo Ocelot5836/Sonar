@@ -27,8 +27,8 @@ repositories {
 }
 
 dependencies {
-    implementation fg.deobf("com.github.Ocelot5836:Sonar:${project.sonar}")
-    shade "com.github.Ocelot5836:Sonar:${project.sonar}"
+    implementation fg.deobf("com.github.Ocelot5836:Sonar:${project.sonar}:api")
+    shade "com.github.Ocelot5836.Sonar:${project.sonar}"
 }
 ```
 
