@@ -28,6 +28,33 @@ public final class ShapeRenderer
     }
 
     /**
+     * Draws a quad with expanding insides.
+     *
+     * @param matrixStack The stack of transformations to move elements
+     * @param x           The x position to start
+     * @param y           The y position to start
+     * @param u           The x position on the texture to start
+     * @param v           The y position on the texture to start
+     * @param width       The x size of the quad
+     * @param height      The y size of the quad
+     * @param cellSize    The amount of pixels in x and y each "cell" should be in a 3x3 grid
+     */
+    public static void renderExpanding(MatrixStack matrixStack, double x, double y, float u, float v, double width, double height, float cellSize)
+    {
+        IVertexBuilder builder = begin();
+        drawRectWithTexture(builder, matrixStack, x, y, u, v, cellSize, cellSize, cellSize, cellSize, 64, 64);
+        drawRectWithTexture(builder, matrixStack, x, y + cellSize, u, v + cellSize, cellSize, height - 2 * cellSize, cellSize, cellSize, 64, 64);
+        drawRectWithTexture(builder, matrixStack, x, y + height - cellSize, u, v + 2 * cellSize, cellSize, cellSize, cellSize, cellSize, 64, 64);
+        drawRectWithTexture(builder, matrixStack, x + cellSize, y, u + cellSize, v, width - 2 * cellSize, cellSize, cellSize, cellSize, 64, 64);
+        drawRectWithTexture(builder, matrixStack, x + cellSize, y + cellSize, u + cellSize, v + cellSize, width - 2 * cellSize, height - 2 * cellSize, cellSize, cellSize, 64, 64);
+        drawRectWithTexture(builder, matrixStack, x + cellSize, y + height - cellSize, u + cellSize, v + 2 * cellSize, width - 2 * cellSize, cellSize, cellSize, cellSize, 64, 64);
+        drawRectWithTexture(builder, matrixStack, x + width - cellSize, y, u + 2 * cellSize, v, cellSize, cellSize, cellSize, cellSize, 64, 64);
+        drawRectWithTexture(builder, matrixStack, x + width - cellSize, y + cellSize, u + 2 * cellSize, v + cellSize, cellSize, height - 2 * cellSize, cellSize, cellSize, 64, 64);
+        drawRectWithTexture(builder, matrixStack, x + width - cellSize, y + height - cellSize, u + 2 * cellSize, v + 2 * cellSize, cellSize, cellSize, cellSize, cellSize, 64, 64);
+        end();
+    }
+
+    /**
      * Draws a quad onto the screen with the specified parameters.
      *
      * @param matrixStack The stack of transformations to move elements
