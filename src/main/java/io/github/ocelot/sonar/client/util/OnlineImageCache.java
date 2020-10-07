@@ -122,6 +122,7 @@ public class OnlineImageCache
                 Minecraft.getInstance().execute(() ->
                 {
                     Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
+                    this.textureCache.put(hash, System.currentTimeMillis() + this.textureCacheTime);
                     this.requested.remove(hash);
                 });
             }
