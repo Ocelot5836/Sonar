@@ -17,6 +17,5 @@ public class RenderEvents
     @SubscribeEvent
     public static void onEvent(RenderGameOverlayEvent event)
     {
-        System.out.println(CACHE.getTextureLocation("https://www.paypalobjects.com/HomeScreen/direct-deposit.png"));
     }
 }
