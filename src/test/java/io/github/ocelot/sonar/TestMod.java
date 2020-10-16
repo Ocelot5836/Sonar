@@ -4,6 +4,7 @@ import io.github.ocelot.sonar.block.TestBlock;
 import io.github.ocelot.sonar.block.TestStateBlock;
 import io.github.ocelot.sonar.client.TestClientInit;
 import io.github.ocelot.sonar.client.tooltip.TooltipColorManager;
+import io.github.ocelot.sonar.common.item.FishBucketItemBase;
 import io.github.ocelot.sonar.common.item.SpawnEggItemBase;
 import io.github.ocelot.sonar.common.item.ValueContainerEditorItem;
 import io.github.ocelot.sonar.common.valuecontainer.OpenValueContainerMessage;
@@ -14,6 +15,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -59,6 +61,7 @@ public class TestMod
     public static final RegistryObject<Item> TEST_ENTITY_A_SPAWN_EGG = ITEMS.register("test_entity_a_spawn_egg", () -> new SpawnEggItemBase<>(TEST_ENTITY_A, 0xff00ff, 0x7f007f, true, new Item.Properties().group(TEST_GROUP)));
     public static final RegistryObject<Item> TEST_ENTITY_B_SPAWN_EGG = ITEMS.register("test_entity_b_spawn_egg", () -> new SpawnEggItemBase<>(TEST_ENTITY_B, 0x00ffff, 0x007f7f, true, new Item.Properties().group(TEST_GROUP)));
     public static final RegistryObject<Item> TEST_ENTITY_C_SPAWN_EGG = ITEMS.register("test_entity_c_spawn_egg", () -> new SpawnEggItemBase<>(TEST_ENTITY_C, 0x00ff00, 0x007f00, true, new Item.Properties().group(TEST_GROUP)));
+    public static final RegistryObject<FishBucketItemBase> TEST_ENTITY_C_BUCKET = ITEMS.register("test_entity_c_bucket", () -> new FishBucketItemBase(TEST_ENTITY_C, () -> Fluids.WATER, true, new Item.Properties().group(TEST_GROUP)));
 
     public static final RegistryObject<TileEntityType<TestTileEntity>> TEST_TILE_ENTITY = TILE_ENTITIES.register("test", () -> TileEntityType.Builder.create(TestTileEntity::new, TEST_BLOCK.get()).build(null));
 
