@@ -10,6 +10,7 @@ import net.minecraft.item.SpawnEggItem;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -60,11 +61,11 @@ public class FishBucketItemBase extends FishBucketItem
     {
         if (!world.isRemote())
         {
-            this.placeFish(world, stack, pos);
+            this.placeFish((ServerWorld) world, stack, pos);
         }
     }
 
-    protected void placeFish(World world, ItemStack stack, BlockPos pos)
+    protected void placeFish(ServerWorld world, ItemStack stack, BlockPos pos)
     {
         this.getFishType().spawn(world, stack, null, pos, SpawnReason.BUCKET, true, false);
     }
