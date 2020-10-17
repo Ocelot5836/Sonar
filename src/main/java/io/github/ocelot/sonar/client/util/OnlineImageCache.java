@@ -58,12 +58,22 @@ public class OnlineImageCache
 
     public OnlineImageCache()
     {
-        this(-1, TimeUnit.MILLISECONDS);
+        this(Sonar.DOMAIN, -1, TimeUnit.MILLISECONDS);
+    }
+
+    public OnlineImageCache(String domain)
+    {
+        this(Sonar.DOMAIN, -1, TimeUnit.MILLISECONDS);
     }
 
     public OnlineImageCache(long textureCacheTime, TimeUnit unit)
     {
-        this.cacheFolder = Minecraft.getInstance().gameDir.toPath().resolve(Sonar.DOMAIN + "-online-image-cache");
+        this(Sonar.DOMAIN, textureCacheTime, unit);
+    }
+
+    public OnlineImageCache(String domain, long textureCacheTime, TimeUnit unit)
+    {
+        this.cacheFolder = Minecraft.getInstance().gameDir.toPath().resolve(domain + "-online-image-cache");
         this.cacheFile = this.cacheFolder.resolve("cache.json");
         this.cache = new HashMap<>();
         this.errored = new HashSet<>();
