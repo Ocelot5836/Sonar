@@ -52,9 +52,8 @@ public class OnlineRequest
         return new EofSensorInputStream(response.getEntity().getContent(), new EofSensorWatcher()
         {
             @Override
-            public boolean eofDetected(InputStream wrapped) throws IOException
+            public boolean eofDetected(InputStream wrapped)
             {
-                response.close();
                 return true;
             }
 
