@@ -132,7 +132,7 @@ public class OnlineImageCache
                 Minecraft.getInstance().execute(() ->
                 {
                     Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
-                    this.textureCache.put(hash, System.currentTimeMillis() + this.textureCacheTime);
+                    this.textureCache.put(hash, System.currentTimeMillis() + 30000);
                     this.requested.remove(hash);
                 });
             }
@@ -193,7 +193,7 @@ public class OnlineImageCache
         ResourceLocation location = this.cache.computeIfAbsent(hash, ResourceLocation::new);
         if (Minecraft.getInstance().getTextureManager().getTexture(location) != null)
         {
-            this.textureCache.put(hash, System.currentTimeMillis() + this.textureCacheTime);
+            this.textureCache.put(hash, System.currentTimeMillis() + 30000);
             return location;
         }
 
@@ -217,7 +217,7 @@ public class OnlineImageCache
                 Minecraft.getInstance().execute(() ->
                 {
                     Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
-                    this.textureCache.put(hash, System.currentTimeMillis() + this.textureCacheTime);
+                    this.textureCache.put(hash, System.currentTimeMillis() + 30000);
                     this.requested.remove(hash);
                 });
             }
