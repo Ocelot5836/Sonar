@@ -1,6 +1,7 @@
 package io.github.ocelot.sonar.client.util;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import io.github.ocelot.sonar.common.util.TimeUtils;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -11,6 +12,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author Ocelot
  * @see FontRenderer
  * @since 2.2.0
+ * @deprecated This class is fairly redundant TODO remove in 6.0.0
  */
 @OnlyIn(Dist.CLIENT)
 public final class FontHelper
@@ -72,11 +74,6 @@ public final class FontHelper
      */
     public static String timeToString(long time, boolean simple)
     {
-        int hours = (int) ((Math.floor(time / 1000.0) + 6) % 24);
-        int minutes = (int) Math.floor((time % 1000) / 1000.0 * 60);
-        String value = String.format("%02d:%02d", simple ? hours % 12 : hours, minutes);
-        if (simple)
-            value += " " + (hours / 12 > 0 ? "PM" : "AM");
-        return value;
+        return TimeUtils.timeToString(time, simple);
     }
 }

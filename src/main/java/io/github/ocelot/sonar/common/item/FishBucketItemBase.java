@@ -6,7 +6,6 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.item.FishBucketItem;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.SpawnEggItem;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
