@@ -2,9 +2,9 @@ package io.github.ocelot.sonar.client.screen;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.ocelot.sonar.client.render.ShapeRenderer;
 import io.github.ocelot.sonar.client.util.FontHelper;
 import io.github.ocelot.sonar.client.util.ScissorHelper;
-import io.github.ocelot.sonar.client.render.ShapeRenderer;
 import io.github.ocelot.sonar.common.util.ScrollHandler;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainer;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainerEntry;
