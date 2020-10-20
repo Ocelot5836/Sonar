@@ -19,6 +19,7 @@ import static org.lwjgl.opengl.GL11C.GL_QUADS;
  *
  * @author Ocelot
  * @since 2.0.0
+ * TODO add color support
  */
 @OnlyIn(Dist.CLIENT)
 public final class ShapeRenderer
