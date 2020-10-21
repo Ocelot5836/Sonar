@@ -7,6 +7,7 @@ import io.github.ocelot.sonar.client.tooltip.TooltipColorManager;
 import io.github.ocelot.sonar.common.item.FishBucketItemBase;
 import io.github.ocelot.sonar.common.item.SpawnEggItemBase;
 import io.github.ocelot.sonar.common.item.ValueContainerEditorItem;
+import io.github.ocelot.sonar.common.util.SortedItemGroup;
 import io.github.ocelot.sonar.common.valuecontainer.OpenValueContainerMessage;
 import io.github.ocelot.sonar.entity.TestEntity;
 import io.github.ocelot.sonar.network.TestMessageHandler;
@@ -18,7 +19,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -36,7 +36,7 @@ public class TestMod
 {
     public static final String MOD_ID = "examplemod";
 
-    public static final ItemGroup TEST_GROUP = new ItemGroup(MOD_ID)
+    public static final SortedItemGroup TEST_GROUP = new SortedItemGroup(MOD_ID)
     {
         @Override
         public ItemStack createIcon()
