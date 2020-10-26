@@ -34,7 +34,7 @@ public class ValueContainerEntrySliderImpl extends AbstractSlider
         this.format = this.createDecimalFormat();
         this.entry = entry;
         this.sliderEntry = (SliderEntry) entry;
-        this.field_230683_b_ = (this.sliderEntry.getSliderValue() - this.sliderEntry.getMinSliderValue()) / (this.sliderEntry.getMaxSliderValue() - this.sliderEntry.getMinSliderValue());
+        this.sliderValue = (this.sliderEntry.getSliderValue() - this.sliderEntry.getMinSliderValue()) / (this.sliderEntry.getMaxSliderValue() - this.sliderEntry.getMinSliderValue());
         this.func_230979_b_();
     }
 
@@ -43,11 +43,11 @@ public class ValueContainerEntrySliderImpl extends AbstractSlider
     {
         if (this.sliderEntry.isPercentage())
         {
-            this.setMessage(new StringTextComponent(this.format.format(Math.floor(this.field_230683_b_ * 100.0)) + "%"));
+            this.setMessage(new StringTextComponent(this.format.format(Math.floor(this.sliderValue * 100.0)) + "%"));
         }
         else
         {
-            double sliderValue = this.field_230683_b_ * (this.sliderEntry.getMaxSliderValue() - this.sliderEntry.getMinSliderValue()) + this.sliderEntry.getMinSliderValue();
+            double sliderValue = this.sliderValue * (this.sliderEntry.getMaxSliderValue() - this.sliderEntry.getMinSliderValue()) + this.sliderEntry.getMinSliderValue();
             this.setMessage(new StringTextComponent(this.format.format(this.sliderEntry.isDecimal() ? sliderValue : Math.floor(sliderValue))));
         }
     }
@@ -56,7 +56,7 @@ public class ValueContainerEntrySliderImpl extends AbstractSlider
     protected void func_230972_a_()
     {
         Optional<Predicate<String>> optional = this.entry.getValidator();
-        double sliderValue = this.field_230683_b_ * (this.sliderEntry.getMaxSliderValue() - this.sliderEntry.getMinSliderValue()) + this.sliderEntry.getMinSliderValue();
+        double sliderValue = this.sliderValue * (this.sliderEntry.getMaxSliderValue() - this.sliderEntry.getMinSliderValue()) + this.sliderEntry.getMinSliderValue();
         String value = String.valueOf(this.sliderEntry.isDecimal() ? sliderValue : Math.floor(sliderValue));
         if (optional.isPresent() && !optional.get().test(value))
             return;

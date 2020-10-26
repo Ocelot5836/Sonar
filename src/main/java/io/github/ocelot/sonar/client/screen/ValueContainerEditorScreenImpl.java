@@ -173,7 +173,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
         float scroll = this.scrollHandler.getInterpolatedScroll(partialTicks);
         for (Widget widget : this.entryWidgets)
         {
-            if (widget.y - scroll + widget.getHeight() < 0)
+            if (widget.y - scroll + widget.getHeightRealms() < 0)
                 continue;
             if (widget.y - scroll >= 160)
                 break;
