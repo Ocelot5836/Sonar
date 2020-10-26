@@ -14,7 +14,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -23,7 +22,7 @@ import java.util.function.Supplier;
  * @author Ocelot
  * @since 2.8.0
  */
-public class SpawnEggItemBase<T extends EntityType<?>> extends SpawnEggItem
+public class SpawnEggItemBase<T extends EntityType<?>> extends SpawnEggItem implements ISortInTab
 {
     private final boolean addToMisc;
     private final Supplier<T> type;
@@ -48,24 +47,21 @@ public class SpawnEggItemBase<T extends EntityType<?>> extends SpawnEggItem
     public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items)
     {
         if (!this.addToMisc)
-        {
             super.fillItemGroup(group, items);
-            return;
-        }
+        else
+            ISortInTab.super.fillItemGroup(group, items);
+    }
 
-        if (this.isInGroup(group) || group == ItemGroup.MISC)
-        {
-            if (items.stream().anyMatch(stack -> stack.getItem() instanceof SpawnEggItem))
-            {
-                Optional<ItemStack> optional = items.stream().filter(stack -> stack.getItem() instanceof SpawnEggItem && "minecraft".equals(Objects.requireNonNull(stack.getItem().getRegistryName()).getNamespace())).reduce((a, b) -> b);
-                if (optional.isPresent() && items.contains(optional.get()))
-                {
-                    items.add(items.indexOf(optional.get()) + 1, new ItemStack(this));
-                    return;
-                }
-            }
-            items.add(new ItemStack(this));
-        }
+    @Override
+    public boolean isType(ItemStack stack)
+    {
+        return stack.getItem() instanceof SpawnEggItem && "minecraft".equals(Objects.requireNonNull(stack.getItem().getRegistryName()).getNamespace());
+    }
+
+    @Override
+    public ItemGroup getItemGroup()
+    {
+        return ItemGroup.MISC;
     }
 
     @Override
