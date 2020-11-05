@@ -63,7 +63,7 @@ public class OnlineImageCache
 
     public OnlineImageCache(String domain)
     {
-        this(Sonar.DOMAIN, -1, TimeUnit.MILLISECONDS);
+        this(domain, -1, TimeUnit.MILLISECONDS);
     }
 
     public OnlineImageCache(long textureCacheTime, TimeUnit unit)
