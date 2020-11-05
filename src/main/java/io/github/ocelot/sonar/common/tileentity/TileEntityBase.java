@@ -47,7 +47,7 @@ public class TileEntityBase extends TileEntity
     @OnlyIn(Dist.CLIENT)
     public void readSyncTag(CompoundNBT nbt)
     {
-        this.read(nbt);
+        this.read(this.getBlockState(), nbt);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class TileEntityBase extends TileEntity
 
     public Optional<ITextComponent> getTitle(World world, BlockPos pos)
     {
-        return Optional.of(this.getBlockState().getBlock().getNameTextComponent());
+        return Optional.of(this.getBlockState().getBlock().getTranslatedName());
     }
 
     /**
