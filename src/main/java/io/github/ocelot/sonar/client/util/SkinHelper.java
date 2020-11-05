@@ -13,6 +13,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -26,6 +27,22 @@ import java.util.function.Consumer;
 @OnlyIn(Dist.CLIENT)
 public class SkinHelper
 {
+    private static final Map<GameProfile, GameProfile> PROFILE_CACHE = new HashMap<>();
+
+    /**
+     * Caches the results of {@link SkullTileEntity#updateContainingBlockInfo()}.
+     *
+     * @param input The input game profile
+     * @return The filled game profile with properties
+     */
+    @Nullable
+    public static GameProfile updateGameProfile(@Nullable GameProfile input)
+    {
+        if (input == null)
+            return null;
+        return PROFILE_CACHE.computeIfAbsent(input, SkullTileEntity::updateGameProfile);
+    }
+
     /**
      * Loads the a texture from the specified player profile.
      *
