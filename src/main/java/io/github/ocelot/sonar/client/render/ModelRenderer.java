@@ -14,6 +14,7 @@ import java.util.Random;
  * <p>Fills {@link IVertexBuilder} with {@link IBakedModel} vertex data.</p>
  *
  * @since 4.1.0
+ * TODO rename JsonModelRenderer 6.0.0
  */
 public class ModelRenderer
 {
