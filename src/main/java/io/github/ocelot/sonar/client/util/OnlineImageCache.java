@@ -111,7 +111,7 @@ public class OnlineImageCache
         return !this.cacheFileData.has(hash) || (this.cacheFileData.get(hash).getAsLong() != -1 && Instant.now().toEpochMilli() - this.cacheFileData.get(hash).getAsLong() > 0);
     }
 
-    private boolean loadCache(String hash, ResourceLocation location)
+    private synchronized boolean loadCache(String hash, ResourceLocation location)
     {
         if (!Files.exists(this.cacheFolder))
             return false;
@@ -125,40 +125,37 @@ public class OnlineImageCache
 
         SimpleResource.RESOURCE_IO_EXECUTOR.execute(() ->
         {
-            synchronized (this)
+            LOGGER.debug("Reading '" + hash + "' from cache.");
+            try (FileInputStream is = new FileInputStream(imageFile.toFile()))
             {
-                LOGGER.debug("Reading '" + hash + "' from cache.");
-                try (FileInputStream is = new FileInputStream(imageFile.toFile()))
+                NativeImage image = NativeImage.read(is);
+                Minecraft.getInstance().execute(() ->
                 {
-                    NativeImage image = NativeImage.read(is);
-                    Minecraft.getInstance().execute(() ->
-                    {
-                        Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
-                        this.textureCache.put(hash, System.currentTimeMillis() + 30000);
-                        this.requested.remove(hash);
-                    });
-                }
-                catch (IOException e)
+                    Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
+                    this.textureCache.put(hash, System.currentTimeMillis() + 30000);
+                    this.requested.remove(hash);
+                });
+            }
+            catch (IOException e)
+            {
+                LOGGER.error("Failed to load image with hash '" + hash + "' from cache. Deleting", e);
+                try
                 {
-                    LOGGER.error("Failed to load image with hash '" + hash + "' from cache. Deleting", e);
-                    try
-                    {
-                        LOGGER.debug("Deleting '" + hash + "' from cache.");
-                        this.cacheFileData.remove(hash);
-                        Files.delete(imageFile);
-                    }
-                    catch (IOException e1)
-                    {
-                        LOGGER.error("Failed to delete image with hash '" + hash + "' from cache.", e1);
-                    }
-                    Minecraft.getInstance().execute(() -> this.requested.remove(hash));
+                    LOGGER.debug("Deleting '" + hash + "' from cache.");
+                    this.cacheFileData.remove(hash);
+                    Files.delete(imageFile);
                 }
+                catch (IOException e1)
+                {
+                    LOGGER.error("Failed to delete image with hash '" + hash + "' from cache.", e1);
+                }
+                Minecraft.getInstance().execute(() -> this.requested.remove(hash));
             }
         });
         return true;
     }
 
-    private void writeCache(String hash, NativeImage image, long expirationDate) throws IOException
+    private synchronized void writeCache(String hash, NativeImage image, long expirationDate) throws IOException
     {
         LOGGER.debug("Writing '" + hash + "' to cache.");
 
