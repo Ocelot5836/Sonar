@@ -125,31 +125,34 @@ public class OnlineImageCache
 
         SimpleResource.RESOURCE_IO_EXECUTOR.execute(() ->
         {
-            LOGGER.debug("Reading '" + hash + "' from cache.");
-            try (FileInputStream is = new FileInputStream(imageFile.toFile()))
+            synchronized (this)
             {
-                NativeImage image = NativeImage.read(is);
-                Minecraft.getInstance().execute(() ->
+                LOGGER.debug("Reading '" + hash + "' from cache.");
+                try (FileInputStream is = new FileInputStream(imageFile.toFile()))
                 {
-                    Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
-                    this.textureCache.put(hash, System.currentTimeMillis() + 30000);
-                    this.requested.remove(hash);
-                });
-            }
-            catch (IOException e)
-            {
-                LOGGER.error("Failed to load image with hash '" + hash + "' from cache. Deleting", e);
-                try
-                {
-                    LOGGER.debug("Deleting '" + hash + "' from cache.");
-                    this.cacheFileData.remove(hash);
-                    Files.delete(imageFile);
+                    NativeImage image = NativeImage.read(is);
+                    Minecraft.getInstance().execute(() ->
+                    {
+                        Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
+                        this.textureCache.put(hash, System.currentTimeMillis() + 30000);
+                        this.requested.remove(hash);
+                    });
                 }
-                catch (IOException e1)
+                catch (IOException e)
                 {
-                    LOGGER.error("Failed to delete image with hash '" + hash + "' from cache.", e1);
+                    LOGGER.error("Failed to load image with hash '" + hash + "' from cache. Deleting", e);
+                    try
+                    {
+                        LOGGER.debug("Deleting '" + hash + "' from cache.");
+                        this.cacheFileData.remove(hash);
+                        Files.delete(imageFile);
+                    }
+                    catch (IOException e1)
+                    {
+                        LOGGER.error("Failed to delete image with hash '" + hash + "' from cache.", e1);
+                    }
+                    Minecraft.getInstance().execute(() -> this.requested.remove(hash));
                 }
-                Minecraft.getInstance().execute(() -> this.requested.remove(hash));
             }
         });
         return true;
@@ -188,7 +191,10 @@ public class OnlineImageCache
     {
         String hash = DigestUtils.md5Hex(url);
         if (this.errored.contains(hash))
+        {
+            this.textureCache.put(hash, System.currentTimeMillis() + 30000);
             return MissingTextureSprite.getLocation();
+        }
 
         ResourceLocation location = this.locationCache.computeIfAbsent(hash, ResourceLocation::new);
         if (Minecraft.getInstance().getTextureManager().getTexture(location) != null)
@@ -227,6 +233,7 @@ public class OnlineImageCache
                 Minecraft.getInstance().execute(() ->
                 {
                     this.errored.add(hash);
+                    this.textureCache.put(hash, System.currentTimeMillis() + 30000);
                     this.requested.remove(hash);
                 });
             }
@@ -246,5 +253,6 @@ public class OnlineImageCache
                 Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().deleteTexture(location));
             }
         });
+        this.errored.removeIf(this::hasTextureExpired);
     }
 }
