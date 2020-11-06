@@ -49,7 +49,7 @@ public class OnlineImageCache
 
     private final Path cacheFolder;
     private final Path cacheFile;
-    private final Map<String, ResourceLocation> cache;
+    private final Map<String, ResourceLocation> locationCache;
     private final Set<String> errored;
     private final Set<String> requested;
     private final Map<String, Long> textureCache;
@@ -75,7 +75,7 @@ public class OnlineImageCache
     {
         this.cacheFolder = Minecraft.getInstance().gameDir.toPath().resolve(domain + "-online-image-cache");
         this.cacheFile = this.cacheFolder.resolve("cache.json");
-        this.cache = new HashMap<>();
+        this.locationCache = new HashMap<>();
         this.errored = new HashSet<>();
         this.requested = new HashSet<>();
         this.textureCache = new HashMap<>();
@@ -190,7 +190,7 @@ public class OnlineImageCache
         if (this.errored.contains(hash))
             return MissingTextureSprite.getLocation();
 
-        ResourceLocation location = this.cache.computeIfAbsent(hash, ResourceLocation::new);
+        ResourceLocation location = this.locationCache.computeIfAbsent(hash, ResourceLocation::new);
         if (Minecraft.getInstance().getTextureManager().getTexture(location) != null)
         {
             this.textureCache.put(hash, System.currentTimeMillis() + 30000);
@@ -237,8 +237,8 @@ public class OnlineImageCache
     @SubscribeEvent
     public void onEvent(TickEvent.ClientTickEvent event)
     {
-        this.cache.entrySet().removeIf(entry -> Minecraft.getInstance().getTextureManager().getTexture(entry.getValue()) == null);
-        this.cache.forEach((hash, location) ->
+        this.locationCache.entrySet().removeIf(entry -> Minecraft.getInstance().getTextureManager().getTexture(entry.getValue()) == null);
+        this.locationCache.forEach((hash, location) ->
         {
             if (this.hasTextureExpired(hash))
             {

@@ -15,6 +15,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -27,7 +28,7 @@ import java.util.function.Consumer;
 @OnlyIn(Dist.CLIENT)
 public class SkinHelper
 {
-    private static final Map<GameProfile, GameProfile> PROFILE_CACHE = new HashMap<>();
+    private static final Map<GameProfile, GameProfile> PROFILE_CACHE = new WeakHashMap<>();
 
     /**
      * Caches the results of {@link SkullTileEntity#updateContainingBlockInfo()}.

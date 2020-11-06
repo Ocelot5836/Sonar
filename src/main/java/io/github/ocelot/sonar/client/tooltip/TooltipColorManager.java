@@ -15,14 +15,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <p>Manages tooltips for items that have custom tooltip colors.</p>
@@ -33,8 +31,8 @@ import java.util.Set;
 public class TooltipColorManager
 {
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final Map<String, ResourceLocation> RESOURCE_CACHE = new HashMap<>();
-    private static final Map<String, Integer> COLOR_CACHE = new HashMap<>();
+    private static final Map<String, ResourceLocation> RESOURCE_CACHE = new WeakHashMap<>();
+    private static final Map<String, Integer> COLOR_CACHE = new WeakHashMap<>();
     private static final Set<String> ERRORED_COLOR_CACHE = new HashSet<>();
 
     public static IForgeRegistry<TooltipColor.RegistryWrapper> TOOLTIP_COLORS;
@@ -81,22 +79,22 @@ public class TooltipColorManager
     {
         if (nbt.contains(name, Constants.NBT.TAG_STRING))
         {
-            String hex = nbt.getString(name);
-            if (ERRORED_COLOR_CACHE.contains(hex))
+            String number = nbt.getString(name);
+            if (ERRORED_COLOR_CACHE.contains(number))
                 return defaultColor;
-            if (COLOR_CACHE.containsKey(hex))
-                return COLOR_CACHE.get(hex);
+            if (COLOR_CACHE.containsKey(number))
+                return COLOR_CACHE.get(number);
 
             try
             {
-                int color = Integer.parseUnsignedInt(nbt.getString(name), 16);
-                COLOR_CACHE.put(hex, color);
+                int color = NumberUtils.createNumber(number).intValue();
+                COLOR_CACHE.put(number, color);
                 return color;
             }
             catch (Exception e)
             {
                 LOGGER.warn("Could not parse tooltip color '" + name + "' as hex", e);
-                ERRORED_COLOR_CACHE.add(hex);
+                ERRORED_COLOR_CACHE.add(number);
                 return 0;
             }
         }
