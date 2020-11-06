@@ -21,9 +21,9 @@ import java.util.Optional;
  * @author Ocelot
  * @since 5.1.0
  */
-public class TileEntityBase extends TileEntity
+public class BaseTileEntity extends TileEntity
 {
-    public TileEntityBase(TileEntityType<?> tileEntityType)
+    public BaseTileEntity(TileEntityType<?> tileEntityType)
     {
         super(tileEntityType);
     }
