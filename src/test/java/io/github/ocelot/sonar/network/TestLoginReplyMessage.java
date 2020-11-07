@@ -19,6 +19,6 @@ public class TestLoginReplyMessage extends SimpleSonarLoginMessage<Object>
     @Override
     public void processPacket(Object handler, NetworkEvent.Context ctx)
     {
-        throw new RuntimeException("Lol");
+//        throw new RuntimeException("Lol");
     }
 }
