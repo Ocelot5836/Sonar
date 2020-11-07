@@ -26,6 +26,7 @@ public class TestMessageHandler
         LOGIN_NETWORK_MANAGER.registerLoginReply(TestLoginReplyMessage.class, TestLoginReplyMessage::new, NetworkDirection.LOGIN_TO_SERVER);
         LOGIN_NETWORK_MANAGER.registerLogin(TestLoginMessage.class, TestLoginMessage::new, NetworkDirection.LOGIN_TO_CLIENT);
         PLAY_NETWORK_MANAGER.register(SyncValueContainerMessage.class, SyncValueContainerMessage::new, NetworkDirection.PLAY_TO_SERVER);
-        PLAY_NETWORK_MANAGER.register(SyncValueContainerMessage.class, SyncValueContainerMessage::new, NetworkDirection.PLAY_TO_SERVER);
+        PLAY_NETWORK_MANAGER.register(CTestPlayMessage.class, CTestPlayMessage::new, NetworkDirection.PLAY_TO_SERVER);
+        PLAY_NETWORK_MANAGER.register(STestPlayMessage.class, STestPlayMessage::new, NetworkDirection.PLAY_TO_CLIENT);
     }
 }
