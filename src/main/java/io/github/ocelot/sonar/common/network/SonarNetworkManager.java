@@ -35,15 +35,15 @@ public class SonarNetworkManager
 {
     private static final Logger LOGGER = LogManager.getLogger();
     private final SimpleChannel channel;
-    private final LazyValue<Supplier<Object>> clientMessageHandler;
-    private final LazyValue<Supplier<Object>> serverMessageHandler;
+    private final LazyValue<LazyValue<Object>> clientMessageHandler;
+    private final LazyValue<LazyValue<Object>> serverMessageHandler;
     private int nextId;
 
-    public SonarNetworkManager(SimpleChannel channel, Supplier<Supplier<Object>> clientSupplier, Supplier<Supplier<Object>> serverSupplier)
+    public SonarNetworkManager(SimpleChannel channel, Supplier<Supplier<Object>> clientFactory, Supplier<Supplier<Object>> serverFactory)
     {
         this.channel = channel;
-        this.clientMessageHandler = new LazyValue<>(clientSupplier);
-        this.serverMessageHandler = new LazyValue<>(serverSupplier);
+        this.clientMessageHandler = new LazyValue<>(() -> new LazyValue<>(clientFactory.get()));
+        this.serverMessageHandler = new LazyValue<>(() -> new LazyValue<>(serverFactory.get()));
     }
 
     @SuppressWarnings("unchecked")
@@ -51,7 +51,7 @@ public class SonarNetworkManager
     {
         try
         {
-            msg.processPacket((T) (ctx.get().getDirection().getReceptionSide().isClient() ? this.clientMessageHandler.getValue().get() : this.serverMessageHandler.getValue().get()), ctx.get());
+            msg.processPacket((T) (ctx.get().getDirection().getReceptionSide().isClient() ? this.clientMessageHandler.getValue().getValue() : this.serverMessageHandler.getValue().getValue()), ctx.get());
         }
         catch (Exception e)
         {
