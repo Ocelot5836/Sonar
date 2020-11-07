@@ -17,6 +17,10 @@ public class OpenValueContainerMessage implements SonarMessage<IValueContainerCl
 {
     private BlockPos pos;
 
+    public OpenValueContainerMessage()
+    {
+    }
+
     public OpenValueContainerMessage(BlockPos pos)
     {
         this.pos = pos;
