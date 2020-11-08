@@ -60,7 +60,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
         this.ySize = HEIGHT;
         this.entryWidgets = new ArrayList<>();
         this.scrollHandler = new ScrollHandler(null, this.getEntries().size() * VALUE_HEIGHT, 142);
-        this.scrollHandler.setScrollSpeed(this.scrollHandler.getMaxScroll() / this.getEntries().size());
+        this.scrollHandler.setScrollSpeed((float) this.scrollHandler.getMaxScroll() / (float) this.getEntries().size());
 
         this.scrolling = false;
     }
@@ -73,7 +73,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
         this.ySize = HEIGHT;
         this.entryWidgets = new ArrayList<>();
         this.scrollHandler = new ScrollHandler(null, this.getEntries().size() * VALUE_HEIGHT, 142);
-        this.scrollHandler.setScrollSpeed(this.scrollHandler.getMaxScroll() / this.getEntries().size());
+        this.scrollHandler.setScrollSpeed((float) this.scrollHandler.getMaxScroll() / (float) this.getEntries().size());
 
         this.scrolling = false;
     }
