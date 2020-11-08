@@ -4,9 +4,10 @@
 
 	"item.examplemod.test_value_container_editor": "Test Value Container Editor",
 	"item.examplemod.test_crash": "Test Crasher",
-	"item.examplemod.test_entity_a": "Test Entity A Spawn Egg",
-	"item.examplemod.test_entity_b": "Test Entity B Spawn Egg",
-	"item.examplemod.test_entity_c": "Test Entity C Spawn Egg",
+	"item.examplemod.test_entity_a_spawn_egg": "Test Entity A Spawn Egg",
+	"item.examplemod.test_entity_b_spawn_egg": "Test Entity B Spawn Egg",
+	"item.examplemod.test_entity_c_spawn_egg": "Test Entity C Spawn Egg",
+	"item.examplemod.zee_spawn_egg": "Z E E Spawn Egg",
 
 	"itemGroup.examplemod": "Test Mod"
 }

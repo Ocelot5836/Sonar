@@ -13,7 +13,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import javax.annotation.Nullable;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -57,8 +56,16 @@ public class SpawnEggItemBase<T extends EntityType<?>> extends SpawnEggItem
         {
             if (items.stream().anyMatch(stack -> stack.getItem() instanceof SpawnEggItem))
             {
-                Optional<ItemStack> optional = items.stream().filter(stack -> stack.getItem() instanceof SpawnEggItem && "minecraft".equals(Objects.requireNonNull(stack.getItem().getRegistryName()).getNamespace())).reduce((a, b) -> b);
-                if (optional.isPresent() && items.contains(optional.get()))
+                String itemName = this.getRegistryName() == null ? null : this.getRegistryName().getPath();
+                Optional<ItemStack> optional = itemName == null ? Optional.empty() : items.stream().filter(stack -> stack.getItem() instanceof SpawnEggItem).max((a, b) ->
+                {
+                    if (a.getItem().getRegistryName() == null || b.getItem().getRegistryName() == null)
+                        return 0;
+                    int valA = itemName.compareToIgnoreCase(a.getItem().getRegistryName().getPath());
+                    int valB = b.getItem().getRegistryName().getPath().compareToIgnoreCase(itemName);
+                    return valB - valA;
+                });
+                if (optional.isPresent())
                 {
                     items.add(items.indexOf(optional.get()) + 1, new ItemStack(this));
                     return;

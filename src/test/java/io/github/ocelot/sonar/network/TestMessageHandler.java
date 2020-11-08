@@ -4,6 +4,8 @@ import io.github.ocelot.sonar.TestMod;
 import io.github.ocelot.sonar.common.network.SonarNetworkManager;
 import io.github.ocelot.sonar.common.valuecontainer.OpenValueContainerMessage;
 import io.github.ocelot.sonar.common.valuecontainer.SyncValueContainerMessage;
+import io.github.ocelot.sonar.network.handler.TestClientHandler;
+import io.github.ocelot.sonar.network.handler.TestServerHandler;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
@@ -15,8 +17,8 @@ public class TestMessageHandler
     public static final SimpleChannel LOGIN = NetworkRegistry.newSimpleChannel(new ResourceLocation(TestMod.MOD_ID, "login"), () -> VERSION, VERSION::equals, VERSION::equals);
     public static final SimpleChannel PLAY = NetworkRegistry.newSimpleChannel(new ResourceLocation(TestMod.MOD_ID, "play"), () -> VERSION, VERSION::equals, VERSION::equals);
 
-    private static final SonarNetworkManager LOGIN_NETWORK_MANAGER = new SonarNetworkManager(LOGIN, () -> TestClientHandler::new, () -> Object::new);
-    private static final SonarNetworkManager PLAY_NETWORK_MANAGER = new SonarNetworkManager(PLAY, () -> TestClientHandler::new, () -> Object::new);
+    private static final SonarNetworkManager LOGIN_NETWORK_MANAGER = new SonarNetworkManager(LOGIN, () -> TestClientHandler::new, () -> TestServerHandler::new);
+    private static final SonarNetworkManager PLAY_NETWORK_MANAGER = new SonarNetworkManager(PLAY, () -> TestClientHandler::new, () -> TestServerHandler::new);
 
     public static void init()
     {

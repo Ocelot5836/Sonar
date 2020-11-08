@@ -62,7 +62,7 @@ public class TestMod
     public static final RegistryObject<EntityType<TestEntity>> TEST_ENTITY_C = ENTITIES.register("test_entity_c", () -> EntityType.Builder.create(TestEntity::new, EntityClassification.CREATURE).size(0.6F, 0.7F).build("test_entity_a"));
     public static final RegistryObject<Item> TEST_ENTITY_A_SPAWN_EGG = ITEMS.register("test_entity_a_spawn_egg", () -> new SpawnEggItemBase<>(TEST_ENTITY_A, 0xff00ff, 0x7f007f, true, new Item.Properties().group(TEST_GROUP)));
     public static final RegistryObject<Item> TEST_ENTITY_B_SPAWN_EGG = ITEMS.register("test_entity_b_spawn_egg", () -> new SpawnEggItemBase<>(TEST_ENTITY_B, 0x00ffff, 0x007f7f, true, new Item.Properties().group(TEST_GROUP)));
-    public static final RegistryObject<Item> TEST_ENTITY_C_SPAWN_EGG = ITEMS.register("test_entity_c_spawn_egg", () -> new SpawnEggItemBase<>(TEST_ENTITY_C, 0x00ff00, 0x007f00, true, new Item.Properties().group(TEST_GROUP)));
+    public static final RegistryObject<Item> ZEE_SPAWN_EGG = ITEMS.register("zee_spawn_egg", () -> new SpawnEggItemBase<>(TEST_ENTITY_C, 0x00ff00, 0x007f00, true, new Item.Properties().group(TEST_GROUP)));
     public static final RegistryObject<FishBucketItemBase> TEST_ENTITY_C_BUCKET = ITEMS.register("test_entity_c_bucket", () -> new FishBucketItemBase(TEST_ENTITY_C, () -> Fluids.WATER, true, new Item.Properties().group(TEST_GROUP)));
 
     public static final RegistryObject<TileEntityType<TestTileEntity>> TEST_TILE_ENTITY = TILE_ENTITIES.register("test", () -> TileEntityType.Builder.create(TestTileEntity::new, TEST_BLOCK.get()).build(null));
