@@ -18,18 +18,18 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
 {
     public static final float DEFAULT_SCROLL_SPEED = 5;
     public static final float DEFAULT_TRANSITION_SPEED = 0.5f;
-    public static final float DEFAULT_MIN_SNAP = 0.1f;
+    public static final double DEFAULT_MIN_SNAP = 0.1f;
 
     private final Runnable markDirty;
     private int height;
     private int visibleHeight;
 
-    private float scroll;
-    private float lastScroll;
-    private float nextScroll;
+    private double scroll;
+    private double lastScroll;
+    private double nextScroll;
     private float scrollSpeed;
     private float transitionSpeed;
-    private float minSnap;
+    private double minSnap;
 
     public ScrollHandler(@Nullable Runnable markDirty, int height, int visibleHeight)
     {
@@ -51,7 +51,7 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
         this.lastScroll = this.scroll;
         if (this.getMaxScroll() > 0)
         {
-            float delta = this.nextScroll - this.scroll;
+            double delta = this.nextScroll - this.scroll;
             if (Math.abs(delta) < this.minSnap)
             {
                 this.scroll = this.nextScroll;
@@ -90,7 +90,7 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
         {
             float scrollAmount = (float) Math.min(Math.abs(amount), maxScroll) * this.getScrollSpeed();
             float finalScroll = (amount < 0 ? -1 : 1) * scrollAmount;
-            float scroll = MathHelper.clamp(this.getScroll() - finalScroll, 0, this.getMaxScroll());
+            double scroll = MathHelper.clamp(this.getScroll() - finalScroll, 0, this.getMaxScroll());
             if (this.getScroll() != scroll)
             {
                 this.scroll(finalScroll);
@@ -105,7 +105,7 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
      *
      * @param scrollAmount The amount to scroll
      */
-    public ScrollHandler scroll(float scrollAmount)
+    public ScrollHandler scroll(double scrollAmount)
     {
         this.nextScroll -= scrollAmount;
         if (this.markDirty != null)
@@ -132,7 +132,7 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
     /**
      * @return The position of the scroll bar
      */
-    public float getScroll()
+    public double getScroll()
     {
         return scroll;
     }
@@ -140,7 +140,7 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
     /**
      * @return The maximum value the scroll can be
      */
-    public float getMaxScroll()
+    public int getMaxScroll()
     {
         return Math.max(0, this.height - this.visibleHeight);
     }
@@ -154,7 +154,7 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
     @OnlyIn(Dist.CLIENT)
     public float getInterpolatedScroll(float partialTicks)
     {
-        return this.lastScroll + (this.scroll - this.lastScroll) * partialTicks;
+        return (float) MathHelper.lerp(partialTicks, this.lastScroll, this.scroll);
     }
 
     /**
@@ -168,7 +168,7 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
     /**
      * @return The scrolling value last tick
      */
-    public float getLastScroll()
+    public double getLastScroll()
     {
         return lastScroll;
     }
@@ -176,7 +176,7 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
     /**
      * @return The scroll value being animated to
      */
-    public float getNextScroll()
+    public double getNextScroll()
     {
         return nextScroll;
     }
@@ -210,7 +210,7 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
      *
      * @param scroll The new scroll value
      */
-    public ScrollHandler setScroll(float scroll)
+    public ScrollHandler setScroll(double scroll)
     {
         this.scroll = MathHelper.clamp(scroll, 0, this.height - this.visibleHeight);
         this.nextScroll = this.scroll;
@@ -238,7 +238,7 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
      *
      * @param minSnap The new snapping value
      */
-    public ScrollHandler setMinSnap(float minSnap)
+    public ScrollHandler setMinSnap(double minSnap)
     {
         this.minSnap = minSnap;
         if (this.markDirty != null)
@@ -263,11 +263,11 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
     public CompoundNBT serializeNBT()
     {
         CompoundNBT nbt = new CompoundNBT();
-        nbt.putFloat("scroll", this.scroll);
-        nbt.putFloat("nextScroll", this.nextScroll);
+        nbt.putFloat("scroll", (float) this.scroll);
+        nbt.putFloat("nextScroll", (float) this.nextScroll);
         nbt.putFloat("scrollSpeed", this.scrollSpeed);
         nbt.putFloat("transitionSpeed", this.transitionSpeed);
-        nbt.putFloat("minSnap", this.minSnap);
+        nbt.putFloat("minSnap", (float) this.minSnap);
         return nbt;
     }
 
