@@ -174,7 +174,7 @@ public final class ShapeRenderer
     public static IVertexBuilder begin()
     {
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        buffer.begin(GL_QUADS, DefaultVertexFormats.POSITION_COLOR_TEX);
+        buffer.begin(GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         return buffer;
     }
 
