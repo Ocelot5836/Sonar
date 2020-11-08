@@ -1,6 +1,7 @@
 package io.github.ocelot.sonar.tileentity;
 
 import io.github.ocelot.sonar.TestMod;
+import io.github.ocelot.sonar.common.tileentity.BaseTileEntity;
 import io.github.ocelot.sonar.common.valuecontainer.*;
 import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.Enchantments;
@@ -25,43 +26,17 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-public class TestTileEntity extends TileEntity implements ValueContainer
+public class TestTileEntity extends BaseTileEntity implements ValueContainer
 {
     public TestTileEntity()
     {
         super(TestMod.TEST_TILE_ENTITY.get());
     }
 
-    private void sync()
-    {
-        this.markDirty();
-        if (this.world != null)
-            this.world.notifyBlockUpdate(this.pos, this.getBlockState(), this.getBlockState(), Constants.BlockFlags.DEFAULT);
-    }
-
-    @Override
-    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt)
-    {
-        this.read(this.getBlockState(), pkt.getNbtCompound());
-    }
-
-    @Nullable
-    @Override
-    public SUpdateTileEntityPacket getUpdatePacket()
-    {
-        return new SUpdateTileEntityPacket(this.pos, 0, this.getUpdateTag());
-    }
-
-    @Override
-    public CompoundNBT getUpdateTag()
-    {
-        return this.write(new CompoundNBT());
-    }
-
     @Override
     public void getEntries(World world, BlockPos pos, List<ValueContainerEntry<?>> entries)
     {
-        for (int i = 0; i < 4096; i++)
+        for (int i = 0; i < 1024; i++)
         {
             entries.add(new StringValueContainerEntry(new StringTextComponent("lul"), Integer.toString(i), "Epic Value btw"));
             entries.add(new FloatValueContainerEntry(new StringTextComponent("Float " + i), "test" + i, i));

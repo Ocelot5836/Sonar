@@ -69,6 +69,7 @@ public class BaseTileEntity extends TileEntity
         return this.writeSyncTag(new CompoundNBT());
     }
 
+    @OnlyIn(Dist.CLIENT)
     public Optional<ITextComponent> getTitle(World world, BlockPos pos)
     {
         return Optional.of(this.getBlockState().getBlock().getTranslatedName());
