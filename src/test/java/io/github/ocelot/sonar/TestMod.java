@@ -70,7 +70,7 @@ public class TestMod
     public TestMod()
     {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-        TooltipColorManager.register(modBus);
+        Sonar.init(modBus, SonarModule.TOOLTIPS);
         BLOCKS.register(modBus);
         TILE_ENTITIES.register(modBus);
         ITEMS.register(modBus);
