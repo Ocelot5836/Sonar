@@ -1,7 +1,6 @@
 package io.github.ocelot.sonar;
 
 import io.github.ocelot.sonar.client.tooltip.TooltipColorManager;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
 
 import javax.annotation.Nullable;

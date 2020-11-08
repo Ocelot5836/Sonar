@@ -2,8 +2,8 @@ package io.github.ocelot.sonar.client.screen;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.ocelot.sonar.Sonar;
 import io.github.ocelot.sonar.client.render.ShapeRenderer;
-import io.github.ocelot.sonar.client.util.FontHelper;
 import io.github.ocelot.sonar.client.util.ScissorHelper;
 import io.github.ocelot.sonar.common.util.ScrollHandler;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainer;
@@ -40,6 +40,7 @@ import java.util.function.Supplier;
 @OnlyIn(Dist.CLIENT)
 public abstract class ValueContainerEditorScreenImpl extends ValueContainerEditorScreen
 {
+    public static final ResourceLocation BACKGROUND_LOCATION = new ResourceLocation(Sonar.DOMAIN, "textures/gui/value_container_editor.png");
     public static final double MAX_SCROLL = 2f;
     public static final int WIDTH = 176;
     public static final int HEIGHT = 166;
@@ -75,7 +76,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
             if (y - scroll >= 160)
                 break;
             ValueContainerEntry<?> entry = this.getEntries().get(i);
-            FontHelper.drawString(this.getMinecraft().fontRenderer, entry.getDisplayName().getFormattedText(), 8, 18 + y, -1, true);
+            this.getMinecraft().fontRenderer.drawStringWithShadow(entry.getDisplayName().getFormattedText(), 8, 18 + y, -1);
         }
     }
 
@@ -387,6 +388,10 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
 
     /**
      * @return The location of the image that should be used for the background of the screen
+     * @deprecated Not needed anymore, resources are included TODO remove in 5.1.0
      */
-    public abstract ResourceLocation getBackgroundTextureLocation();
+    public ResourceLocation getBackgroundTextureLocation()
+    {
+        return BACKGROUND_LOCATION;
+    }
 }
