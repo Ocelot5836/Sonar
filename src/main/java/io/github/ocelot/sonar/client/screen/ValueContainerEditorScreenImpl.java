@@ -53,6 +53,19 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
 
     private boolean scrolling;
 
+    public ValueContainerEditorScreenImpl(ValueContainer container, BlockPos pos)
+    {
+        super(container, pos);
+        this.xSize = WIDTH;
+        this.ySize = HEIGHT;
+        this.entryWidgets = new ArrayList<>();
+        this.scrollHandler = new ScrollHandler(null, this.getEntries().size() * VALUE_HEIGHT, 142);
+        this.scrollHandler.setScrollSpeed(this.scrollHandler.getMaxScroll() / this.getEntries().size());
+
+        this.scrolling = false;
+    }
+
+    @Deprecated
     public ValueContainerEditorScreenImpl(ValueContainer container, BlockPos pos, Supplier<ITextComponent> defaultTitle)
     {
         super(container, pos, defaultTitle);
