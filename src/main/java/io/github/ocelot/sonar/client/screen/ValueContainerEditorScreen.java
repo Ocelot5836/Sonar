@@ -1,6 +1,7 @@
 package io.github.ocelot.sonar.client.screen;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import io.github.ocelot.sonar.Sonar;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainer;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainerEntry;
 import net.minecraft.client.Minecraft;
@@ -11,6 +12,7 @@ import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -33,6 +35,12 @@ public abstract class ValueContainerEditorScreen extends Screen
     private final List<ValueContainerEntry<?>> entries;
     private final String formattedTitle;
 
+    public ValueContainerEditorScreen(ValueContainer container, BlockPos pos)
+    {
+        this(container, pos, () -> new TranslationTextComponent("screen." + Sonar.DOMAIN + ".value_container"));
+    }
+
+    @Deprecated
     public ValueContainerEditorScreen(ValueContainer container, BlockPos pos, Supplier<ITextComponent> defaultTitle)
     {
         super(container.getTitle(Objects.requireNonNull(Minecraft.getInstance().world), pos).orElseGet(defaultTitle));

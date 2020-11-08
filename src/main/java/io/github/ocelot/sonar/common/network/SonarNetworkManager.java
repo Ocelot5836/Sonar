@@ -2,8 +2,13 @@ package io.github.ocelot.sonar.common.network;
 
 import io.github.ocelot.sonar.common.network.message.SonarLoginMessage;
 import io.github.ocelot.sonar.common.network.message.SonarMessage;
+import net.minecraft.client.network.login.IClientLoginNetHandler;
+import net.minecraft.client.network.status.IClientStatusNetHandler;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SDisconnectPacket;
+import net.minecraft.network.login.ServerLoginNetHandler;
+import net.minecraft.network.play.ServerPlayNetHandler;
+import net.minecraft.network.status.IServerStatusNetHandler;
 import net.minecraft.util.LazyValue;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -30,15 +35,15 @@ public class SonarNetworkManager
 {
     private static final Logger LOGGER = LogManager.getLogger();
     private final SimpleChannel channel;
-    private final LazyValue<Supplier<Object>> clientMessageHandler;
-    private final LazyValue<Supplier<Object>> serverMessageHandler;
+    private final LazyValue<LazyValue<Object>> clientMessageHandler;
+    private final LazyValue<LazyValue<Object>> serverMessageHandler;
     private int nextId;
 
-    public SonarNetworkManager(SimpleChannel channel, Supplier<Supplier<Object>> clientSupplier, Supplier<Supplier<Object>> serverSupplier)
+    public SonarNetworkManager(SimpleChannel channel, Supplier<Supplier<Object>> clientFactory, Supplier<Supplier<Object>> serverFactory)
     {
         this.channel = channel;
-        this.clientMessageHandler = new LazyValue<>(clientSupplier);
-        this.serverMessageHandler = new LazyValue<>(serverSupplier);
+        this.clientMessageHandler = new LazyValue<>(() -> new LazyValue<>(clientFactory.get()));
+        this.serverMessageHandler = new LazyValue<>(() -> new LazyValue<>(serverFactory.get()));
     }
 
     @SuppressWarnings("unchecked")
@@ -46,21 +51,36 @@ public class SonarNetworkManager
     {
         try
         {
-            msg.processPacket((T) (ctx.get().getDirection().getReceptionSide().isClient() ? this.clientMessageHandler.getValue().get() : this.serverMessageHandler.getValue().get()), ctx.get());
-            return true;
+            msg.processPacket((T) (ctx.get().getDirection().getReceptionSide().isClient() ? this.clientMessageHandler.getValue().getValue() : this.serverMessageHandler.getValue().getValue()), ctx.get());
         }
         catch (Exception e)
         {
             LOGGER.error("Failed to process packet for class: " + msg.getClass().getName(), e);
-            if (ctx.get().getDirection().getReceptionSide().isServer())
+
+            ITextComponent reason = new TranslationTextComponent("disconnect.genericReason", "Internal Exception: " + e);
+            NetworkManager networkManager = ctx.get().getNetworkManager();
+            INetHandler netHandler = networkManager.getNetHandler();
+            boolean local = networkManager.isLocalChannel();
+
+            // Need to check the channel type to determine how to disconnect
+            if (netHandler instanceof IServerStatusNetHandler)
+                networkManager.closeChannel(reason);
+            if (netHandler instanceof ServerLoginNetHandler)
+                ((ServerLoginNetHandler) netHandler).disconnect(reason);
+            if (netHandler instanceof ServerPlayNetHandler)
+                ((ServerPlayNetHandler) netHandler).disconnect(reason);
+            if (netHandler instanceof IClientStatusNetHandler)
             {
-                ITextComponent textComponent = new TranslationTextComponent("disconnect.genericReason", "Internal Exception: " + e);
-                NetworkManager networkManager = ctx.get().getNetworkManager();
-                networkManager.sendPacket(new SDisconnectPacket(textComponent), future -> networkManager.closeChannel(textComponent));
-                networkManager.disableAutoRead();
+                networkManager.closeChannel(reason);
+                netHandler.onDisconnect(reason);
             }
-            return false;
+            if (netHandler instanceof IClientLoginNetHandler)
+            {
+                networkManager.closeChannel(reason);
+                netHandler.onDisconnect(reason);
+            }
         }
+        return true;
     }
 
     private <MSG extends SonarMessage<T>, T> SimpleChannel.MessageBuilder<MSG> getMessageBuilder(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)

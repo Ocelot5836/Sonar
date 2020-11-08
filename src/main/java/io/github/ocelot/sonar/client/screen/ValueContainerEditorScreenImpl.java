@@ -2,6 +2,7 @@ package io.github.ocelot.sonar.client.screen;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.ocelot.sonar.Sonar;
 import io.github.ocelot.sonar.client.render.ShapeRenderer;
 import io.github.ocelot.sonar.client.util.FontHelper;
 import io.github.ocelot.sonar.client.util.ScissorHelper;
@@ -42,6 +43,7 @@ import java.util.function.Supplier;
 @OnlyIn(Dist.CLIENT)
 public abstract class ValueContainerEditorScreenImpl extends ValueContainerEditorScreen
 {
+    public static final ResourceLocation BACKGROUND_LOCATION = new ResourceLocation(Sonar.DOMAIN, "textures/gui/value_container_editor.png");
     public static final double MAX_SCROLL = 2f;
     public static final int WIDTH = 176;
     public static final int HEIGHT = 166;
@@ -54,6 +56,19 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
 
     private boolean scrolling;
 
+    public ValueContainerEditorScreenImpl(ValueContainer container, BlockPos pos)
+    {
+        super(container, pos);
+        this.xSize = WIDTH;
+        this.ySize = HEIGHT;
+        this.entryWidgets = new ArrayList<>();
+        this.scrollHandler = new ScrollHandler(null, this.getEntries().size() * VALUE_HEIGHT, 142);
+        this.scrollHandler.setScrollSpeed((float) this.scrollHandler.getMaxScroll() / (float) this.getEntries().size());
+
+        this.scrolling = false;
+    }
+
+    @Deprecated
     public ValueContainerEditorScreenImpl(ValueContainer container, BlockPos pos, Supplier<ITextComponent> defaultTitle)
     {
         super(container, pos, defaultTitle);
@@ -61,7 +76,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
         this.ySize = HEIGHT;
         this.entryWidgets = new ArrayList<>();
         this.scrollHandler = new ScrollHandler(null, this.getEntries().size() * VALUE_HEIGHT, 142);
-        this.scrollHandler.setScrollSpeed(this.scrollHandler.getMaxScroll() / this.getEntries().size());
+        this.scrollHandler.setScrollSpeed((float) this.scrollHandler.getMaxScroll() / (float) this.getEntries().size());
 
         this.scrolling = false;
     }
@@ -77,7 +92,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
             if (y - scroll >= 160)
                 break;
             ValueContainerEntry<?> entry = this.getEntries().get(i);
-            FontHelper.drawString(matrixStack, this.getMinecraft().fontRenderer, entry.getDisplayName().getString(), 8, 18 + y, -1, true);
+            this.getMinecraft().fontRenderer.drawStringWithShadow(matrixStack, entry.getDisplayName().getString(), 8, 18 + y, -1);
         }
     }
 
@@ -389,6 +404,10 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
 
     /**
      * @return The location of the image that should be used for the background of the screen
+     * @deprecated Not needed anymore, resources are included TODO remove in 5.1.0
      */
-    public abstract ResourceLocation getBackgroundTextureLocation();
+    public ResourceLocation getBackgroundTextureLocation()
+    {
+        return BACKGROUND_LOCATION;
+    }
 }

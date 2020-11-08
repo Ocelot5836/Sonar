@@ -20,7 +20,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 /**
  * <p>Manages tooltips for items that have custom tooltip colors.</p>
@@ -41,6 +44,7 @@ public class TooltipColorManager
      * Registers the required events for tooltip colors to function.
      *
      * @param bus The mod event bus. This should come from {@link FMLJavaModLoadingContext#getModEventBus()}
+     * @deprecated Deprecated in favor of {@link io.github.ocelot.sonar.SonarModule#TOOLTIPS}. TODO remove in 6.0.0
      */
     public static void register(IEventBus bus)
     {
