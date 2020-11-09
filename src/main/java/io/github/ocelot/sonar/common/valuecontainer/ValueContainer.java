@@ -4,11 +4,13 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -41,6 +43,31 @@ public interface ValueContainer
     void readEntries(World world, BlockPos pos, Map<String, ValueContainerEntry<?>> entries);
 
     /**
+     * Writes data into a new tag.
+     *
+     * @param world The world the value container is in
+     * @param pos   The position of the value container
+     * @return A tag of data to send or null to not send any
+     */
+    @Nullable
+    default CompoundNBT writeClientValueContainer(World world, BlockPos pos)
+    {
+        return null;
+    }
+
+    /**
+     * Reads data from the specified tag.
+     *
+     * @param world The world the value container is in
+     * @param pos   The position of the value container
+     * @param nbt   The server data tag
+     */
+    @OnlyIn(Dist.CLIENT)
+    default void readClientValueContainer(World world, BlockPos pos, CompoundNBT nbt)
+    {
+    }
+
+    /**
      * Fetches a list of entries from this container.
      *
      * @param world The world this container is in
@@ -59,7 +86,7 @@ public interface ValueContainer
      *
      * @param world The world this container is in
      * @param pos   The pos this container is in
-     * @return The title of this container or null to use the default title
+     * @return An optional containing the title for this container
      */
     @OnlyIn(Dist.CLIENT)
     Optional<ITextComponent> getTitle(World world, BlockPos pos);
@@ -135,5 +162,21 @@ public interface ValueContainer
         }
         if (!deserializedEntries.isEmpty())
             container.readEntries(world, pos, deserializedEntries);
+    }
+
+    /**
+     * Retrieves a value container from the specified position.
+     *
+     * @param world The world to get the container from
+     * @param pos   The position of the container
+     * @return An optional containing the value container at that position
+     */
+    static Optional<ValueContainer> get(IBlockReader world, BlockPos pos)
+    {
+        if (world.getTileEntity(pos) instanceof ValueContainer)
+            return Optional.ofNullable((ValueContainer) world.getTileEntity(pos));
+        if (world.getBlockState(pos).getBlock() instanceof ValueContainer)
+            return Optional.of((ValueContainer) world.getBlockState(pos).getBlock());
+        return Optional.empty();
     }
 }

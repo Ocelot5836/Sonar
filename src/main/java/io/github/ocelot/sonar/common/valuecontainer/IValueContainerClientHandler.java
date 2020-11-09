@@ -2,7 +2,7 @@ package io.github.ocelot.sonar.common.valuecontainer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 /**
  * <p>Manages the receiving of value container messages on the client side.</p>
@@ -34,19 +35,23 @@ public interface IValueContainerClientHandler
 
         ctx.enqueueWork(() ->
         {
-            BlockPos pos = msg.getPos();
-
             if (world == null)
                 return;
 
-            TileEntity te = world.getTileEntity(pos);
-            if (!(te instanceof ValueContainer) && !(world.getBlockState(pos).getBlock() instanceof ValueContainer))
+            BlockPos pos = msg.getPos();
+            CompoundNBT nbt = msg.getNbt();
+
+            Optional<ValueContainer> valueContainerOptional = ValueContainer.get(world, pos);
+            if (!valueContainerOptional.isPresent())
             {
-                LOGGER.error("Tile Entity at '" + pos + "' was expected to be a ValueContainer, but it was " + world.getTileEntity(pos) + "!");
+                LOGGER.error("ValueContainer was expected at '" + pos + "', but it was not present!");
                 return;
             }
 
-            Screen screen = this.createValueContainerScreen(te instanceof ValueContainer ? (ValueContainer) te : (ValueContainer) world.getBlockState(pos).getBlock(), pos);
+            if (nbt != null)
+                valueContainerOptional.get().readClientValueContainer(world, pos, nbt);
+
+            Screen screen = this.createValueContainerScreen(valueContainerOptional.get(), pos);
             if (screen == null)
                 return;
 
@@ -62,5 +67,8 @@ public interface IValueContainerClientHandler
      * @return The new screen or null if no screen is requested
      */
     @Nullable
-    Screen createValueContainerScreen(ValueContainer container, BlockPos pos);
+    default Screen createValueContainerScreen(ValueContainer container, BlockPos pos)
+    {
+        return null;
+    }
 }
