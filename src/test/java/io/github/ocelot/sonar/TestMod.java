@@ -3,12 +3,10 @@ package io.github.ocelot.sonar;
 import io.github.ocelot.sonar.block.TestBlock;
 import io.github.ocelot.sonar.block.TestStateBlock;
 import io.github.ocelot.sonar.client.TestClientInit;
-import io.github.ocelot.sonar.client.tooltip.TooltipColorManager;
 import io.github.ocelot.sonar.common.item.FishBucketItemBase;
 import io.github.ocelot.sonar.common.item.SpawnEggItemBase;
 import io.github.ocelot.sonar.common.item.ValueContainerEditorItem;
 import io.github.ocelot.sonar.common.util.SortedItemGroup;
-import io.github.ocelot.sonar.common.valuecontainer.OpenValueContainerMessage;
 import io.github.ocelot.sonar.entity.TestEntity;
 import io.github.ocelot.sonar.item.CrashItem;
 import io.github.ocelot.sonar.network.TestMessageHandler;
@@ -28,7 +26,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -55,7 +52,7 @@ public class TestMod
     public static final RegistryObject<TestStateBlock> TEST_STATE_BLOCK = BLOCKS.register("test_state", () -> new TestStateBlock(Block.Properties.from(Blocks.IRON_BLOCK)));
     public static final RegistryObject<BlockItem> TEST_BLOCK_ITEM = ITEMS.register("test", () -> new BlockItem(TEST_BLOCK.get(), new Item.Properties().group(TEST_GROUP)));
     public static final RegistryObject<BlockItem> TEST_STATE_BLOCK_ITEM = ITEMS.register("test_state", () -> new BlockItem(TEST_STATE_BLOCK.get(), new Item.Properties().group(TEST_GROUP)));
-    public static final RegistryObject<Item> TEST_EDITOR_ITEM = ITEMS.register("test_value_container_editor", () -> new ValueContainerEditorItem(new Item.Properties().group(TEST_GROUP), (player, pos) -> TestMessageHandler.PLAY.send(PacketDistributor.PLAYER.with(() -> player), new OpenValueContainerMessage(pos))));
+    public static final RegistryObject<Item> TEST_EDITOR_ITEM = ITEMS.register("test_value_container_editor", () -> new ValueContainerEditorItem(new Item.Properties().group(TEST_GROUP)));
     public static final RegistryObject<CrashItem> TEST_CRASH_ITEM = ITEMS.register("test_crash", () -> new CrashItem(new Item.Properties().group(TEST_GROUP)));
     public static final RegistryObject<EntityType<TestEntity>> TEST_ENTITY_A = ENTITIES.register("test_entity_a", () -> EntityType.Builder.create(TestEntity::new, EntityClassification.CREATURE).size(0.6F, 0.7F).build("test_entity_a"));
     public static final RegistryObject<EntityType<TestEntity>> TEST_ENTITY_B = ENTITIES.register("test_entity_b", () -> EntityType.Builder.create(TestEntity::new, EntityClassification.CREATURE).size(0.6F, 0.7F).build("test_entity_a"));
@@ -70,7 +67,7 @@ public class TestMod
     public TestMod()
     {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-        Sonar.init(modBus, SonarModule.TOOLTIPS);
+        Sonar.init(modBus, SonarModule.values());
         BLOCKS.register(modBus);
         TILE_ENTITIES.register(modBus);
         ITEMS.register(modBus);
