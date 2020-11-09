@@ -54,7 +54,7 @@ public class TooltipColorManager
 
     private static void registerRegistries(RegistryEvent.NewRegistry event)
     {
-        TOOLTIP_COLORS = new RegistryBuilder<TooltipColor.RegistryWrapper>().setName(new ResourceLocation(Sonar.DOMAIN, "tooltip_colors")).setType(TooltipColor.RegistryWrapper.class).disableSaving().create();
+        TOOLTIP_COLORS = new RegistryBuilder<TooltipColor.RegistryWrapper>().setName(new ResourceLocation(Sonar.getParentModId(), Sonar.DOMAIN + "_tooltip_colors")).setType(TooltipColor.RegistryWrapper.class).disableSaving().create();
     }
 
     @SubscribeEvent
