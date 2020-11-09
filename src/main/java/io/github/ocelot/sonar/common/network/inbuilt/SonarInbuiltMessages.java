@@ -19,7 +19,7 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 public class SonarInbuiltMessages
 {
     public static final String PROTOCOL_VERSION = "1";
-    public static SimpleChannel PLAY = NetworkRegistry.newSimpleChannel(new ResourceLocation(Sonar.DOMAIN, "play"), () -> PROTOCOL_VERSION, PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals);
+    public static SimpleChannel PLAY = NetworkRegistry.newSimpleChannel(new ResourceLocation(Sonar.getParentModId(), Sonar.DOMAIN + "_play"), () -> PROTOCOL_VERSION, PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals);
 
     /**
      * Internal. Do not use.
