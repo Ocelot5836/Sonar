@@ -2,6 +2,7 @@ package io.github.ocelot.sonar.block;
 
 import io.github.ocelot.sonar.common.block.BaseBlock;
 import io.github.ocelot.sonar.common.valuecontainer.*;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -11,6 +12,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,10 +38,18 @@ public class TestStateBlock extends BaseBlock implements ValueContainer
     {
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Nullable
     @Override
-    public Optional<ITextComponent> getTitle(World world, BlockPos pos)
+    public CompoundNBT writeClientValueContainer(World world, BlockPos pos)
     {
-        return Optional.of(this.getNameTextComponent());
+        CompoundNBT nbt = new CompoundNBT();
+        nbt.putInt("Test", 7);
+        return nbt;
+    }
+
+    @Override
+    public void readClientValueContainer(World world, BlockPos pos, CompoundNBT nbt)
+    {
+        System.out.println("Received " + nbt.getInt("Test"));
     }
 }
