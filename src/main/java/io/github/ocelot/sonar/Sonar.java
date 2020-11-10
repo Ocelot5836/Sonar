@@ -3,6 +3,7 @@ package io.github.ocelot.sonar;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
@@ -20,6 +21,7 @@ public final class Sonar
      * The domain (modid) used for resource locations.
      */
     public static final String DOMAIN = "sonar";
+    private static String parentModId;
     private static SonarModule[] modules;
 
     private Sonar()
@@ -34,6 +36,7 @@ public final class Sonar
      */
     public static void init(IEventBus modBus, SonarModule... modules)
     {
+        Sonar.parentModId = ModLoadingContext.get().getActiveNamespace();
         Sonar.modules = Arrays.stream(modules).distinct().toArray(SonarModule[]::new);
         Arrays.stream(Sonar.modules).filter(module -> !module.isClientOnly()).forEach(module -> module.init(modBus));
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> Arrays.stream(Sonar.modules).filter(SonarModule::isClientOnly).forEach(module -> module.init(modBus)));
@@ -60,6 +63,14 @@ public final class Sonar
     public static boolean isModuleLoaded(SonarModule module)
     {
         return Arrays.stream(modules).anyMatch(m -> m == module);
+    }
+
+    /**
+     * @return The id of the mod hosting Sonar
+     */
+    public static String getParentModId()
+    {
+        return parentModId;
     }
 
     /**
