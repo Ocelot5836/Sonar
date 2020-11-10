@@ -107,12 +107,6 @@ public class BaseBlock extends Block
         return Optional.of(this.getTranslatedName());
     }
 
-    @OnlyIn(Dist.CLIENT)
-    public Optional<ITextComponent> getTitle(World world, BlockPos pos)
-    {
-        return Optional.of(this.getNameTextComponent());
-    }
-
     /**
      * Calculates the comparator redstone value for the specified tile entity for the inventory items.
      *
