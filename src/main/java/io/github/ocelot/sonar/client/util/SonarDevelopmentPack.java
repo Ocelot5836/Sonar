@@ -3,7 +3,10 @@ package io.github.ocelot.sonar.client.util;
 import com.google.gson.Gson;
 import io.github.ocelot.sonar.Sonar;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.*;
+import net.minecraft.resources.IPackNameDecorator;
+import net.minecraft.resources.ResourcePack;
+import net.minecraft.resources.ResourcePackInfo;
+import net.minecraft.resources.ResourcePackType;
 import net.minecraft.resources.data.IMetadataSectionSerializer;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
@@ -19,7 +22,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -94,7 +96,7 @@ public class SonarDevelopmentPack extends ResourcePack
     {
         try
         {
-            return Arrays.stream(this.getResources()).map(resource -> new ResourceLocation(Sonar.DOMAIN, resource.substring(8 + Sonar.DOMAIN.length()))).collect(Collectors.toSet());
+            return Arrays.stream(this.getResources()).filter(resource -> namespaceIn.equals(Sonar.DOMAIN) && resource.startsWith(pathIn) && filterIn.test(resource)).map(resource -> new ResourceLocation(Sonar.DOMAIN, resource.substring(8 + Sonar.DOMAIN.length()))).collect(Collectors.toSet());
         }
         catch (IOException e)
         {
