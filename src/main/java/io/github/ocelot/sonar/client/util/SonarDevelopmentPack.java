@@ -23,16 +23,25 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class SonarDevelopmentPack extends ResourcePack
+/**
+ * <p>Manages adding a new resource pack with Sonar resources when in a development environment.</p>
+ *
+ * @author Ocelot
+ * @since 5.1.0
+ */
+public final class SonarDevelopmentPack extends ResourcePack
 {
     private static final Gson GSON = new Gson();
     private String[] resources;
 
-    public SonarDevelopmentPack()
+    private SonarDevelopmentPack()
     {
         super(new File("Sonar Resources"));
     }
 
+    /**
+     * Internal. Do not call.
+     */
     public static void init()
     {
         if (FMLLoader.isProduction())
@@ -64,7 +73,7 @@ public class SonarDevelopmentPack extends ResourcePack
     }
 
     @Override
-    protected InputStream getInputStream(String resourcePath) throws IOException
+    protected InputStream getInputStream(String resourcePath)
     {
         return SonarDevelopmentPack.class.getResourceAsStream("/" + resourcePath);
     }
