@@ -37,16 +37,12 @@ public class SonarDevelopmentPack extends ResourcePack
     {
         if (FMLLoader.isProduction())
             return;
-        Minecraft.getInstance().getResourcePackList().addPackFinder(new IPackFinder()
+        Minecraft.getInstance().getResourcePackList().addPackFinder((packs, packInfoFactory) ->
         {
-            @Override
-            public void findPacks(Consumer<ResourcePackInfo> packs, ResourcePackInfo.IFactory packInfoFactory)
+            ResourcePackInfo t1 = ResourcePackInfo.createResourcePack(Sonar.DOMAIN + "_dev", true, SonarDevelopmentPack::new, packInfoFactory, ResourcePackInfo.Priority.TOP, IPackNameDecorator.BUILTIN);
+            if (t1 != null)
             {
-                ResourcePackInfo t1 = ResourcePackInfo.createResourcePack(Sonar.DOMAIN + "_dev", true, SonarDevelopmentPack::new, packInfoFactory, ResourcePackInfo.Priority.TOP, IPackNameDecorator.BUILTIN);
-                if (t1 != null)
-                {
-                    packs.accept(t1);
-                }
+                packs.accept(t1);
             }
         });
     }
