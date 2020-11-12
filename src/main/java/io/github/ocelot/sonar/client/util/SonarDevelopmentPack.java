@@ -97,7 +97,7 @@ public class SonarDevelopmentPack extends ResourcePack
     {
         try
         {
-            return Arrays.stream(this.getResources()).map(resource -> new ResourceLocation(Sonar.DOMAIN, resource.substring(8 + Sonar.DOMAIN.length()))).collect(Collectors.toSet());
+            return Arrays.stream(this.getResources()).filter(resource -> namespaceIn.equals(Sonar.DOMAIN) && resource.startsWith(pathIn) && filterIn.test(resource)).map(resource -> new ResourceLocation(Sonar.DOMAIN, resource.substring(8 + Sonar.DOMAIN.length()))).collect(Collectors.toSet());
         }
         catch (IOException e)
         {
