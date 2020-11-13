@@ -127,4 +127,10 @@ public final class SonarDevelopmentPack extends ResourcePack
 
         return object;
     }
+
+    @Override
+    public boolean isHidden()
+    {
+        return true;
+    }
 }
