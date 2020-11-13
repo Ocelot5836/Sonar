@@ -45,6 +45,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     public static final int WIDTH = 176;
     public static final int HEIGHT = 166;
     public static final int VALUE_HEIGHT = 35;
+    private static final MatrixStack MATRIX_STACK = new MatrixStack();
 
     private final int xSize;
     private final int ySize;
@@ -199,7 +200,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
         float screenX = (this.width - this.xSize) / 2f;
         float screenY = (this.height - this.ySize) / 2f;
         this.getMinecraft().getTextureManager().bindTexture(this.getBackgroundTextureLocation());
-        ShapeRenderer.drawRectWithTexture(new MatrixStack(), screenX, screenY, 0, 0, this.xSize, this.ySize);
+        ShapeRenderer.drawRectWithTexture(MATRIX_STACK, screenX, screenY, 0, 0, this.xSize, this.ySize);
     }
 
     @Override
@@ -210,7 +211,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
         this.getMinecraft().getTextureManager().bindTexture(this.getBackgroundTextureLocation());
         boolean hasScroll = this.scrollHandler.getMaxScroll() > 0;
         float scrollbarY = hasScroll ? 127 * (this.scrollHandler.getInterpolatedScroll(partialTicks) / this.scrollHandler.getMaxScroll()) : 0;
-        ShapeRenderer.drawRectWithTexture(new MatrixStack(), 158, 18 + scrollbarY, hasScroll ? 176 : 188, 0, 12, 15);
+        ShapeRenderer.drawRectWithTexture(MATRIX_STACK, 158, 18 + scrollbarY, hasScroll ? 176 : 188, 0, 12, 15);
     }
 
     @Override
