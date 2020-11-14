@@ -2,19 +2,15 @@ package io.github.ocelot.sonar.client.render;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.util.Direction;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
-
-import java.util.Random;
 
 /**
  * <p>Fills {@link IVertexBuilder} with {@link IBakedModel} vertex data.</p>
  *
  * @since 4.1.0
- * TODO rename JsonModelRenderer 6.0.0
+ * @deprecated Use {@link BakedModelRenderer} instead. TODO remove in 6.0.0
  */
 public class ModelRenderer
 {
@@ -29,7 +25,7 @@ public class ModelRenderer
      */
     public static void renderModel(IBakedModel model, IVertexBuilder builder, MatrixStack matrixStack, int packedLight, int packedOverlay)
     {
-        renderModel(model, builder, matrixStack, packedLight, packedOverlay, EmptyModelData.INSTANCE);
+        BakedModelRenderer.renderModel(model, builder, matrixStack, 1.0F, 1.0F, 1.0F, packedLight, packedOverlay, EmptyModelData.INSTANCE);
     }
 
     /**
@@ -44,17 +40,6 @@ public class ModelRenderer
      */
     public static void renderModel(IBakedModel model, IVertexBuilder builder, MatrixStack matrixStack, int packedLight, int packedOverlay, IModelData modelData)
     {
-        Random random = new Random(42L);
-        for (Direction direction : Direction.values())
-        {
-            for (BakedQuad quad : model.getQuads(null, direction, random, modelData))
-            {
-                builder.addQuad(matrixStack.getLast(), quad, 1, 1, 1, packedLight, packedOverlay);
-            }
-        }
-        for (BakedQuad quad : model.getQuads(null, null, random, modelData))
-        {
-            builder.addQuad(matrixStack.getLast(), quad, 1, 1, 1, packedLight, packedOverlay);
-        }
+        BakedModelRenderer.renderModel(model, builder, matrixStack, 1.0F, 1.0F, 1.0F, packedLight, packedOverlay, modelData);
     }
 }
