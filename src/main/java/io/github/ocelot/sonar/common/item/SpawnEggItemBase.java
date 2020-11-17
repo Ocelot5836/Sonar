@@ -24,6 +24,7 @@ import java.util.function.Supplier;
  */
 public class SpawnEggItemBase<T extends EntityType<?>> extends SpawnEggItem
 {
+    private static final Map<EntityType<?>, SpawnEggItem> SPAWN_EGGS = ObfuscationReflectionHelper.getPrivateValue(SpawnEggItem.class, null, "field_195987_b");
     private final boolean addToMisc;
     private final Supplier<T> type;
 
@@ -37,10 +38,9 @@ public class SpawnEggItemBase<T extends EntityType<?>> extends SpawnEggItem
 
     private void onEvent(RegistryEvent.Register<EntityType<?>> event)
     {
-        Map<EntityType<?>, SpawnEggItem> eggs = ObfuscationReflectionHelper.getPrivateValue(SpawnEggItem.class, this, "field_195987_b");
-        if (eggs == null)
+        if (SPAWN_EGGS == null)
             throw new RuntimeException("Failed to inject spawns eggs");
-        eggs.put(this.type.get(), this);
+        SPAWN_EGGS.put(this.type.get(), this);
     }
 
     @Override
