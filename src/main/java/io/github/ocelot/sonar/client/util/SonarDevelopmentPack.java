@@ -42,9 +42,10 @@ public final class SonarDevelopmentPack extends ResourcePack
     /**
      * Internal. Do not call.
      */
+    @SuppressWarnings("ConstantConditions")
     public static void init()
     {
-        if (FMLLoader.isProduction())
+        if (FMLLoader.isProduction() || Minecraft.getInstance() == null)
             return;
         Minecraft.getInstance().getResourcePackList().addPackFinder(new IPackFinder()
         {
