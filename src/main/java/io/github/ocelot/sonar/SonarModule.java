@@ -15,6 +15,9 @@ import java.util.function.Consumer;
  */
 public enum SonarModule
 {
+    /**
+     * @deprecated TODO remove in 6.0.0
+     */
     TOOLTIPS(false, TooltipColorManager::register, null),
     INBUILT_NETWORK(false, SonarInbuiltMessages::register, null);
 

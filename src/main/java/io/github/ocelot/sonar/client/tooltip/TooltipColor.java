@@ -7,6 +7,7 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
  *
  * @author Ocelot
  * @since 3.2.0
+ * @deprecated TODO remove in 6.0.0
  */
 public interface TooltipColor
 {
