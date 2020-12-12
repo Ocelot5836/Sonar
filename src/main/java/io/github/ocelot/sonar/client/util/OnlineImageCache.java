@@ -125,7 +125,6 @@ public class OnlineImageCache
 
         Util.getRenderingService().execute(() ->
         {
-            LOGGER.debug("Reading '" + hash + "' from cache.");
             try (FileInputStream is = new FileInputStream(imageFile.toFile()))
             {
                 NativeImage image = NativeImage.read(is);
@@ -141,7 +140,6 @@ public class OnlineImageCache
                 LOGGER.error("Failed to load image with hash '" + hash + "' from cache. Deleting", e);
                 try
                 {
-                    LOGGER.debug("Deleting '" + hash + "' from cache.");
                     this.cacheFileData.remove(hash);
                     Files.delete(imageFile);
                 }
@@ -157,8 +155,6 @@ public class OnlineImageCache
 
     private synchronized void writeCache(String hash, NativeImage image, long expirationDate) throws IOException
     {
-        LOGGER.debug("Writing '" + hash + "' to cache.");
-
         if (!Files.exists(this.cacheFolder))
             Files.createDirectories(this.cacheFolder);
         if (!Files.exists(this.cacheFile))
@@ -209,7 +205,7 @@ public class OnlineImageCache
             return null;
         }
 
-        LOGGER.debug("Requesting image from '" + hash + "'");
+        LOGGER.info("Requesting image from '" + hash + "'");
         this.requested.add(hash);
         OnlineRequest.request(url).thenAcceptAsync(result ->
         {
@@ -246,7 +242,6 @@ public class OnlineImageCache
         {
             if (this.hasTextureExpired(hash))
             {
-                LOGGER.debug("Deleting '" + hash + "' texture.");
                 Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().deleteTexture(location));
             }
         });
