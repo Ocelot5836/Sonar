@@ -28,9 +28,9 @@ public class SpawnEggItemBase<T extends EntityType<?>> extends SpawnEggItem
     private final boolean addToMisc;
     private final Supplier<T> type;
 
-    public SpawnEggItemBase(Supplier<T> type, int primaryColor, int secondaryColor, boolean addToMisc, Properties builder)
+    public SpawnEggItemBase(Supplier<T> type, int backgroundColor, int spotColor, boolean addToMisc, Properties builder)
     {
-        super(null, primaryColor, secondaryColor, builder);
+        super(null, backgroundColor, spotColor, builder);
         this.type = type;
         this.addToMisc = addToMisc;
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(EntityType.class, EventPriority.LOWEST, this::onEvent);
@@ -46,13 +46,7 @@ public class SpawnEggItemBase<T extends EntityType<?>> extends SpawnEggItem
     @Override
     public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items)
     {
-        if (!this.addToMisc)
-        {
-            super.fillItemGroup(group, items);
-            return;
-        }
-
-        if (this.isInGroup(group) || group == ItemGroup.MISC)
+        if (this.isInGroup(group) || (this.addToMisc && group == ItemGroup.MISC))
         {
             if (items.stream().anyMatch(stack -> stack.getItem() instanceof SpawnEggItem))
             {
