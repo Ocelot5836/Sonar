@@ -4,7 +4,6 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.ocelot.sonar.Sonar;
 import io.github.ocelot.sonar.client.render.ShapeRenderer;
-import io.github.ocelot.sonar.client.util.FontHelper;
 import io.github.ocelot.sonar.client.util.ScissorHelper;
 import io.github.ocelot.sonar.common.util.ScrollHandler;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainer;
@@ -14,7 +13,6 @@ import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -150,6 +148,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
         super.init(minecraft, width, height);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
@@ -165,21 +164,21 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
         for (Widget widget : this.buttons)
             widget.render(matrixStack, mouseX, mouseY, partialTicks);
 
-        matrixStack.push();
-        matrixStack.translate((this.width - this.xSize) / 2f, (this.height - this.ySize) / 2f, 0);
+        RenderSystem.pushMatrix();
+        RenderSystem.translatef((this.width - this.xSize) / 2f, (this.height - this.ySize) / 2f, 0);
         {
-            matrixStack.push();
-            matrixStack.translate(0, -this.scrollHandler.getInterpolatedScroll(partialTicks), 0);
+            RenderSystem.pushMatrix();
+            RenderSystem.translatef(0, -this.scrollHandler.getInterpolatedScroll(partialTicks), 0);
             {
                 ScissorHelper.push((this.width - this.xSize) / 2f + 6, (this.height - this.ySize) / 2f + 18, 148, 142);
                 this.renderWidgets(matrixStack, mouseX - (int) ((this.width - this.xSize) / 2f), mouseY - (int) ((this.height - this.ySize) / 2f) + (int) this.scrollHandler.getInterpolatedScroll(partialTicks), partialTicks);
                 this.renderLabels(matrixStack, partialTicks);
                 ScissorHelper.pop();
             }
-            matrixStack.pop();
+            RenderSystem.popMatrix();
             this.renderForeground(matrixStack, mouseX - (int) ((this.width - this.xSize) / 2f), mouseY - (int) ((this.height - this.ySize) / 2f), partialTicks);
         }
-        matrixStack.pop();
+        RenderSystem.popMatrix();
     }
 
     @Override
@@ -298,6 +297,15 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
         }
 
         return false;
+    }
+
+    @Override
+    public void setListener(@Nullable IGuiEventListener listener)
+    {
+        for (Widget entryWidget : this.entryWidgets)
+            if (entryWidget != listener && entryWidget instanceof TextFieldWidget)
+                ((TextFieldWidget) entryWidget).setFocused2(false);
+        super.setListener(listener);
     }
 
     @Override
