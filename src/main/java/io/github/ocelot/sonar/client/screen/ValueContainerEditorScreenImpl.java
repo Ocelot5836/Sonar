@@ -299,12 +299,12 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     }
 
     @Override
-    public void setListener(@Nullable IGuiEventListener listener)
+    public void func_212932_b(@Nullable IGuiEventListener listener)
     {
         for (Widget entryWidget : this.entryWidgets)
             if (entryWidget != listener && entryWidget instanceof TextFieldWidget)
                 ((TextFieldWidget) entryWidget).setFocused2(false);
-        super.setListener(listener);
+        super.func_212932_b(listener);
     }
 
     @Override
