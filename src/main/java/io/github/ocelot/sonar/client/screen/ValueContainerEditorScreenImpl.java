@@ -299,6 +299,15 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     }
 
     @Override
+    public void setListener(@Nullable IGuiEventListener listener)
+    {
+        for (Widget entryWidget : this.entryWidgets)
+            if (entryWidget != listener && entryWidget instanceof TextFieldWidget)
+                ((TextFieldWidget) entryWidget).setFocused2(false);
+        super.setListener(listener);
+    }
+
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
     {
         boolean flag = false;
