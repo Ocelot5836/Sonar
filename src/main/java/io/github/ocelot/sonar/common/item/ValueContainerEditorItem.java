@@ -17,7 +17,6 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 import java.util.Optional;
-import java.util.function.BiConsumer;
 
 /**
  * <p>A default implementation of a value container editor item.</p>
@@ -27,35 +26,9 @@ import java.util.function.BiConsumer;
  */
 public class ValueContainerEditorItem extends Item
 {
-    private final BiConsumer<ServerPlayerEntity, BlockPos> packetSender;
-
-    /**
-     * @deprecated Override method instead. TODO remove in 6.0.0
-     */
-    public ValueContainerEditorItem(Properties properties, BiConsumer<ServerPlayerEntity, BlockPos> packetSender)
-    {
-        super(properties);
-        this.packetSender = packetSender;
-    }
-
     public ValueContainerEditorItem(Properties properties)
     {
         super(properties);
-        this.packetSender = null;
-    }
-
-    /**
-     * Whether or not the specified player is permitted to use the value container editor.
-     *
-     * @param world  The world the player is in
-     * @param pos    The position the player clicked
-     * @param player The player to check
-     * @return Whether or not that player can use this container editor
-     * @deprecated Use {@link #canPlayerUse(ValueContainer, World, BlockPos, PlayerEntity)} instead. TODO remove in 6.0.0
-     */
-    protected boolean canPlayerUse(World world, BlockPos pos, PlayerEntity player)
-    {
-        return player.canUseCommandBlock();
     }
 
     /**
@@ -68,7 +41,7 @@ public class ValueContainerEditorItem extends Item
      */
     protected boolean canPlayerUse(ValueContainer valueContainer, World world, BlockPos pos, PlayerEntity player)
     {
-        return this.canPlayerUse(world, pos, player);
+        return player.canUseCommandBlock();
     }
 
     /**
@@ -82,19 +55,9 @@ public class ValueContainerEditorItem extends Item
      */
     protected boolean sendPacket(ValueContainer valueContainer, ServerWorld world, BlockPos pos, ServerPlayerEntity player)
     {
-        // TODO remove in 6.0.0
-        if (this.packetSender != null)
-        {
-            this.packetSender.accept(player, pos);
-        }
-        else if (Sonar.isModuleLoaded(SonarModule.INBUILT_NETWORK))
-        {
-            SonarInbuiltMessages.PLAY.send(PacketDistributor.PLAYER.with(() -> player), new OpenValueContainerMessage(world, pos));
-        }
-        else
-        {
+        if (!Sonar.isModuleLoaded(SonarModule.INBUILT_NETWORK))
             throw new IllegalStateException("There is no implementation to send a packet! Enable INBUILT_NETWORK Sonar Module to automatically handle.");
-        }
+        SonarInbuiltMessages.PLAY.send(PacketDistributor.PLAYER.with(() -> player), new OpenValueContainerMessage(world, pos));
         return true;
     }
 
@@ -117,7 +80,8 @@ public class ValueContainerEditorItem extends Item
                         player.sendStatusMessage(new TranslationTextComponent(this.getTranslationKey(context.getItem()) + ".cannot_edit"), false);
                         return ActionResultType.SUCCESS;
                     }
-                    this.sendPacket(valueContainer, (ServerWorld) world, pos, (ServerPlayerEntity) player);
+                    if (this.sendPacket(valueContainer, (ServerWorld) world, pos, (ServerPlayerEntity) player))
+                        return ActionResultType.SUCCESS;
                 }
                 else if (this.canPlayerUse(valueContainer, world, pos, player))
                 {
