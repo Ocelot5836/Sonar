@@ -1,6 +1,5 @@
 package io.github.ocelot.sonar;
 
-import io.github.ocelot.sonar.client.tooltip.TooltipColorManager;
 import io.github.ocelot.sonar.common.network.inbuilt.SonarInbuiltMessages;
 import net.minecraftforge.eventbus.api.IEventBus;
 
@@ -15,10 +14,6 @@ import java.util.function.Consumer;
  */
 public enum SonarModule
 {
-    /**
-     * @deprecated TODO remove in 6.0.0
-     */
-    TOOLTIPS(false, TooltipColorManager::register, null),
     INBUILT_NETWORK(false, SonarInbuiltMessages::register, null);
 
     private final boolean clientOnly;

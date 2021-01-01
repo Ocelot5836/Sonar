@@ -44,7 +44,7 @@ public final class ShapeRenderer
      */
     public static void drawRectWithTexture(MatrixStack matrixStack, double x, double y, double width, double height, TextureAtlasSprite sprite)
     {
-        drawRectWithTexture(matrixStack, x, y, zLevel, sprite.getMinU(), sprite.getMinV(), width, height, sprite.getMaxU() - sprite.getMinU(), sprite.getMaxV() - sprite.getMinV(), 1f, 1f);
+        drawRectWithTexture(matrixStack, x, y, sprite.getMinU(), sprite.getMinV(), width, height, sprite.getMaxU() - sprite.getMinU(), sprite.getMaxV() - sprite.getMinV(), 1f, 1f);
     }
 
     /**
@@ -59,7 +59,7 @@ public final class ShapeRenderer
      */
     public static void drawRectWithTexture(MatrixStack matrixStack, double x, double y, float u, float v, double width, double height)
     {
-        drawRectWithTexture(matrixStack, x, y, zLevel, u, v, width, height, (float) width, (float) height, 256f, 256f);
+        drawRectWithTexture(matrixStack, x, y, u, v, width, height, (float) width, (float) height, 256f, 256f);
     }
 
     /**
@@ -76,7 +76,7 @@ public final class ShapeRenderer
      */
     public static void drawRectWithTexture(MatrixStack matrixStack, double x, double y, float u, float v, double width, double height, float textureWidth, float textureHeight)
     {
-        drawRectWithTexture(matrixStack, x, y, zLevel, u, v, width, height, textureWidth, textureHeight, 256f, 256f);
+        drawRectWithTexture(matrixStack, x, y, u, v, width, height, textureWidth, textureHeight, 256f, 256f);
     }
 
     /**
@@ -95,80 +95,7 @@ public final class ShapeRenderer
      */
     public static void drawRectWithTexture(MatrixStack matrixStack, double x, double y, float u, float v, double width, double height, float textureWidth, float textureHeight, float sourceWidth, float sourceHeight)
     {
-        drawRectWithTexture(matrixStack, x, y, zLevel, u, v, width, height, textureWidth, textureHeight, sourceWidth, sourceHeight);
-    }
-
-    /**
-     * Draws a quad onto the screen with the specified parameters.
-     *
-     * @param x      The x position to start
-     * @param y      The y position to start
-     * @param z      The z position to start
-     * @param width  The x size of the quad
-     * @param height The y size of the quad
-     * @param sprite The sprite to render to the screen
-     * @deprecated Use {@link #setZLevel(double)} to change z values. TODO remove in 6.0.0
-     */
-    public static void drawRectWithTexture(MatrixStack matrixStack, double x, double y, double z, double width, double height, TextureAtlasSprite sprite)
-    {
-        drawRectWithTexture(matrixStack, x, y, z, sprite.getMinU(), sprite.getMinV(), width, height, sprite.getMaxU() - sprite.getMinU(), sprite.getMaxV() - sprite.getMinV(), 1f, 1f);
-    }
-
-    /**
-     * Draws a quad onto the screen with the specified parameters.
-     *
-     * @param x      The x position to start
-     * @param y      The y position to start
-     * @param z      The z position to start
-     * @param u      The x position on the texture to start
-     * @param v      The y position on the texture to start
-     * @param width  The x size of the quad
-     * @param height The y size of the quad
-     * @deprecated Use {@link #setZLevel(double)} to change z values. TODO remove in 6.0.0
-     */
-    public static void drawRectWithTexture(MatrixStack matrixStack, double x, double y, double z, float u, float v, double width, double height)
-    {
-        drawRectWithTexture(matrixStack, x, y, z, u, v, width, height, (float) width, (float) height, 256f, 256f);
-    }
-
-    /**
-     * Draws a quad onto the screen with the specified parameters.
-     *
-     * @param x             The x position to start
-     * @param y             The y position to start
-     * @param z             The z position to start
-     * @param u             The x position on the texture to start
-     * @param v             The y position on the texture to start
-     * @param width         The x size of the quad
-     * @param height        The y size of the quad
-     * @param textureWidth  The x size of the selection area on the texture
-     * @param textureHeight The y size on the selection area on the texture
-     * @deprecated Use {@link #setZLevel(double)} to change z values. TODO remove in 6.0.0
-     */
-    public static void drawRectWithTexture(MatrixStack matrixStack, double x, double y, double z, float u, float v, double width, double height, float textureWidth, float textureHeight)
-    {
-        drawRectWithTexture(matrixStack, x, y, z, u, v, width, height, textureWidth, textureHeight, 256f, 256f);
-    }
-
-    /**
-     * Draws a quad onto the screen with the specified parameters.
-     *
-     * @param x             The x position to start
-     * @param y             The y position to start
-     * @param z             The z position to start
-     * @param u             The x position on the texture to start
-     * @param v             The y position on the texture to start
-     * @param width         The x size of the quad
-     * @param height        The y size of the quad
-     * @param textureWidth  The x size of the selection area on the texture
-     * @param textureHeight The y size on the selection area on the texture
-     * @param sourceWidth   The width of the texture source
-     * @param sourceHeight  The height of the texture source
-     * @deprecated Use {@link #setZLevel(double)} to change z values. TODO remove in 6.0.0
-     */
-    public static void drawRectWithTexture(MatrixStack matrixStack, double x, double y, double z, float u, float v, double width, double height, float textureWidth, float textureHeight, float sourceWidth, float sourceHeight)
-    {
-        drawRectWithTexture(begin(), matrixStack, x, y, z, u, v, width, height, textureWidth, textureHeight, sourceWidth, sourceHeight);
+        drawRectWithTexture(begin(), matrixStack, x, y, u, v, width, height, textureWidth, textureHeight, sourceWidth, sourceHeight);
         end();
     }
 
@@ -206,7 +133,7 @@ public final class ShapeRenderer
      */
     public static void drawRectWithTexture(IVertexBuilder buffer, MatrixStack matrixStack, double x, double y, double width, double height, TextureAtlasSprite sprite)
     {
-        drawRectWithTexture(buffer, matrixStack, x, y, zLevel, sprite.getMinU(), sprite.getMinV(), width, height, sprite.getMaxU() - sprite.getMinU(), sprite.getMaxV() - sprite.getMinV(), 1f, 1f);
+        drawRectWithTexture(buffer, matrixStack, x, y, sprite.getMinU(), sprite.getMinV(), width, height, sprite.getMaxU() - sprite.getMinU(), sprite.getMaxV() - sprite.getMinV(), 1f, 1f);
     }
 
     /**
@@ -222,7 +149,7 @@ public final class ShapeRenderer
      */
     public static void drawRectWithTexture(IVertexBuilder buffer, MatrixStack matrixStack, double x, double y, float u, float v, double width, double height)
     {
-        drawRectWithTexture(buffer, matrixStack, x, y, zLevel, u, v, width, height, (float) width, (float) height, 256f, 256f);
+        drawRectWithTexture(buffer, matrixStack, x, y, u, v, width, height, (float) width, (float) height, 256f, 256f);
     }
 
     /**
@@ -240,7 +167,7 @@ public final class ShapeRenderer
      */
     public static void drawRectWithTexture(IVertexBuilder buffer, MatrixStack matrixStack, double x, double y, float u, float v, double width, double height, float textureWidth, float textureHeight)
     {
-        drawRectWithTexture(buffer, matrixStack, x, y, zLevel, u, v, width, height, textureWidth, textureHeight, 256f, 256f);
+        drawRectWithTexture(buffer, matrixStack, x, y, u, v, width, height, textureWidth, textureHeight, 256f, 256f);
     }
 
     /**
@@ -260,91 +187,13 @@ public final class ShapeRenderer
      */
     public static void drawRectWithTexture(IVertexBuilder buffer, MatrixStack matrixStack, double x, double y, float u, float v, double width, double height, float textureWidth, float textureHeight, float sourceWidth, float sourceHeight)
     {
-        drawRectWithTexture(buffer, matrixStack, x, y, zLevel, u, v, width, height, textureWidth, textureHeight, sourceWidth, sourceHeight);
-    }
-
-    /**
-     * Draws a quad into the specified buffer for chain rendering.
-     *
-     * @param buffer The buffer being rendered into
-     * @param x      The x position to start
-     * @param y      The y position to start
-     * @param z      The z position to start
-     * @param width  The x size of the quad
-     * @param height The y size of the quad
-     * @param sprite The sprite to render to the screen
-     * @deprecated Use {@link #setZLevel(double)} to change z values. TODO remove in 6.0.0
-     */
-    public static void drawRectWithTexture(IVertexBuilder buffer, MatrixStack matrixStack, double x, double y, double z, double width, double height, TextureAtlasSprite sprite)
-    {
-        drawRectWithTexture(buffer, matrixStack, x, y, z, sprite.getMinU(), sprite.getMinV(), width, height, sprite.getMaxU() - sprite.getMinU(), sprite.getMaxV() - sprite.getMinV(), 1f, 1f);
-    }
-
-    /**
-     * Draws a quad into the specified buffer for chain rendering.
-     *
-     * @param buffer The buffer being rendered into
-     * @param x      The x position to start
-     * @param y      The y position to start
-     * @param z      The z position to start
-     * @param u      The x position on the texture to start
-     * @param v      The y position on the texture to start
-     * @param width  The x size of the quad
-     * @param height The y size of the quad
-     * @deprecated Use {@link #setZLevel(double)} to change z values. TODO remove in 6.0.0
-     */
-    public static void drawRectWithTexture(IVertexBuilder buffer, MatrixStack matrixStack, double x, double y, double z, float u, float v, double width, double height)
-    {
-        drawRectWithTexture(buffer, matrixStack, x, y, z, u, v, width, height, (float) width, (float) height, 256f, 256f);
-    }
-
-    /**
-     * Draws a quad into the specified buffer for chain rendering.
-     *
-     * @param buffer        The buffer being rendered into
-     * @param x             The x position to start
-     * @param y             The y position to start
-     * @param z             The z position to start
-     * @param u             The x position on the texture to start
-     * @param v             The y position on the texture to start
-     * @param width         The x size of the quad
-     * @param height        The y size of the quad
-     * @param textureWidth  The x size of the selection area on the texture
-     * @param textureHeight The y size on the selection area on the texture
-     * @deprecated Use {@link #setZLevel(double)} to change z values. TODO remove in 6.0.0
-     */
-    public static void drawRectWithTexture(IVertexBuilder buffer, MatrixStack matrixStack, double x, double y, double z, float u, float v, double width, double height, float textureWidth, float textureHeight)
-    {
-        drawRectWithTexture(buffer, matrixStack, x, y, z, u, v, width, height, textureWidth, textureHeight, 256, 256);
-    }
-
-    /**
-     * Draws a quad into the specified buffer for chain rendering.
-     *
-     * @param buffer        The buffer being rendered into
-     * @param matrixStack   The stack of transformations to move elements
-     * @param x             The x position to start
-     * @param y             The y position to start
-     * @param z             The z position to start
-     * @param u             The x position on the texture to start
-     * @param v             The y position on the texture to start
-     * @param width         The x size of the quad
-     * @param height        The y size of the quad
-     * @param textureWidth  The x size of the selection area on the texture
-     * @param textureHeight The y size on the selection area on the texture
-     * @param sourceWidth   The width of the texture source
-     * @param sourceHeight  The height of the texture source
-     * @deprecated Use {@link #setZLevel(double)} to change z values. TODO remove in 6.0.0
-     */
-    public static void drawRectWithTexture(IVertexBuilder buffer, MatrixStack matrixStack, double x, double y, double z, float u, float v, double width, double height, float textureWidth, float textureHeight, float sourceWidth, float sourceHeight)
-    {
         float scaleWidth = 1f / sourceWidth;
         float scaleHeight = 1f / sourceHeight;
         Matrix4f matrix4f = matrixStack.getLast().getMatrix();
-        buffer.pos(matrix4f, (float) x, (float) (y + height), (float) z).color(red, green, blue, alpha).tex(u * scaleWidth, (v + textureHeight) * scaleHeight).endVertex();
-        buffer.pos(matrix4f, (float) (x + width), (float) (y + height), (float) z).color(red, green, blue, alpha).tex((u + textureWidth) * scaleWidth, (v + textureHeight) * scaleHeight).endVertex();
-        buffer.pos(matrix4f, (float) (x + width), (float) y, (float) z).color(red, green, blue, alpha).tex((u + textureWidth) * scaleWidth, v * scaleHeight).endVertex();
-        buffer.pos(matrix4f, (float) x, (float) y, (float) z).color(red, green, blue, alpha).tex(u * scaleWidth, v * scaleHeight).endVertex();
+        buffer.pos(matrix4f, (float) x, (float) (y + height), (float) zLevel).color(red, green, blue, alpha).tex(u * scaleWidth, (v + textureHeight) * scaleHeight).endVertex();
+        buffer.pos(matrix4f, (float) (x + width), (float) (y + height), (float) zLevel).color(red, green, blue, alpha).tex((u + textureWidth) * scaleWidth, (v + textureHeight) * scaleHeight).endVertex();
+        buffer.pos(matrix4f, (float) (x + width), (float) y, (float) zLevel).color(red, green, blue, alpha).tex((u + textureWidth) * scaleWidth, v * scaleHeight).endVertex();
+        buffer.pos(matrix4f, (float) x, (float) y, (float) zLevel).color(red, green, blue, alpha).tex(u * scaleWidth, v * scaleHeight).endVertex();
     }
 
     /**
