@@ -60,7 +60,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
         this.xSize = WIDTH;
         this.ySize = HEIGHT;
         this.entryWidgets = new ArrayList<>();
-        this.scrollHandler = new ScrollHandler(null, this.getEntries().size() * VALUE_HEIGHT, 142);
+        this.scrollHandler = new ScrollHandler(this.getEntries().size() * VALUE_HEIGHT, 142);
         this.scrollHandler.setScrollSpeed((float) this.scrollHandler.getMaxScroll() / (float) this.getEntries().size());
 
         this.scrolling = false;
@@ -73,7 +73,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
         this.xSize = WIDTH;
         this.ySize = HEIGHT;
         this.entryWidgets = new ArrayList<>();
-        this.scrollHandler = new ScrollHandler(null, this.getEntries().size() * VALUE_HEIGHT, 142);
+        this.scrollHandler = new ScrollHandler(this.getEntries().size() * VALUE_HEIGHT, 142);
         this.scrollHandler.setScrollSpeed((float) this.scrollHandler.getMaxScroll() / (float) this.getEntries().size());
 
         this.scrolling = false;
@@ -200,7 +200,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     {
         float screenX = (this.width - this.xSize) / 2f;
         float screenY = (this.height - this.ySize) / 2f;
-        this.getMinecraft().getTextureManager().bindTexture(this.getBackgroundTextureLocation());
+        this.getMinecraft().getTextureManager().bindTexture(BACKGROUND_LOCATION);
         ShapeRenderer.drawRectWithTexture(matrixStack, screenX, screenY, 0, 0, this.xSize, this.ySize);
     }
 
@@ -209,7 +209,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     {
         this.getMinecraft().fontRenderer.drawString(matrixStack, this.getFormattedTitle(), (this.xSize - this.getMinecraft().fontRenderer.getStringWidth(this.getFormattedTitle())) / 2f, 6f, 4210752);
 
-        this.getMinecraft().getTextureManager().bindTexture(this.getBackgroundTextureLocation());
+        this.getMinecraft().getTextureManager().bindTexture(BACKGROUND_LOCATION);
         boolean hasScroll = this.scrollHandler.getMaxScroll() > 0;
         float scrollbarY = hasScroll ? 127 * (this.scrollHandler.getInterpolatedScroll(partialTicks) / this.scrollHandler.getMaxScroll()) : 0;
         ShapeRenderer.drawRectWithTexture(matrixStack, 158, 18 + scrollbarY, hasScroll ? 176 : 188, 0, 12, 15);
@@ -408,14 +408,5 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
             }
         }
         return false;
-    }
-
-    /**
-     * @return The location of the image that should be used for the background of the screen
-     * @deprecated Not needed anymore, resources are included TODO remove in 5.1.0
-     */
-    public ResourceLocation getBackgroundTextureLocation()
-    {
-        return BACKGROUND_LOCATION;
     }
 }

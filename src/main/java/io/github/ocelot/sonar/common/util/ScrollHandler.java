@@ -1,12 +1,8 @@
 package io.github.ocelot.sonar.common.util;
 
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.INBTSerializable;
-
-import javax.annotation.Nullable;
 
 /**
  * <p>Handles smooth scrolling automatically.</p>
@@ -14,13 +10,12 @@ import javax.annotation.Nullable;
  * @author Ocelot
  * @since 2.2.0
  */
-public final class ScrollHandler implements INBTSerializable<CompoundNBT>
+public final class ScrollHandler
 {
     public static final float DEFAULT_SCROLL_SPEED = 5;
     public static final float DEFAULT_TRANSITION_SPEED = 0.5f;
     public static final double DEFAULT_MIN_SNAP = 0.1f;
 
-    private final Runnable markDirty;
     private int height;
     private int visibleHeight;
 
@@ -31,9 +26,8 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
     private float transitionSpeed;
     private double minSnap;
 
-    public ScrollHandler(@Nullable Runnable markDirty, int height, int visibleHeight)
+    public ScrollHandler(int height, int visibleHeight)
     {
-        this.markDirty = markDirty;
         this.height = height;
         this.visibleHeight = visibleHeight;
 
@@ -65,16 +59,12 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
             {
                 this.scroll = 0;
                 this.nextScroll = 0;
-                if (this.markDirty != null)
-                    this.markDirty.run();
             }
 
             if (this.scroll >= this.getMaxScroll())
             {
                 this.scroll = this.getMaxScroll();
                 this.nextScroll = this.getMaxScroll();
-                if (this.markDirty != null)
-                    this.markDirty.run();
             }
         }
     }
@@ -108,8 +98,6 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
     public ScrollHandler scroll(double scrollAmount)
     {
         this.nextScroll -= scrollAmount;
-        if (this.markDirty != null)
-            this.markDirty.run();
         return this;
     }
 
@@ -215,8 +203,6 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
         this.scroll = MathHelper.clamp(scroll, 0, this.height - this.visibleHeight);
         this.nextScroll = this.scroll;
         this.lastScroll = this.scroll;
-        if (this.markDirty != null)
-            this.markDirty.run();
         return this;
     }
 
@@ -228,8 +214,6 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
     public ScrollHandler setTransitionSpeed(float transitionSpeed)
     {
         this.transitionSpeed = transitionSpeed;
-        if (this.markDirty != null)
-            this.markDirty.run();
         return this;
     }
 
@@ -241,8 +225,6 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
     public ScrollHandler setMinSnap(double minSnap)
     {
         this.minSnap = minSnap;
-        if (this.markDirty != null)
-            this.markDirty.run();
         return this;
     }
 
@@ -254,30 +236,6 @@ public final class ScrollHandler implements INBTSerializable<CompoundNBT>
     public ScrollHandler setScrollSpeed(float scrollSpeed)
     {
         this.scrollSpeed = Math.max(scrollSpeed, 0);
-        if (this.markDirty != null)
-            this.markDirty.run();
         return this;
-    }
-
-    @Override
-    public CompoundNBT serializeNBT()
-    {
-        CompoundNBT nbt = new CompoundNBT();
-        nbt.putFloat("scroll", (float) this.scroll);
-        nbt.putFloat("nextScroll", (float) this.nextScroll);
-        nbt.putFloat("scrollSpeed", this.scrollSpeed);
-        nbt.putFloat("transitionSpeed", this.transitionSpeed);
-        nbt.putFloat("minSnap", (float) this.minSnap);
-        return nbt;
-    }
-
-    @Override
-    public void deserializeNBT(CompoundNBT nbt)
-    {
-        this.scroll = nbt.getFloat("scroll");
-        this.nextScroll = nbt.getFloat("nextScroll");
-        this.scrollSpeed = nbt.getFloat("scrollSpeed");
-        this.transitionSpeed = nbt.getFloat("transitionSpeed");
-        this.minSnap = nbt.getFloat("minSnap");
     }
 }
