@@ -1,8 +1,6 @@
 package io.github.ocelot.sonar.common.util;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.conn.EofSensorInputStream;
-import org.apache.http.conn.EofSensorWatcher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -50,65 +48,7 @@ public class OnlineRequest
             throw new IOException("Failed to connect to '" + url + "'. " + connection.getResponseCode() + " " + connection.getResponseMessage());
         }
 
-        return new EofSensorInputStream(stream, new EofSensorWatcher()
-        {
-            @Override
-            public boolean eofDetected(InputStream wrapped)
-            {
-                return true;
-            }
-
-            @Override
-            public boolean streamClosed(InputStream wrapped) throws IOException
-            {
-                stream.close();
-                if (connection.getErrorStream() != null)
-                    connection.getErrorStream().close();
-                return true;
-            }
-
-            @Override
-            public boolean streamAbort(InputStream wrapped) throws IOException
-            {
-                stream.close();
-                if (connection.getErrorStream() != null)
-                    connection.getErrorStream().close();
-                return true;
-            }
-        });
-
-//        HttpGet get = new HttpGet(url);
-//        CloseableHttpClient client = HttpClients.custom().setUserAgent(USER_AGENT).build();
-//        CloseableHttpResponse response = client.execute(get);
-//        StatusLine statusLine = response.getStatusLine();
-//        if (statusLine.getStatusCode() != 200)
-//        {
-//            client.close();
-//            response.close();
-//            throw new IOException("Failed to connect to '" + url + "'. " + statusLine.getStatusCode() + " " + statusLine.getReasonPhrase());
-//        }
-//        return new EofSensorInputStream(response.getEntity().getContent(), new EofSensorWatcher()
-//        {
-//            @Override
-//            public boolean eofDetected(InputStream wrapped)
-//            {
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean streamClosed(InputStream wrapped) throws IOException
-//            {
-//                response.close();
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean streamAbort(InputStream wrapped) throws IOException
-//            {
-//                response.close();
-//                return true;
-//            }
-//        });
+        return stream;
     }
 
     /**
