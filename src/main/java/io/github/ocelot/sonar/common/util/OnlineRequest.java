@@ -1,18 +1,16 @@
 package io.github.ocelot.sonar.common.util;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.EofSensorInputStream;
 import org.apache.http.conn.EofSensorWatcher;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -37,19 +35,22 @@ public class OnlineRequest
      * @param url The url to get the data from
      * @return An open stream to the internet
      */
-    public static InputStream get(String url) throws IOException
+    public static InputStream get(String url) throws URISyntaxException, IOException
     {
-        HttpGet get = new HttpGet(url);
-        CloseableHttpClient client = HttpClients.custom().setUserAgent(USER_AGENT).build();
-        CloseableHttpResponse response = client.execute(get);
-        StatusLine statusLine = response.getStatusLine();
-        if (statusLine.getStatusCode() != 200)
+        HttpURLConnection connection = (HttpURLConnection) new URI(url).toURL().openConnection();
+        connection.addRequestProperty("User-Agent", USER_AGENT);
+        InputStream stream = connection.getInputStream();
+
+        if (connection.getResponseCode() != 200)
         {
-            client.close();
-            response.close();
-            throw new IOException("Failed to connect to '" + url + "'. " + statusLine.getStatusCode() + " " + statusLine.getReasonPhrase());
+            if (stream != null)
+                stream.close();
+            if (connection.getErrorStream() != null)
+                connection.getErrorStream().close();
+            throw new IOException("Failed to connect to '" + url + "'. " + connection.getResponseCode() + " " + connection.getResponseMessage());
         }
-        return new EofSensorInputStream(response.getEntity().getContent(), new EofSensorWatcher()
+
+        return new EofSensorInputStream(stream, new EofSensorWatcher()
         {
             @Override
             public boolean eofDetected(InputStream wrapped)
@@ -60,17 +61,54 @@ public class OnlineRequest
             @Override
             public boolean streamClosed(InputStream wrapped) throws IOException
             {
-                response.close();
+                stream.close();
+                if (connection.getErrorStream() != null)
+                    connection.getErrorStream().close();
                 return true;
             }
 
             @Override
             public boolean streamAbort(InputStream wrapped) throws IOException
             {
-                response.close();
+                stream.close();
+                if (connection.getErrorStream() != null)
+                    connection.getErrorStream().close();
                 return true;
             }
         });
+
+//        HttpGet get = new HttpGet(url);
+//        CloseableHttpClient client = HttpClients.custom().setUserAgent(USER_AGENT).build();
+//        CloseableHttpResponse response = client.execute(get);
+//        StatusLine statusLine = response.getStatusLine();
+//        if (statusLine.getStatusCode() != 200)
+//        {
+//            client.close();
+//            response.close();
+//            throw new IOException("Failed to connect to '" + url + "'. " + statusLine.getStatusCode() + " " + statusLine.getReasonPhrase());
+//        }
+//        return new EofSensorInputStream(response.getEntity().getContent(), new EofSensorWatcher()
+//        {
+//            @Override
+//            public boolean eofDetected(InputStream wrapped)
+//            {
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean streamClosed(InputStream wrapped) throws IOException
+//            {
+//                response.close();
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean streamAbort(InputStream wrapped) throws IOException
+//            {
+//                response.close();
+//                return true;
+//            }
+//        });
     }
 
     /**
