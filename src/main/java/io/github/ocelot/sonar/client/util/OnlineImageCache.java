@@ -3,6 +3,7 @@ package io.github.ocelot.sonar.client.util;
 import com.google.common.base.Charsets;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.ocelot.sonar.Sonar;
 import io.github.ocelot.sonar.common.util.OnlineRequest;
 import net.minecraft.client.Minecraft;
@@ -28,11 +29,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -43,7 +44,7 @@ import java.util.concurrent.TimeUnit;
  * @since 3.1.0
  */
 @OnlyIn(Dist.CLIENT)
-public class OnlineImageCache
+public class OnlineImageCache implements TextureCache
 {
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -51,7 +52,7 @@ public class OnlineImageCache
     private final Path cacheFile;
     private final Map<String, ResourceLocation> locationCache;
     private final Set<String> errored;
-    private final Set<String> requested;
+    private final Map<String, CompletableFuture<ResourceLocation>> requested;
     private final Map<String, Long> textureCache;
     private final long textureCacheTime;
     private JsonObject cacheFileData;
@@ -77,7 +78,7 @@ public class OnlineImageCache
         this.cacheFile = this.cacheFolder.resolve("cache.json");
         this.locationCache = new HashMap<>();
         this.errored = new HashSet<>();
-        this.requested = new HashSet<>();
+        this.requested = new HashMap<>();
         this.textureCache = new HashMap<>();
         this.textureCacheTime = unit.toMillis(textureCacheTime);
 
@@ -108,49 +109,54 @@ public class OnlineImageCache
 
     private boolean hasExpired(String hash)
     {
-        return !this.cacheFileData.has(hash) || (this.cacheFileData.get(hash).getAsLong() != -1 && Instant.now().toEpochMilli() - this.cacheFileData.get(hash).getAsLong() > 0);
+        return !this.cacheFileData.has(hash) || (this.cacheFileData.get(hash).getAsLong() != -1 && System.currentTimeMillis() - this.cacheFileData.get(hash).getAsLong() > 0);
     }
 
-    private synchronized boolean loadCache(String hash, ResourceLocation location)
+    @Nullable
+    private synchronized CompletableFuture<ResourceLocation> loadCache(String hash, ResourceLocation location)
     {
         if (!Files.exists(this.cacheFolder))
-            return false;
+            return null;
 
         Path imageFile = this.cacheFolder.resolve(hash);
         if (!Files.exists(imageFile))
-            return false;
+            return null;
 
         if (this.hasExpired(hash))
-            return false;
+            return null;
 
-        Util.getRenderingService().execute(() ->
+        return CompletableFuture.supplyAsync(() ->
         {
             try (FileInputStream is = new FileInputStream(imageFile.toFile()))
             {
-                NativeImage image = NativeImage.read(is);
-                Minecraft.getInstance().execute(() ->
-                {
-                    Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
-                    this.textureCache.put(hash, System.currentTimeMillis() + 30000);
-                    this.requested.remove(hash);
-                });
+                return NativeImage.read(is);
             }
             catch (IOException e)
             {
                 LOGGER.error("Failed to load image with hash '" + hash + "' from cache. Deleting", e);
+                return null;
+            }
+        }, Util.getRenderingService()).thenApplyAsync(image ->
+        {
+            if (image == null)
+            {
                 try
                 {
                     this.cacheFileData.remove(hash);
                     Files.delete(imageFile);
                 }
-                catch (IOException e1)
+                catch (IOException e)
                 {
-                    LOGGER.error("Failed to delete image with hash '" + hash + "' from cache.", e1);
+                    LOGGER.error("Failed to delete image with hash '" + hash + "' from cache.", e);
                 }
-                Minecraft.getInstance().execute(() -> this.requested.remove(hash));
+                this.textureCache.put(hash, System.currentTimeMillis() + 30000);
+                this.errored.add(hash);
+                return MissingTextureSprite.getLocation();
             }
-        });
-        return true;
+            Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
+            this.textureCache.put(hash, System.currentTimeMillis() + 30000);
+            return location;
+        }, command -> RenderSystem.recordRenderCall(command::run));
     }
 
     private synchronized void writeCache(String hash, NativeImage image, long expirationDate) throws IOException
@@ -173,65 +179,113 @@ public class OnlineImageCache
         image.write(this.cacheFolder.resolve(hash));
     }
 
-    /**
-     * Fetches an image from the specified url and caches the result forever.
-     *
-     * @param url The url to get the image from
-     * @return The location of the texture downloaded or null if it is currently being processed
-     */
-    @Nullable
-    public ResourceLocation getTextureLocation(String url)
+//        String hash = DigestUtils.md5Hex(url);
+//        if (this.errored.contains(hash))
+//        {
+//            this.textureCache.put(hash, System.currentTimeMillis() + 30000);
+//            return MissingTextureSprite.getLocation();
+//        }
+//
+//        ResourceLocation location = this.locationCache.computeIfAbsent(hash, ResourceLocation::new);
+//        if (Minecraft.getInstance().getTextureManager().getTexture(location) != null)
+//        {
+//            this.textureCache.put(hash, System.currentTimeMillis() + 30000);
+//            return location;
+//        }
+//
+//        if (this.requested.contains(hash))
+//            return null;
+//
+//        if (this.loadCache(hash, location))
+//        {
+//            this.requested.add(hash);
+//            return null;
+//        }
+//
+//        LOGGER.info("Requesting image from '" + hash + "'");
+//        this.requested.add(hash);
+//        OnlineRequest.request(url).thenAcceptAsync(result ->
+//        {
+//            try
+//            {
+//                NativeImage image = NativeImage.read(result);
+//                this.writeCache(hash, image, Instant.now().toEpochMilli() + this.textureCacheTime);
+//                Minecraft.getInstance().execute(() ->
+//                {
+//                    Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
+//                    this.textureCache.put(hash, System.currentTimeMillis() + 30000);
+//                    this.requested.remove(hash);
+//                });
+//            }
+//            catch (IOException e)
+//            {
+//                LOGGER.error("Failed to load online texture from '" + url + "'. Using missing texture sprite.", e);
+//                Minecraft.getInstance().execute(() ->
+//                {
+//                    this.errored.add(hash);
+//                    this.textureCache.put(hash, System.currentTimeMillis() + 30000);
+//                    this.requested.remove(hash);
+//                });
+//            }
+//        });
+//        return null;
+
+    @Override
+    public CompletableFuture<ResourceLocation> requestTexture(String url)
     {
         String hash = DigestUtils.md5Hex(url);
         if (this.errored.contains(hash))
         {
             this.textureCache.put(hash, System.currentTimeMillis() + 30000);
-            return MissingTextureSprite.getLocation();
+            return CompletableFuture.completedFuture(MissingTextureSprite.getLocation());
         }
 
-        ResourceLocation location = this.locationCache.computeIfAbsent(hash, ResourceLocation::new);
+        ResourceLocation location = this.locationCache.computeIfAbsent(hash, key -> new ResourceLocation(Sonar.DOMAIN, key));
         if (Minecraft.getInstance().getTextureManager().getTexture(location) != null)
         {
             this.textureCache.put(hash, System.currentTimeMillis() + 30000);
-            return location;
+            return CompletableFuture.completedFuture(location);
         }
 
-        if (this.requested.contains(hash))
-            return null;
+        if (this.requested.containsKey(hash))
+            return this.requested.get(hash);
 
-        if (this.loadCache(hash, location))
+        CompletableFuture<ResourceLocation> cachedFuture = this.loadCache(hash, location);
+        if (cachedFuture != null)
         {
-            this.requested.add(hash);
-            return null;
+            this.requested.put(hash, cachedFuture);
+            return cachedFuture;
         }
 
         LOGGER.info("Requesting image from '" + hash + "'");
-        this.requested.add(hash);
-        OnlineRequest.request(url).thenAcceptAsync(result ->
+        CompletableFuture<ResourceLocation> future = OnlineRequest.request(url).thenApplyAsync(result ->
         {
+            if (result == null)
+                return null;
             try
             {
                 NativeImage image = NativeImage.read(result);
-                this.writeCache(hash, image, Instant.now().toEpochMilli() + this.textureCacheTime);
-                Minecraft.getInstance().execute(() ->
-                {
-                    Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
-                    this.textureCache.put(hash, System.currentTimeMillis() + 30000);
-                    this.requested.remove(hash);
-                });
+                this.writeCache(hash, image, System.currentTimeMillis() + this.textureCacheTime);
+                return image;
             }
             catch (IOException e)
             {
                 LOGGER.error("Failed to load online texture from '" + url + "'. Using missing texture sprite.", e);
-                Minecraft.getInstance().execute(() ->
-                {
-                    this.errored.add(hash);
-                    this.textureCache.put(hash, System.currentTimeMillis() + 30000);
-                    this.requested.remove(hash);
-                });
+                return null;
             }
-        });
-        return null;
+        }).thenApplyAsync(image ->
+        {
+            this.textureCache.put(hash, System.currentTimeMillis() + 30000);
+            if (image == null)
+            {
+                this.errored.add(hash);
+                return MissingTextureSprite.getLocation();
+            }
+            Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
+            return location;
+        }, command -> RenderSystem.recordRenderCall(command::run));
+        this.requested.put(hash, future);
+        return future;
     }
 
     @SubscribeEvent
@@ -246,5 +300,6 @@ public class OnlineImageCache
             }
         });
         this.errored.removeIf(this::hasTextureExpired);
+        this.requested.values().removeIf(CompletableFuture::isDone);
     }
 }
