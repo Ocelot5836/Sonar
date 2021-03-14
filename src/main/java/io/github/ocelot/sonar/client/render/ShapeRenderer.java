@@ -219,8 +219,8 @@ public final class ShapeRenderer
         {
             float angle = (float) (Math.PI * 2 * i / segments + Math.PI / 2);
             builder.pos(matrix4f, x, y, zLevel).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix4f, x + MathHelper.cos(angle + burstAngleOffset) * width, y + MathHelper.sin(angle + burstAngleOffset) * height, zLevel).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix4f, x + MathHelper.cos(angle - burstAngleOffset) * width, y + MathHelper.sin(angle - burstAngleOffset) * height, zLevel).color(red, green, blue, alpha).endVertex();
+            builder.pos(matrix4f, x + MathHelper.cos(angle + burstAngleOffset) * width / 2.0F, y + MathHelper.sin(angle + burstAngleOffset) * height / 2.0F, zLevel).color(red, green, blue, alpha).endVertex();
+            builder.pos(matrix4f, x + MathHelper.cos(angle - burstAngleOffset) * width / 2.0F, y + MathHelper.sin(angle - burstAngleOffset) * height / 2.0F, zLevel).color(red, green, blue, alpha).endVertex();
         }
 
         RenderSystem.enableBlend();
