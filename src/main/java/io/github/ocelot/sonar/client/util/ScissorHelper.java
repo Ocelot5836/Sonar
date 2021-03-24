@@ -13,7 +13,7 @@ import java.util.Stack;
 import static org.lwjgl.opengl.GL11C.*;
 
 /**
- * <p>Handles scissoring parts of </p>
+ * <p>Handles scissoring parts of the screen based on GUI coordinates instead of raw screen coordinates.</p>
  *
  * @author Ocelot
  * @see GL11C <a target="_blank" href="http://docs.gl/gl4/glScissor">OpenGL Scissor Test Reference Page</a>
