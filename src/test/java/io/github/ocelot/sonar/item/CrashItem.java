@@ -1,9 +1,7 @@
 package io.github.ocelot.sonar.item;
 
-import io.github.ocelot.sonar.client.gui.TestGui;
 import io.github.ocelot.sonar.network.STestPlayMessage;
 import io.github.ocelot.sonar.network.TestMessageHandler;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
@@ -23,15 +21,8 @@ public class CrashItem extends Item
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand)
     {
-        if (player.isSecondaryUseActive())
-        {
-            if (world.isRemote())
-                Minecraft.getInstance().displayGuiScreen(new TestGui());
-        }
-        else if (!world.isRemote())
-        {
+        if (!world.isRemote())
             TestMessageHandler.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), new STestPlayMessage());
-        }
         return ActionResult.resultSuccess(player.getHeldItem(hand));
     }
 }
