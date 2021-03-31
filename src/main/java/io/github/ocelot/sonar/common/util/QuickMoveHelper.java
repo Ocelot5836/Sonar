@@ -32,9 +32,10 @@ public class QuickMoveHelper
      * @param toSize    The amount of slots to include in the ending area
      * @param reverse   Whether or not to start from the last slot of the to area
      */
-    public void add(int fromStart, int fromSize, int toStart, int toSize, boolean reverse)
+    public QuickMoveHelper add(int fromStart, int fromSize, int toStart, int toSize, boolean reverse)
     {
         this.actions.add(new Action(fromStart, fromSize, toStart, toSize, reverse));
+        return this;
     }
 
     /**
