@@ -71,13 +71,13 @@ public class AdvancedFboAttachmentColorTexture2D extends Texture implements Adva
     }
 
     @Override
-    public void bind()
+    public void bindAttachment()
     {
         this.bindTexture();
     }
 
     @Override
-    public void unbind()
+    public void unbindAttachment()
     {
         if (!RenderSystem.isOnRenderThreadOrInit())
         {
