@@ -29,12 +29,12 @@ public interface AdvancedFboAttachment extends NativeResource
     /**
      * Binds this attachment.
      */
-    void bind();
+    void bindAttachment();
 
     /**
      * Unbinds this attachment.
      */
-    void unbind();
+    void unbindAttachment();
 
     /**
      * @return The width of this attachment

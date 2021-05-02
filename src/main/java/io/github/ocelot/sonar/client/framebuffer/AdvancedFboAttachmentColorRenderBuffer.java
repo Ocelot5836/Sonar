@@ -32,7 +32,7 @@ public class AdvancedFboAttachmentColorRenderBuffer implements AdvancedFboAttach
 
     private void createRaw()
     {
-        this.bind();
+        this.bindAttachment();
         if (this.samples == 1)
         {
             glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, this.width, this.height);
@@ -41,7 +41,7 @@ public class AdvancedFboAttachmentColorRenderBuffer implements AdvancedFboAttach
         {
             glRenderbufferStorageMultisample(GL_RENDERBUFFER, this.samples, GL_RGBA8, this.width, this.height);
         }
-        this.unbind();
+        this.unbindAttachment();
     }
 
     private int getId()
@@ -82,7 +82,7 @@ public class AdvancedFboAttachmentColorRenderBuffer implements AdvancedFboAttach
     }
 
     @Override
-    public void bind()
+    public void bindAttachment()
     {
         if (!RenderSystem.isOnRenderThreadOrInit())
         {
@@ -95,7 +95,7 @@ public class AdvancedFboAttachmentColorRenderBuffer implements AdvancedFboAttach
     }
 
     @Override
-    public void unbind()
+    public void unbindAttachment()
     {
         if (!RenderSystem.isOnRenderThreadOrInit())
         {
