@@ -32,7 +32,7 @@ public class AdvancedFboAttachmentDepthRenderBuffer implements AdvancedFboAttach
 
     private void createRaw()
     {
-        this.bind();
+        this.bindAttachment();
         if (this.samples == 1)
         {
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, this.width, this.height);
@@ -41,7 +41,7 @@ public class AdvancedFboAttachmentDepthRenderBuffer implements AdvancedFboAttach
         {
             glRenderbufferStorageMultisample(GL_RENDERBUFFER, this.samples, GL_DEPTH_COMPONENT24, this.width, this.height);
         }
-        this.unbind();
+        this.unbindAttachment();
     }
 
     private int getId()
@@ -84,7 +84,7 @@ public class AdvancedFboAttachmentDepthRenderBuffer implements AdvancedFboAttach
     }
 
     @Override
-    public void bind()
+    public void bindAttachment()
     {
         if (!RenderSystem.isOnRenderThreadOrInit())
         {
@@ -97,7 +97,7 @@ public class AdvancedFboAttachmentDepthRenderBuffer implements AdvancedFboAttach
     }
 
     @Override
-    public void unbind()
+    public void unbindAttachment()
     {
         if (!RenderSystem.isOnRenderThreadOrInit())
         {
