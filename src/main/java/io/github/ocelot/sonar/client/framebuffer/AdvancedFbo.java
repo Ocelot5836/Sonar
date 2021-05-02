@@ -791,12 +791,12 @@ public class AdvancedFbo implements NativeResource
             this.framebufferFilter = framebufferFilter;
             for (int i = 0; i < this.fbo.getColorAttachments(); i++)
             {
-                this.fbo.getColorAttachment(i).bind();
+                this.fbo.getColorAttachment(i).bindAttachment();
                 GlStateManager.texParameter(3553, 10241, framebufferFilter);
                 GlStateManager.texParameter(3553, 10240, framebufferFilter);
                 GlStateManager.texParameter(3553, 10242, 10496);
                 GlStateManager.texParameter(3553, 10243, 10496);
-                this.fbo.getColorAttachment(i).unbind();
+                this.fbo.getColorAttachment(i).unbindAttachment();
             }
         }
 
@@ -804,14 +804,14 @@ public class AdvancedFbo implements NativeResource
         public void bindFramebufferTexture()
         {
             if (this.fbo.hasColorAttachment(0))
-                this.fbo.getColorAttachment(0).bind();
+                this.fbo.getColorAttachment(0).bindAttachment();
         }
 
         @Override
         public void unbindFramebufferTexture()
         {
             if (this.fbo.hasColorAttachment(0))
-                this.fbo.getColorAttachment(0).unbind();
+                this.fbo.getColorAttachment(0).unbindAttachment();
         }
 
         @Override
