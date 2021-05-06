@@ -38,10 +38,15 @@ public class AdvancedFboAttachmentDepthTexture2D extends Texture implements Adva
     {
         if (!RenderSystem.isOnRenderThreadOrInit())
         {
-            RenderSystem.recordRenderCall(() -> TextureUtil.prepareImage(this.getGlTextureId(), this.mipmapLevels, this.width, this.height));
+            RenderSystem.recordRenderCall(() ->
+            {
+                this.setBlurMipmap(false, this.mipmapLevels > 1);
+                TextureUtil.prepareImage(this.getGlTextureId(), this.mipmapLevels, this.width, this.height);
+            });
         }
         else
         {
+            this.setBlurMipmap(false, this.mipmapLevels > 1);
             TextureUtil.prepareImage(this.getGlTextureId(), this.mipmapLevels, this.width, this.height);
         }
     }

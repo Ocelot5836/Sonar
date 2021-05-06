@@ -78,18 +78,6 @@ public class AdvancedFbo implements NativeResource
     }
 
     /**
-     * Sets the size of this framebuffer to the specified values.
-     *
-     * @param width  The new width of the framebuffer
-     * @param height The new height of the framebuffer
-     */
-    public void setSize(int width, int height)
-    {
-        this.width = width;
-        this.height = height;
-    }
-
-    /**
      * Clears the buffers in this framebuffer.
      */
     public void clear()
@@ -778,7 +766,8 @@ public class AdvancedFbo implements NativeResource
             this.framebufferHeight = height;
             if (this.fbo == null) // Assumed to be init phase so no action taken
                 return;
-            this.fbo.setSize(width, height);
+            this.fbo.width = width;
+            this.fbo.height = height;
             AdvancedFboAttachment attachment = this.fbo.hasColorAttachment(0) ? this.fbo.getColorAttachment(0) : null;
             this.framebufferTextureWidth = attachment == null ? this.framebufferWidth : attachment.getWidth();
             this.framebufferTextureHeight = attachment == null ? this.framebufferHeight : attachment.getHeight();
