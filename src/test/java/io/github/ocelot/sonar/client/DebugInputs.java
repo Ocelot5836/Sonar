@@ -2,6 +2,7 @@ package io.github.ocelot.sonar.client;
 
 import io.github.ocelot.sonar.TestMod;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.SimpleResource;
 import net.minecraft.util.Util;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
@@ -55,7 +56,7 @@ public class DebugInputs
                     ByteBuffer image = BufferUtils.createByteBuffer(width * height * componentsCount);
                     glGetTexImage(GL_TEXTURE_2D, 0, components, GL_UNSIGNED_BYTE, image);
 
-                    Util.getRenderingService().execute(() -> stbi_write_png(outputFile.toString(), width, height, componentsCount, image, 0));
+                    SimpleResource.RESOURCE_IO_EXECUTOR.execute(() -> stbi_write_png(outputFile.toString(), width, height, componentsCount, image, 0));
                 }
                 Util.getOSType().openFile(outputFolder.toFile());
             }
