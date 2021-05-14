@@ -47,7 +47,7 @@ public final class ShapeRenderer
      */
     public static void drawRectWithTexture(MatrixStack matrixStack, float x, float y, float width, float height, TextureAtlasSprite sprite)
     {
-        drawRectWithTexture(matrixStack, x, y, sprite.getU0(), sprite.getV0(), width, height, sprite.getU1() - sprite.getU0(), sprite.getV1() - sprite.getV0(), 1f, 1f);
+        drawRectWithTexture(matrixStack, x, y, sprite.getMinU(), sprite.getMinV(), width, height, sprite.getMaxU() - sprite.getMinU(), sprite.getMaxV() - sprite.getMinV(), 1f, 1f);
     }
 
     /**
@@ -109,7 +109,7 @@ public final class ShapeRenderer
      */
     public static IVertexBuilder begin()
     {
-        BufferBuilder buffer = Tessellator.getInstance().getBuilder();
+        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
         buffer.begin(GL_QUADS, DefaultVertexFormats.POSITION_COLOR_TEX);
         return buffer;
     }
@@ -119,7 +119,7 @@ public final class ShapeRenderer
      */
     public static void end()
     {
-        Tessellator.getInstance().end();
+        Tessellator.getInstance().draw();
         zLevel = 0;
         resetColor();
     }
@@ -136,7 +136,7 @@ public final class ShapeRenderer
      */
     public static void drawRectWithTexture(IVertexBuilder buffer, MatrixStack matrixStack, float x, float y, float width, float height, TextureAtlasSprite sprite)
     {
-        drawRectWithTexture(buffer, matrixStack, x, y, sprite.getU0(), sprite.getV0(), width, height, sprite.getU1() - sprite.getU0(), sprite.getV1() - sprite.getV0(), 1f, 1f);
+        drawRectWithTexture(buffer, matrixStack, x, y, sprite.getMinU(), sprite.getMinV(), width, height, sprite.getMaxU() - sprite.getMinU(), sprite.getMaxV() - sprite.getMinV(), 1f, 1f);
     }
 
     /**
@@ -192,11 +192,11 @@ public final class ShapeRenderer
     {
         float scaleWidth = 1f / sourceWidth;
         float scaleHeight = 1f / sourceHeight;
-        Matrix4f matrix4f = matrixStack.last().pose();
-        buffer.vertex(matrix4f, x, y + height, zLevel).color(red, green, blue, alpha).uv(u * scaleWidth, (v + textureHeight) * scaleHeight).endVertex();
-        buffer.vertex(matrix4f, x + width, y + height, zLevel).color(red, green, blue, alpha).uv((u + textureWidth) * scaleWidth, (v + textureHeight) * scaleHeight).endVertex();
-        buffer.vertex(matrix4f, x + width, y, zLevel).color(red, green, blue, alpha).uv((u + textureWidth) * scaleWidth, v * scaleHeight).endVertex();
-        buffer.vertex(matrix4f, x, y, zLevel).color(red, green, blue, alpha).uv(u * scaleWidth, v * scaleHeight).endVertex();
+        Matrix4f matrix4f = matrixStack.getLast().getMatrix();
+        buffer.pos(matrix4f, x, y + height, zLevel).color(red, green, blue, alpha).tex(u * scaleWidth, (v + textureHeight) * scaleHeight).endVertex();
+        buffer.pos(matrix4f, x + width, y + height, zLevel).color(red, green, blue, alpha).tex((u + textureWidth) * scaleWidth, (v + textureHeight) * scaleHeight).endVertex();
+        buffer.pos(matrix4f, x + width, y, zLevel).color(red, green, blue, alpha).tex((u + textureWidth) * scaleWidth, v * scaleHeight).endVertex();
+        buffer.pos(matrix4f, x, y, zLevel).color(red, green, blue, alpha).tex(u * scaleWidth, v * scaleHeight).endVertex();
     }
 
     /**
@@ -210,17 +210,17 @@ public final class ShapeRenderer
      */
     public static void drawSunburst(MatrixStack matrixStack, float x, float y, float width, float height, int segments)
     {
-        BufferBuilder builder = Tessellator.getInstance().getBuilder();
+        BufferBuilder builder = Tessellator.getInstance().getBuffer();
         builder.begin(GL_TRIANGLES, DefaultVertexFormats.POSITION_COLOR);
 
-        Matrix4f matrix4f = matrixStack.last().pose();
+        Matrix4f matrix4f = matrixStack.getLast().getMatrix();
         float burstAngleOffset = (float) (Math.PI * (1.0F / segments / 2F));
         for (int i = 0; i < segments; i++)
         {
             float angle = (float) (Math.PI * 2 * i / segments + Math.PI / 2);
-            builder.vertex(matrix4f, x, y, zLevel).color(red, green, blue, alpha).endVertex();
-            builder.vertex(matrix4f, x + MathHelper.cos(angle + burstAngleOffset) * width / 2.0F, y + MathHelper.sin(angle + burstAngleOffset) * height / 2.0F, zLevel).color(red, green, blue, alpha).endVertex();
-            builder.vertex(matrix4f, x + MathHelper.cos(angle - burstAngleOffset) * width / 2.0F, y + MathHelper.sin(angle - burstAngleOffset) * height / 2.0F, zLevel).color(red, green, blue, alpha).endVertex();
+            builder.pos(matrix4f, x, y, zLevel).color(red, green, blue, alpha).endVertex();
+            builder.pos(matrix4f, x + MathHelper.cos(angle + burstAngleOffset) * width / 2.0F, y + MathHelper.sin(angle + burstAngleOffset) * height / 2.0F, zLevel).color(red, green, blue, alpha).endVertex();
+            builder.pos(matrix4f, x + MathHelper.cos(angle - burstAngleOffset) * width / 2.0F, y + MathHelper.sin(angle - burstAngleOffset) * height / 2.0F, zLevel).color(red, green, blue, alpha).endVertex();
         }
 
         RenderSystem.enableBlend();

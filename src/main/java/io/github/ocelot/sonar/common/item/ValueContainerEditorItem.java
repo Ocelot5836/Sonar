@@ -18,8 +18,6 @@ import net.minecraftforge.fml.network.PacketDistributor;
 
 import java.util.Optional;
 
-import net.minecraft.item.Item.Properties;
-
 /**
  * <p>A default implementation of a value container editor item.</p>
  *
@@ -43,7 +41,7 @@ public class ValueContainerEditorItem extends Item
      */
     protected boolean canPlayerUse(ValueContainer valueContainer, World world, BlockPos pos, PlayerEntity player)
     {
-        return player.canUseGameMasterBlocks();
+        return player.canUseCommandBlock();
     }
 
     /**
@@ -64,10 +62,10 @@ public class ValueContainerEditorItem extends Item
     }
 
     @Override
-    public ActionResultType useOn(ItemUseContext context)
+    public ActionResultType onItemUse(ItemUseContext context)
     {
-        World world = context.getLevel();
-        BlockPos pos = context.getClickedPos();
+        World world = context.getWorld();
+        BlockPos pos = context.getPos();
         PlayerEntity player = context.getPlayer();
         if (player != null && player.isCreative())
         {
@@ -75,11 +73,11 @@ public class ValueContainerEditorItem extends Item
             if (valueContainerOptional.isPresent())
             {
                 ValueContainer valueContainer = valueContainerOptional.get();
-                if (!world.isClientSide())
+                if (!world.isRemote())
                 {
                     if (!this.canPlayerUse(valueContainer, world, pos, player))
                     {
-                        player.displayClientMessage(new TranslationTextComponent(this.getDescriptionId(context.getItemInHand()) + ".cannot_edit"), false);
+                        player.sendStatusMessage(new TranslationTextComponent(this.getTranslationKey(context.getItem()) + ".cannot_edit"), false);
                         return ActionResultType.SUCCESS;
                     }
                     if (this.sendPacket(valueContainer, (ServerWorld) world, pos, (ServerPlayerEntity) player))

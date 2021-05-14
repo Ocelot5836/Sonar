@@ -39,12 +39,12 @@ public class BakedModelRenderer
         {
             for (BakedQuad quad : model.getQuads(null, direction, RANDOM, modelData))
             {
-                builder.putBulkData(matrixStack.last(), quad, red, green, blue, packedLight, packedOverlay);
+                builder.addQuad(matrixStack.getLast(), quad, red, green, blue, packedLight, packedOverlay);
             }
         }
         for (BakedQuad quad : model.getQuads(null, null, RANDOM, modelData))
         {
-            builder.putBulkData(matrixStack.last(), quad, red, green, blue, packedLight, packedOverlay);
+            builder.addQuad(matrixStack.getLast(), quad, red, green, blue, packedLight, packedOverlay);
         }
     }
 }

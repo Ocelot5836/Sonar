@@ -9,8 +9,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import io.github.ocelot.sonar.common.valuecontainer.ValueContainerEntry.InputType;
-
 /**
  * <p>Specifies a {@link ValueContainerEntry} as being for a vector type</p>
  *

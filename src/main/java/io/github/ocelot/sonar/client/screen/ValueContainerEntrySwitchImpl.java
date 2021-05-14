@@ -52,7 +52,7 @@ public class ValueContainerEntrySwitchImpl extends AbstractButton
         {
             if (this.clicked(mouseX, mouseY))
             {
-                this.playDownSound(Minecraft.getInstance().getSoundManager());
+                this.playDownSound(Minecraft.getInstance().getSoundHandler());
                 this.onPress(mouseButton);
                 return true;
             }

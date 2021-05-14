@@ -33,13 +33,13 @@ public interface TextureCache
     {
         Logger logger = LogManager.getLogger();
         logger.info("Requesting image from '" + url + "'");
-        return OnlineRequest.request(url, Util.backgroundExecutor()).thenApplyAsync(stream ->
+        return OnlineRequest.request(url, Util.getServerExecutor()).thenApplyAsync(stream ->
         {
             try
             {
                 NativeImage image = NativeImage.read(stream);
                 ResourceLocation location = new ResourceLocation(DigestUtils.md5Hex(url));
-                Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(image));
+                Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
                 return location;
             }
             catch (Exception e)

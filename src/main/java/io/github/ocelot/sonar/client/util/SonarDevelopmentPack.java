@@ -46,12 +46,12 @@ public final class SonarDevelopmentPack extends ResourcePack
     {
         if (FMLLoader.isProduction() || Minecraft.getInstance() == null)
             return;
-        Minecraft.getInstance().getResourcePackRepository().addSource(new IPackFinder()
+        Minecraft.getInstance().getResourcePackList().addPackFinder(new IPackFinder()
         {
             @Override
-            public <T extends ResourcePackInfo> void loadPacks(Map<String, T> nameToPackMap, ResourcePackInfo.IFactory<T> packInfoFactory)
+            public <T extends ResourcePackInfo> void addPackInfosToMap(Map<String, T> nameToPackMap, ResourcePackInfo.IFactory<T> packInfoFactory)
             {
-                T t1 = ResourcePackInfo.create(Sonar.DOMAIN + "_dev", true, SonarDevelopmentPack::new, packInfoFactory, ResourcePackInfo.Priority.TOP);
+                T t1 = ResourcePackInfo.createResourcePack(Sonar.DOMAIN + "_dev", true, SonarDevelopmentPack::new, packInfoFactory, ResourcePackInfo.Priority.TOP);
                 if (t1 != null)
                 {
                     nameToPackMap.put(Sonar.DOMAIN + "_dev", t1);
@@ -73,13 +73,13 @@ public final class SonarDevelopmentPack extends ResourcePack
     }
 
     @Override
-    protected InputStream getResource(String resourcePath)
+    protected InputStream getInputStream(String resourcePath)
     {
         return SonarDevelopmentPack.class.getResourceAsStream("/" + resourcePath);
     }
 
     @Override
-    public boolean hasResource(String resourcePath)
+    public boolean resourceExists(String resourcePath)
     {
         try
         {
@@ -92,7 +92,7 @@ public final class SonarDevelopmentPack extends ResourcePack
     }
 
     @Override
-    public Set<String> getNamespaces(ResourcePackType type)
+    public Set<String> getResourceNamespaces(ResourcePackType type)
     {
         return Collections.singleton(Sonar.DOMAIN);
     }
@@ -103,7 +103,7 @@ public final class SonarDevelopmentPack extends ResourcePack
     }
 
     @Override
-    public Collection<ResourceLocation> getResources(ResourcePackType type, String namespaceIn, String pathIn, int maxDepthIn, Predicate<String> filterIn)
+    public Collection<ResourceLocation> getAllResourceLocations(ResourcePackType type, String namespaceIn, String pathIn, int maxDepthIn, Predicate<String> filterIn)
     {
         try
         {
@@ -117,12 +117,12 @@ public final class SonarDevelopmentPack extends ResourcePack
 
     @Nullable
     @Override
-    public <T> T getMetadataSection(IMetadataSectionSerializer<T> deserializer) throws IOException
+    public <T> T getMetadata(IMetadataSectionSerializer<T> deserializer) throws IOException
     {
         T object;
-        try (InputStream inputstream = this.getResource(Sonar.DOMAIN + "_pack.mcmeta"))
+        try (InputStream inputstream = this.getInputStream(Sonar.DOMAIN + "_pack.mcmeta"))
         {
-            object = getMetadataFromStream(deserializer, inputstream);
+            object = getResourceMetadata(deserializer, inputstream);
         }
 
         return object;

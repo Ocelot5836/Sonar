@@ -8,8 +8,6 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import io.github.ocelot.sonar.common.valuecontainer.ValueContainerEntry.InputType;
-
 /**
  * <p>A {@link NumberValueContainerEntry} that supports string data types.</p>
  *

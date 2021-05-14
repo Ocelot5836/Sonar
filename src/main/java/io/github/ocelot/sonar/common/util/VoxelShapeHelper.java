@@ -69,17 +69,17 @@ public final class VoxelShapeHelper
         switch (direction)
         {
             case UP:
-                return Block.box(x1, z1, y1, x2, z2, y2);
+                return Block.makeCuboidShape(x1, z1, y1, x2, z2, y2);
             case DOWN:
-                return Block.box(x1, 16 - z1, y1, x2, 16 - z2, y2);
+                return Block.makeCuboidShape(x1, 16 - z1, y1, x2, 16 - z2, y2);
             case NORTH:
-                return Block.box(16 - x1, y1, 16 - z2, 16 - x2, y2, 16 - z1);
+                return Block.makeCuboidShape(16 - x1, y1, 16 - z2, 16 - x2, y2, 16 - z1);
             case EAST:
-                return Block.box(z1, y1, 16 - x1, z2, y2, 16 - x2);
+                return Block.makeCuboidShape(z1, y1, 16 - x1, z2, y2, 16 - x2);
             case SOUTH:
-                return Block.box(x1, y1, z1, x2, y2, z2);
+                return Block.makeCuboidShape(x1, y1, z1, x2, y2, z2);
             case WEST:
-                return Block.box(16 - z2, y1, x1, 16 - z1, y2, x2);
+                return Block.makeCuboidShape(16 - z2, y1, x1, 16 - z1, y2, x2);
             default:
                 throw new IllegalStateException("Unexpected value: " + direction);
         }
@@ -112,16 +112,16 @@ public final class VoxelShapeHelper
             for (VoxelShape shape : this.shapes)
             {
                 Set<VoxelShape> rotatedShapes = new HashSet<>();
-                for (AxisAlignedBB box : shape.toAabbs())
+                for (AxisAlignedBB box : shape.toBoundingBoxList())
                 {
                     rotatedShapes.add(transformer.apply(box));
                 }
                 VoxelShape result = VoxelShapes.empty();
                 for (VoxelShape rotatedShape : rotatedShapes)
                 {
-                    result = VoxelShapes.joinUnoptimized(result, rotatedShape, IBooleanFunction.OR);
+                    result = VoxelShapes.combine(result, rotatedShape, IBooleanFunction.OR);
                 }
-                newBuilder.append(result.optimize());
+                newBuilder.append(result.simplify());
             }
             return newBuilder;
         }
@@ -160,7 +160,7 @@ public final class VoxelShapeHelper
          */
         public Builder translate(double x, double y, double z)
         {
-            return transformRaw(box -> Block.box(box.minX * 16.0 + x, box.minY * 16.0 + y, box.minZ * 16.0 + z, box.maxX * 16.0 + x, box.maxY * 16.0 + y, box.maxZ * 16.0 + z));
+            return transformRaw(box -> Block.makeCuboidShape(box.minX * 16.0 + x, box.minY * 16.0 + y, box.minZ * 16.0 + z, box.maxX * 16.0 + x, box.maxY * 16.0 + y, box.maxZ * 16.0 + z));
         }
 
         /**
@@ -195,7 +195,7 @@ public final class VoxelShapeHelper
          */
         public Builder scale(double x, double y, double z)
         {
-            return transformRaw(box -> Block.box(box.minX * 16.0 * x, box.minY * 16.0 * y, box.minZ * 16.0 * z, box.maxX * 16.0 * x, box.maxY * 16.0 * y, box.maxZ * 16.0 * z));
+            return transformRaw(box -> Block.makeCuboidShape(box.minX * 16.0 * x, box.minY * 16.0 * y, box.minZ * 16.0 * z, box.maxX * 16.0 * x, box.maxY * 16.0 * y, box.maxZ * 16.0 * z));
         }
 
         /**
@@ -219,9 +219,9 @@ public final class VoxelShapeHelper
             VoxelShape result = VoxelShapes.empty();
             for (VoxelShape shape : this.shapes)
             {
-                result = VoxelShapes.joinUnoptimized(result, shape, combineFunction);
+                result = VoxelShapes.combine(result, shape, combineFunction);
             }
-            return result.optimize();
+            return result.simplify();
         }
     }
 }

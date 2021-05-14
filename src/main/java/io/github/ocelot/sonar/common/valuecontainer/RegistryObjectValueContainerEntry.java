@@ -12,8 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import io.github.ocelot.sonar.common.valuecontainer.ValueContainerEntry.InputType;
-
 /**
  * <p>A {@link NumberValueContainerEntry} that supports Minecraft {@link ResourceLocation}.</p>
  *
@@ -128,7 +126,7 @@ public class RegistryObjectValueContainerEntry<T extends IForgeRegistryEntry<T>>
     {
         return s ->
         {
-            if (!ResourceLocation.isValidResourceLocation(s))
+            if (!ResourceLocation.isResouceNameValid(s))
                 return false;
             return entry.registry.containsKey(new ResourceLocation(s));
         };

@@ -30,7 +30,7 @@ public abstract class DynamicInventory implements IInventory
     private int getNextEmptySlot(ItemStack stack, int loopStart, int loopEnd)
     {
         for (int i = loopStart; i < loopEnd; i++)
-            if (this.canPlaceItem(i, stack) && this.inventory.getOrDefault(i, ItemStack.EMPTY).isEmpty())
+            if (this.isItemValidForSlot(i, stack) && this.inventory.getOrDefault(i, ItemStack.EMPTY).isEmpty())
                 return i;
         return -1;
     }
@@ -80,7 +80,7 @@ public abstract class DynamicInventory implements IInventory
      */
     public ItemStack addItem(ItemStack stack)
     {
-        return this.addItem(stack, 0, this.getContainerSize());
+        return this.addItem(stack, 0, this.getSizeInventory());
     }
 
     /**
@@ -94,17 +94,17 @@ public abstract class DynamicInventory implements IInventory
     public ItemStack addItem(ItemStack stack, int startIndex, int endIndex)
     {
         int loopStart = Math.max(0, startIndex);
-        int loopEnd = Math.min(this.getContainerSize(), endIndex);
+        int loopEnd = Math.min(this.getSizeInventory(), endIndex);
         ItemStack copy = stack.copy();
         for (int i = loopStart; i < loopEnd; i++)
         {
-            ItemStack stackInSlot = this.getItem(i);
-            if (this.canPlaceItem(i, stack) && ItemStack.isSame(stackInSlot, copy) && ItemStack.tagMatches(stackInSlot, copy))
+            ItemStack stackInSlot = this.getStackInSlot(i);
+            if (this.isItemValidForSlot(i, stack) && ItemStack.areItemsEqual(stackInSlot, copy) && ItemStack.areItemStackTagsEqual(stackInSlot, copy))
             {
                 this.mergeStacks(copy, stackInSlot, i);
                 if (copy.isEmpty())
                 {
-                    this.setChanged();
+                    this.markDirty();
                     return ItemStack.EMPTY;
                 }
             }
@@ -124,8 +124,8 @@ public abstract class DynamicInventory implements IInventory
             }
         }
 
-        if (!ItemStack.matches(stack, copy))
-            this.setChanged();
+        if (!ItemStack.areItemStacksEqual(stack, copy))
+            this.markDirty();
 
         return copy;
     }
@@ -137,23 +137,23 @@ public abstract class DynamicInventory implements IInventory
     }
 
     @Override
-    public ItemStack getItem(int index)
+    public ItemStack getStackInSlot(int index)
     {
         return this.inventory.getOrDefault(index, ItemStack.EMPTY);
     }
 
     @Override
-    public ItemStack removeItem(int index, int count)
+    public ItemStack decrStackSize(int index, int count)
     {
         if (this.inventory.getOrDefault(index, ItemStack.EMPTY).isEmpty() || count <= 0)
             return ItemStack.EMPTY;
         ItemStack stack = this.inventory.getOrDefault(index, ItemStack.EMPTY).split(count);
-        this.setChanged();
+        this.markDirty();
         return stack;
     }
 
     @Override
-    public ItemStack removeItemNoUpdate(int index)
+    public ItemStack removeStackFromSlot(int index)
     {
         if (this.inventory.getOrDefault(index, ItemStack.EMPTY).isEmpty())
             return ItemStack.EMPTY;
@@ -164,29 +164,29 @@ public abstract class DynamicInventory implements IInventory
         }
         else
         {
-            this.setChanged();
+            this.markDirty();
             return stack;
         }
     }
 
     @Override
-    public void setItem(int index, ItemStack stack)
+    public void setInventorySlotContents(int index, ItemStack stack)
     {
-        if (index < 0 || index >= this.getContainerSize())
+        if (index < 0 || index >= this.getSizeInventory())
             return;
         this.inventory.put(index, stack);
         if (!stack.isEmpty() && stack.getCount() > this.getSlotStackLimit(index))
             stack.setCount(this.getSlotStackLimit(index));
-        this.setChanged();
+        this.markDirty();
     }
 
     @Override
-    public void setChanged()
+    public void markDirty()
     {
         if (this.listeners == null)
             return;
         for (IInventoryChangedListener listener : this.listeners)
-            listener.containerChanged(this);
+            listener.onInventoryChanged(this);
     }
 
     /**
@@ -197,11 +197,11 @@ public abstract class DynamicInventory implements IInventory
      */
     public int getSlotStackLimit(int index)
     {
-        return this.getMaxStackSize();
+        return this.getInventoryStackLimit();
     }
 
     @Override
-    public void clearContent()
+    public void clear()
     {
         this.inventory.clear();
     }
@@ -214,14 +214,14 @@ public abstract class DynamicInventory implements IInventory
     public void write(CompoundNBT nbt)
     {
         ListNBT list = new ListNBT();
-        for (int i = 0; i < this.getContainerSize(); ++i)
+        for (int i = 0; i < this.getSizeInventory(); ++i)
         {
             ItemStack stack = this.inventory.getOrDefault(i, ItemStack.EMPTY);
             if (!stack.isEmpty())
             {
                 CompoundNBT slotNbt = new CompoundNBT();
                 slotNbt.putByte("Slot", (byte) i);
-                stack.save(slotNbt);
+                stack.write(slotNbt);
                 list.add(slotNbt);
             }
         }
@@ -235,16 +235,16 @@ public abstract class DynamicInventory implements IInventory
      */
     public void read(CompoundNBT nbt)
     {
-        this.clearContent();
+        this.clear();
 
         ListNBT list = nbt.getList("Items", 10);
         for (int i = 0; i < list.size(); ++i)
         {
             CompoundNBT slotNbt = list.getCompound(i);
             int index = slotNbt.getByte("Slot") & 255;
-            if (index < this.getContainerSize())
+            if (index < this.getSizeInventory())
             {
-                this.inventory.put(index, ItemStack.of(slotNbt));
+                this.inventory.put(index, ItemStack.read(slotNbt));
             }
         }
     }

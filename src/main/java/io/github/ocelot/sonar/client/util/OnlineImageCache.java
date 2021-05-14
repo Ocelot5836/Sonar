@@ -74,7 +74,7 @@ public class OnlineImageCache implements TextureCache
 
     public OnlineImageCache(String domain, long textureCacheTime, TimeUnit unit)
     {
-        this.cacheFolder = Minecraft.getInstance().gameDirectory.toPath().resolve(domain + "-online-image-cache");
+        this.cacheFolder = Minecraft.getInstance().gameDir.toPath().resolve(domain + "-online-image-cache");
         this.cacheFile = this.cacheFolder.resolve("cache.json");
         this.locationCache = new HashMap<>();
         this.errored = new HashSet<>();
@@ -136,7 +136,7 @@ public class OnlineImageCache implements TextureCache
                 LOGGER.error("Failed to load image with hash '" + hash + "' from cache. Deleting", e);
                 return null;
             }
-        }, SimpleResource.IO_EXECUTOR).thenApplyAsync(image ->
+        }, SimpleResource.RESOURCE_IO_EXECUTOR).thenApplyAsync(image ->
         {
             if (image == null)
             {
@@ -153,7 +153,7 @@ public class OnlineImageCache implements TextureCache
                 this.errored.add(hash);
                 return MissingTextureSprite.getLocation();
             }
-            Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(image));
+            Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
             this.textureCache.put(hash, System.currentTimeMillis() + 30000);
             return location;
         }, command -> RenderSystem.recordRenderCall(command::run));
@@ -176,7 +176,7 @@ public class OnlineImageCache implements TextureCache
             LOGGER.error("Failed to write cache to file.", e);
         }
 
-        image.writeToFile(this.cacheFolder.resolve(hash));
+        image.write(this.cacheFolder.resolve(hash));
     }
 
 //        String hash = DigestUtils.md5Hex(url);
@@ -281,7 +281,7 @@ public class OnlineImageCache implements TextureCache
                 this.errored.add(hash);
                 return MissingTextureSprite.getLocation();
             }
-            Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(image));
+            Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
             return location;
         }, command -> RenderSystem.recordRenderCall(command::run));
         this.requested.put(hash, future);
@@ -296,7 +296,7 @@ public class OnlineImageCache implements TextureCache
         {
             if (this.hasTextureExpired(hash))
             {
-                Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().release(location));
+                Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().deleteTexture(location));
             }
         });
         this.errored.removeIf(this::hasTextureExpired);

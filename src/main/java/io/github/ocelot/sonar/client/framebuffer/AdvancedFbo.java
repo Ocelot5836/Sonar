@@ -87,7 +87,7 @@ public class AdvancedFbo implements NativeResource
             mask |= GL_COLOR_BUFFER_BIT;
         if (this.hasDepthAttachment())
             mask |= GL_DEPTH_BUFFER_BIT;
-        GlStateManager._clear(mask, Minecraft.ON_OSX);
+        GlStateManager.clear(mask, Minecraft.IS_RUNNING_ON_MAC);
     }
 
     /**
@@ -268,7 +268,7 @@ public class AdvancedFbo implements NativeResource
      */
     public void resolveToFrambuffer(Framebuffer target)
     {
-        this.resolveToFbo(target.frameBufferId, target.viewWidth, target.viewHeight, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+        this.resolveToFbo(target.framebufferObject, target.framebufferWidth, target.framebufferHeight, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     }
 
     /**
@@ -280,7 +280,7 @@ public class AdvancedFbo implements NativeResource
      */
     public void resolveToFrambuffer(Framebuffer target, int mask, int filtering)
     {
-        this.resolveToFbo(target.frameBufferId, target.viewWidth, target.viewHeight, mask, filtering);
+        this.resolveToFbo(target.framebufferObject, target.framebufferWidth, target.framebufferHeight, mask, filtering);
     }
 
     /**
@@ -303,21 +303,21 @@ public class AdvancedFbo implements NativeResource
         {
             RenderSystem.recordRenderCall(() ->
             {
-                MainWindow window = Minecraft.getInstance().getWindow();
+                MainWindow window = Minecraft.getInstance().getMainWindow();
                 this.bindRead(false);
                 unbindDraw();
                 glDrawBuffer(GL_BACK);
-                glBlitFramebuffer(0, 0, this.width, this.height, 0, 0, window.getWidth(), window.getHeight(), mask, filtering);
+                glBlitFramebuffer(0, 0, this.width, this.height, 0, 0, window.getFramebufferWidth(), window.getFramebufferHeight(), mask, filtering);
                 unbindRead();
             });
         }
         else
         {
-            MainWindow window = Minecraft.getInstance().getWindow();
+            MainWindow window = Minecraft.getInstance().getMainWindow();
             this.bindRead(false);
             unbindDraw();
             glDrawBuffer(GL_BACK);
-            glBlitFramebuffer(0, 0, this.width, this.height, 0, 0, window.getWidth(), window.getHeight(), mask, filtering);
+            glBlitFramebuffer(0, 0, this.width, this.height, 0, 0, window.getFramebufferWidth(), window.getFramebufferHeight(), mask, filtering);
             unbindRead();
         }
     }
@@ -513,7 +513,7 @@ public class AdvancedFbo implements NativeResource
 
         public Builder(Framebuffer parent)
         {
-            this(parent.viewWidth, parent.viewHeight);
+            this(parent.framebufferWidth, parent.framebufferHeight);
             this.addAttachments(parent);
         }
 
@@ -547,11 +547,11 @@ public class AdvancedFbo implements NativeResource
          */
         public Builder addAttachments(Framebuffer parent)
         {
-            this.addColorTextureBuffer(parent.width, parent.height, 0);
+            this.addColorTextureBuffer(parent.framebufferTextureWidth, parent.framebufferTextureHeight, 0);
             if (parent.useDepth)
             {
                 Validate.isTrue(this.depthAttachment == null, "Only one depth attachment can be applied to an FBO.");
-                this.setDepthRenderBuffer(parent.width, parent.height, 1);
+                this.setDepthRenderBuffer(parent.framebufferTextureWidth, parent.framebufferTextureHeight, 1);
             }
             return this;
         }
@@ -735,9 +735,9 @@ public class AdvancedFbo implements NativeResource
 
         private Wrapper(AdvancedFbo fbo)
         {
-            super(fbo.width, fbo.height, fbo.hasDepthAttachment(), Minecraft.ON_OSX);
+            super(fbo.width, fbo.height, fbo.hasDepthAttachment(), Minecraft.IS_RUNNING_ON_MAC);
             this.fbo = fbo;
-            this.createBuffers(this.fbo.getWidth(), this.fbo.getHeight(), Minecraft.ON_OSX);
+            this.createBuffers(this.fbo.getWidth(), this.fbo.getHeight(), Minecraft.IS_RUNNING_ON_MAC);
         }
 
         @Override
@@ -754,7 +754,7 @@ public class AdvancedFbo implements NativeResource
         }
 
         @Override
-        public void destroyBuffers()
+        public void deleteFramebuffer()
         {
             this.fbo.close();
         }
@@ -762,49 +762,49 @@ public class AdvancedFbo implements NativeResource
         @Override
         public void createBuffers(int width, int height, boolean onMac)
         {
-            this.viewWidth = width;
-            this.viewHeight = height;
+            this.framebufferWidth = width;
+            this.framebufferHeight = height;
             if (this.fbo == null) // Assumed to be init phase so no action taken
                 return;
             this.fbo.width = width;
             this.fbo.height = height;
             AdvancedFboAttachment attachment = this.fbo.hasColorAttachment(0) ? this.fbo.getColorAttachment(0) : null;
-            this.width = attachment == null ? this.viewWidth : attachment.getWidth();
-            this.height = attachment == null ? this.viewHeight : attachment.getHeight();
+            this.framebufferTextureWidth = attachment == null ? this.framebufferWidth : attachment.getWidth();
+            this.framebufferTextureHeight = attachment == null ? this.framebufferHeight : attachment.getHeight();
         }
 
         @Override
-        public void setFilterMode(int framebufferFilter)
+        public void setFramebufferFilter(int framebufferFilter)
         {
             RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-            this.filterMode = framebufferFilter;
+            this.framebufferFilter = framebufferFilter;
             for (int i = 0; i < this.fbo.getColorAttachments(); i++)
             {
                 this.fbo.getColorAttachment(i).bindAttachment();
-                GlStateManager._texParameter(3553, 10241, framebufferFilter);
-                GlStateManager._texParameter(3553, 10240, framebufferFilter);
-                GlStateManager._texParameter(3553, 10242, 10496);
-                GlStateManager._texParameter(3553, 10243, 10496);
+                GlStateManager.texParameter(3553, 10241, framebufferFilter);
+                GlStateManager.texParameter(3553, 10240, framebufferFilter);
+                GlStateManager.texParameter(3553, 10242, 10496);
+                GlStateManager.texParameter(3553, 10243, 10496);
                 this.fbo.getColorAttachment(i).unbindAttachment();
             }
         }
 
         @Override
-        public void bindRead()
+        public void bindFramebufferTexture()
         {
             if (this.fbo.hasColorAttachment(0))
                 this.fbo.getColorAttachment(0).bindAttachment();
         }
 
         @Override
-        public void unbindRead()
+        public void unbindFramebufferTexture()
         {
             if (this.fbo.hasColorAttachment(0))
                 this.fbo.getColorAttachment(0).unbindAttachment();
         }
 
         @Override
-        public void bindWrite(boolean setViewport)
+        public void bindFramebuffer(boolean setViewport)
         {
             this.fbo.bind(setViewport);
         }

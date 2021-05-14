@@ -42,11 +42,11 @@ public abstract class ValueContainerEditorScreen extends Screen
     @Deprecated
     public ValueContainerEditorScreen(ValueContainer container, BlockPos pos, Supplier<ITextComponent> defaultTitle)
     {
-        super(container.getTitle(Objects.requireNonNull(Minecraft.getInstance().level), pos).orElseGet(defaultTitle));
+        super(container.getTitle(Objects.requireNonNull(Minecraft.getInstance().world), pos).orElseGet(defaultTitle));
         this.container = container;
         this.pos = pos;
-        this.entries = container.getEntries(Minecraft.getInstance().level, pos);
-        this.formattedTitle = this.getTitle().getColoredString();
+        this.entries = container.getEntries(Minecraft.getInstance().world, pos);
+        this.formattedTitle = this.getTitle().getFormattedText();
     }
 
     /**
@@ -90,20 +90,20 @@ public abstract class ValueContainerEditorScreen extends Screen
      */
     protected boolean shouldStayOpen()
     {
-        return this.minecraft == null || this.minecraft.level == null || this.minecraft.level.getBlockState(this.pos).getBlock() instanceof ValueContainer || this.minecraft.level.getBlockEntity(this.pos) instanceof ValueContainer;
+        return this.minecraft == null || this.minecraft.world == null || this.minecraft.world.getBlockState(this.pos).getBlock() instanceof ValueContainer || this.minecraft.world.getTileEntity(this.pos) instanceof ValueContainer;
     }
 
     @Override
     public void tick()
     {
-        if (this.minecraft == null || this.minecraft.player == null || this.minecraft.level == null)
+        if (this.minecraft == null || this.minecraft.player == null || this.minecraft.world == null)
             return;
 
         this.children.forEach(this::tickChild);
 
         if (!this.shouldStayOpen())
         {
-            this.minecraft.player.closeContainer();
+            this.minecraft.player.closeScreen();
         }
     }
 
@@ -114,7 +114,7 @@ public abstract class ValueContainerEditorScreen extends Screen
             return;
 
         // Fixes the partial ticks actually being the tick length
-        partialTicks = this.getMinecraft().getFrameTime();
+        partialTicks = this.getMinecraft().getRenderPartialTicks();
 
         super.renderBackground();
         this.renderBackground(mouseX, mouseY, partialTicks);
@@ -145,10 +145,10 @@ public abstract class ValueContainerEditorScreen extends Screen
         if (super.keyPressed(keyCode, scanCode, modifiers) || this.getFocused() != null)
             return true;
 
-        InputMappings.Input mouseKey = InputMappings.getKey(keyCode, scanCode);
-        if (keyCode == 256 || this.minecraft.options.keyInventory.isActiveAndMatches(mouseKey))
+        InputMappings.Input mouseKey = InputMappings.getInputByCode(keyCode, scanCode);
+        if (keyCode == 256 || this.minecraft.gameSettings.keyBindInventory.isActiveAndMatches(mouseKey))
         {
-            this.minecraft.player.closeContainer();
+            this.minecraft.player.closeScreen();
             return true;
         }
 
@@ -158,7 +158,7 @@ public abstract class ValueContainerEditorScreen extends Screen
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
     {
-        if (!this.getChildAt(mouseX, mouseY).isPresent() || !super.mouseClicked(mouseX, mouseY, mouseButton))
+        if (!this.getEventListenerForPos(mouseX, mouseY).isPresent() || !super.mouseClicked(mouseX, mouseY, mouseButton))
         {
             if (this.getFocused() != null && !this.getFocused().isMouseOver(mouseX, mouseY))
             {

@@ -30,8 +30,6 @@ import net.minecraftforge.items.IItemHandler;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-import net.minecraft.block.Block.Properties;
-
 /**
  * <p>Adds common functionality to blocks that use waterlogging or facing properties. To properly be able to waterlog a block, implement {@link IWaterLoggable} on the implementation.</p>
  *
@@ -51,62 +49,62 @@ public class BaseBlock extends Block
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState state, World world, BlockPos pos)
+    public int getComparatorInputOverride(BlockState state, World world, BlockPos pos)
     {
-        return getComparatorInputOverride(world.getBlockEntity(pos));
+        return getComparatorInputOverride(world.getTileEntity(pos));
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, IWorld world, BlockPos currentPos, BlockPos facingPos)
+    public BlockState updatePostPlacement(BlockState state, Direction facing, BlockState facingState, IWorld world, BlockPos currentPos, BlockPos facingPos)
     {
-        if (state.hasProperty(WATERLOGGED) && state.getValue(WATERLOGGED))
-            world.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
-        return super.updateShape(state, facing, facingState, world, currentPos, facingPos);
+        if (state.has(WATERLOGGED) && state.get(WATERLOGGED))
+            world.getPendingFluidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(world));
+        return super.updatePostPlacement(state, facing, facingState, world, currentPos, facingPos);
     }
 
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context)
     {
-        BlockState state = this.defaultBlockState();
-        if (state.hasProperty(HORIZONTAL_FACING))
-            state = state.setValue(HORIZONTAL_FACING, context.getHorizontalDirection().getOpposite());
-        if (state.hasProperty(FACING))
-            state = state.setValue(FACING, context.getNearestLookingDirection().getOpposite());
-        if (state.hasProperty(WATERLOGGED))
-            state = state.setValue(WATERLOGGED, context.getLevel().getFluidState(context.getClickedPos()).getType() == Fluids.WATER);
+        BlockState state = this.getDefaultState();
+        if (state.has(HORIZONTAL_FACING))
+            state = state.with(HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
+        if (state.has(FACING))
+            state = state.with(FACING, context.getNearestLookingDirection().getOpposite());
+        if (state.has(WATERLOGGED))
+            state = state.with(WATERLOGGED, context.getWorld().getFluidState(context.getPos()).getFluid() == Fluids.WATER);
         return state;
     }
 
     @Override
     public BlockState rotate(BlockState state, Rotation rotation)
     {
-        if (state.hasProperty(HORIZONTAL_FACING))
-            state = state.setValue(HORIZONTAL_FACING, rotation.rotate(state.getValue(HORIZONTAL_FACING)));
-        if (state.hasProperty(FACING))
-            state = state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+        if (state.has(HORIZONTAL_FACING))
+            state = state.with(HORIZONTAL_FACING, rotation.rotate(state.get(HORIZONTAL_FACING)));
+        if (state.has(FACING))
+            state = state.with(FACING, rotation.rotate(state.get(FACING)));
         return state;
     }
 
     @Override
     public BlockState mirror(BlockState state, Mirror mirror)
     {
-        if (state.hasProperty(HORIZONTAL_FACING))
-            state.rotate(mirror.getRotation(state.getValue(HORIZONTAL_FACING)));
-        if (state.hasProperty(FACING))
-            state.rotate(mirror.getRotation(state.getValue(FACING)));
+        if (state.has(HORIZONTAL_FACING))
+            state.rotate(mirror.toRotation(state.get(HORIZONTAL_FACING)));
+        if (state.has(FACING))
+            state.rotate(mirror.toRotation(state.get(FACING)));
         return state;
     }
 
     @Override
     public IFluidState getFluidState(BlockState state)
     {
-        return state.hasProperty(WATERLOGGED) && state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
+        return state.has(WATERLOGGED) && state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
     }
 
     @OnlyIn(Dist.CLIENT)
     public Optional<ITextComponent> getTitle(World world, BlockPos pos)
     {
-        return Optional.of(this.getName());
+        return Optional.of(this.getNameTextComponent());
     }
 
     /**
@@ -139,6 +137,6 @@ public class BaseBlock extends Block
 
             return MathHelper.floor((fillPercentage / (float) inventory.getSlots()) * 14.0F) + (!empty ? 1 : 0);
         }
-        return te instanceof IInventory ? Container.getRedstoneSignalFromContainer((IInventory) te) : 0;
+        return te instanceof IInventory ? Container.calcRedstoneFromInventory((IInventory) te) : 0;
     }
 }

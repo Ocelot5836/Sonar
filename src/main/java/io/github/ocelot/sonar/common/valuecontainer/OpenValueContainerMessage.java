@@ -36,7 +36,7 @@ public class OpenValueContainerMessage implements SonarMessage<IValueContainerCl
     public void readPacketData(PacketBuffer buf)
     {
         this.pos = buf.readBlockPos();
-        this.nbt = buf.readBoolean() ? buf.readNbt() : null;
+        this.nbt = buf.readBoolean() ? buf.readCompoundTag() : null;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class OpenValueContainerMessage implements SonarMessage<IValueContainerCl
         buf.writeBlockPos(this.pos);
         buf.writeBoolean(this.nbt != null);
         if (this.nbt != null)
-            buf.writeNbt(this.nbt);
+            buf.writeCompoundTag(this.nbt);
     }
 
     @Override

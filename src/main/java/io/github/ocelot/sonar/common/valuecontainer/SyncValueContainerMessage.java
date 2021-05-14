@@ -38,14 +38,14 @@ public class SyncValueContainerMessage implements SonarMessage<IValueContainerSe
     public void readPacketData(PacketBuffer buf)
     {
         this.pos = buf.readBlockPos();
-        this.data = buf.readNbt();
+        this.data = buf.readCompoundTag();
     }
 
     @Override
     public void writePacketData(PacketBuffer buf)
     {
         buf.writeBlockPos(this.pos);
-        buf.writeNbt(this.data);
+        buf.writeCompoundTag(this.data);
     }
 
     @Override

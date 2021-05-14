@@ -37,13 +37,13 @@ public class TestTileEntity extends BaseTileEntity implements ValueContainer
     {
         for (int i = 0; i < 1024; i++)
         {
-            entries.add(new StringValueContainerEntry(new StringTextComponent(EnchantmentNameParts.getInstance().getRandomName(Objects.requireNonNull(Minecraft.getInstance().getFontManager().get(Minecraft.ALT_FONT)), 64)), Integer.toString(i), "Epic Value btw"));
+            entries.add(new StringValueContainerEntry(new StringTextComponent(EnchantmentNameParts.getInstance().generateNewRandomName(Objects.requireNonNull(Minecraft.getInstance().getFontResourceManager().getFontRenderer(Minecraft.standardGalacticFontRenderer)), 64)), Integer.toString(i), "Epic Value btw"));
             entries.add(new FloatValueContainerEntry(new StringTextComponent("Float " + i), "test" + i, i));
             entries.add(new BooleanValueContainerEntry(new StringTextComponent("Boolean " + i), "bool" + i, i % 2 == 0));
             entries.add(new ResourceLocationValueContainerEntry(new StringTextComponent("Resource Location " + i), "resourceLocation" + i, LootTables.EMPTY));
             entries.add(new RegistryObjectValueContainerEntry<>(new StringTextComponent("Enchantment " + i), "enchantment" + i, ForgeRegistries.ENCHANTMENTS, Enchantments.BINDING_CURSE));
             entries.add(new RegistryObjectValueContainerEntry<>(new StringTextComponent("Block " + i), "block" + i, ForgeRegistries.BLOCKS, Blocks.ACACIA_PLANKS));
-            entries.add(new RegistryObjectValueContainerEntry<>(new StringTextComponent("Sound Event " + i), "soundevent" + i, ForgeRegistries.SOUND_EVENTS, SoundEvents.BEEHIVE_DRIP));
+            entries.add(new RegistryObjectValueContainerEntry<>(new StringTextComponent("Sound Event " + i), "soundevent" + i, ForgeRegistries.SOUND_EVENTS, SoundEvents.BLOCK_BEEHIVE_DROP));
             entries.add(new ArrayValueContainerEntry<>(new StringTextComponent("Array " + i), "array" + i, ValueContainerEntry.InputType.values()).setDisplayGenerator(side -> side.name().toLowerCase(Locale.ROOT)));
         }
     }

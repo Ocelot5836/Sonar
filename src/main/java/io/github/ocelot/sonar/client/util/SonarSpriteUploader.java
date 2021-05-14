@@ -39,7 +39,7 @@ public class SonarSpriteUploader extends ReloadListener<AtlasTexture.SheetData> 
         this.registeredSprites = new HashSet<>();
         this.registeredSpriteSuppliers = new HashSet<>();
         this.mipmapLevels = 0;
-        textureManager.register(this.textureAtlas.location(), this.textureAtlas);
+        textureManager.loadTexture(this.textureAtlas.getTextureLocation(), this.textureAtlas);
     }
 
     /**
@@ -89,9 +89,9 @@ public class SonarSpriteUploader extends ReloadListener<AtlasTexture.SheetData> 
     protected AtlasTexture.SheetData prepare(IResourceManager resourceManager, IProfiler profiler)
     {
         profiler.startTick();
-        profiler.push("stitching");
-        AtlasTexture.SheetData atlastexture$sheetdata = this.textureAtlas.prepareToStitch(resourceManager, this.getResourceLocations().map(this::resolveLocation), profiler, this.mipmapLevels);
-        profiler.pop();
+        profiler.startSection("stitching");
+        AtlasTexture.SheetData atlastexture$sheetdata = this.textureAtlas.stitch(resourceManager, this.getResourceLocations().map(this::resolveLocation), profiler, this.mipmapLevels);
+        profiler.endSection();
         profiler.endTick();
         return atlastexture$sheetdata;
     }
@@ -100,16 +100,16 @@ public class SonarSpriteUploader extends ReloadListener<AtlasTexture.SheetData> 
     protected void apply(AtlasTexture.SheetData object, IResourceManager resourceManager, IProfiler profiler)
     {
         profiler.startTick();
-        profiler.push("upload");
-        this.textureAtlas.reload(object);
-        profiler.pop();
+        profiler.startSection("upload");
+        this.textureAtlas.upload(object);
+        profiler.endSection();
         profiler.endTick();
     }
 
     @Override
     public void close()
     {
-        this.textureAtlas.clearTextureData();
+        this.textureAtlas.clear();
     }
 
     /**

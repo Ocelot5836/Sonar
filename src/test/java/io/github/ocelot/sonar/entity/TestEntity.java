@@ -14,7 +14,7 @@ public class TestEntity extends BeeEntity
     }
 
     @Override
-    public IPacket<?> getAddEntityPacket()
+    public IPacket<?> createSpawnPacket()
     {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
