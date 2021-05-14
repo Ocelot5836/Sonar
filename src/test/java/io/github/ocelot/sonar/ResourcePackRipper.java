@@ -45,13 +45,13 @@ public class ResourcePackRipper
 
     private static void log(String message, Object... args)
     {
-        Minecraft.getInstance().ingameGUI.getChatGUI().printChatMessage((new StringTextComponent("")).appendSibling((new TranslationTextComponent("debug.prefix")).applyTextStyles(TextFormatting.YELLOW, TextFormatting.BOLD)).appendText(" ").appendSibling(new TranslationTextComponent(TestMod.MOD_ID + ".resource_pack_dump." + message, args)));
+        Minecraft.getInstance().gui.getChat().addMessage(new StringTextComponent("").append(new TranslationTextComponent("debug.prefix").withStyle(TextFormatting.YELLOW, TextFormatting.BOLD)).append(" ").append(new TranslationTextComponent(TestMod.MOD_ID + ".resource_pack_dump." + message, args)));
     }
 
     @SubscribeEvent
     public static void onEvent(InputEvent event)
     {
-        if (TestClientInit.DUMP_RESOURCEPACKS.isPressed())
+        if (TestClientInit.DUMP_RESOURCEPACKS.consumeClick())
         {
             if (running)
             {
@@ -59,7 +59,7 @@ public class ResourcePackRipper
                 return;
             }
 
-            Set<ClientResourcePackInfo> resourcePacks = Minecraft.getInstance().getResourcePackList().getEnabledPacks().stream().filter(info -> info.getResourcePack() instanceof FilePack).collect(Collectors.toSet());
+            Set<ClientResourcePackInfo> resourcePacks = Minecraft.getInstance().getResourcePackRepository().getSelected().stream().filter(info -> info.open() instanceof FilePack).collect(Collectors.toSet());
             if (resourcePacks.isEmpty())
             {
                 log("none");
@@ -69,7 +69,7 @@ public class ResourcePackRipper
             log("saving", resourcePacks.size());
 
             running = true;
-            Path output = Paths.get(Minecraft.getInstance().gameDir.toURI()).resolve("resourcepack-dump");
+            Path output = Paths.get(Minecraft.getInstance().gameDirectory.toURI()).resolve("resourcepack-dump");
             CompletableFuture.supplyAsync(() ->
             {
                 try
@@ -83,7 +83,7 @@ public class ResourcePackRipper
                     LOGGER.error("Failed to create '" + output + "'", e);
                     return false;
                 }
-            }, SimpleResource.RESOURCE_IO_EXECUTOR).thenAcceptAsync(success ->
+            }, SimpleResource.IO_EXECUTOR).thenAcceptAsync(success ->
             {
                 if (!success)
                 {
@@ -92,10 +92,10 @@ public class ResourcePackRipper
                 }
 
                 Stopwatch stopwatch = Stopwatch.createStarted();
-                CompletableFuture.allOf(resourcePacks.stream().filter(info -> info.getResourcePack() instanceof FilePack).map(info ->
+                CompletableFuture.allOf(resourcePacks.stream().filter(info -> info.open() instanceof FilePack).map(info ->
                 {
-                    String name = info.getName();
-                    IResourcePack resourcePack = info.getResourcePack();
+                    String name = info.getId();
+                    IResourcePack resourcePack = info.open();
                     Path packFolder = output.resolve(name);
 
                     return CompletableFuture.runAsync(() ->
@@ -141,13 +141,13 @@ public class ResourcePackRipper
                                 LOGGER.error("Failed to write ZIP entry '" + entry.getName() + "' to '" + file + "'", e);
                             }
                         });
-                    }, SimpleResource.RESOURCE_IO_EXECUTOR);
+                    }, SimpleResource.IO_EXECUTOR);
                 }).toArray(CompletableFuture[]::new)).
                         thenRunAsync(() ->
                         {
                             log("complete", stopwatch);
                             running = false;
-                            Util.getOSType().openFile(output.toFile());
+                            Util.getPlatform().openFile(output.toFile());
                         }, Minecraft.getInstance());
             }, Minecraft.getInstance());
         }

@@ -46,19 +46,19 @@ public abstract class SortedItemGroup extends ItemGroup
 
     private int getIndex(Item item)
     {
-        Map<Item, Integer> indexes = this.indexedItems.getValue();
+        Map<Item, Integer> indexes = this.indexedItems.get();
         return indexes.containsKey(item) ? indexes.get(item) : indexes.size();
     }
 
     @Override
-    public void fill(NonNullList<ItemStack> items)
+    public void fillItemList(NonNullList<ItemStack> items)
     {
-        super.fill(items);
+        super.fillItemList(items);
         items.sort((stack1, stack2) ->
         {
             int index1 = this.getIndex(stack1.getItem());
             int index2 = this.getIndex(stack2.getItem());
-            if (this.indexedItems.getValue().containsKey(stack1.getItem()) || this.indexedItems.getValue().containsKey(stack2.getItem()))
+            if (this.indexedItems.get().containsKey(stack1.getItem()) || this.indexedItems.get().containsKey(stack2.getItem()))
                 return Integer.compare(index1, index2); // Index by specified position
 
             if (stack1.getItem().getRegistryName() == null || stack2.getItem().getRegistryName() == null)

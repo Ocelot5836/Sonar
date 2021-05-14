@@ -19,10 +19,10 @@ public class CrashItem extends Item
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand)
+    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand)
     {
-        if (!world.isRemote())
+        if (!world.isClientSide())
             TestMessageHandler.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), new STestPlayMessage());
-        return ActionResult.resultSuccess(player.getHeldItem(hand));
+        return ActionResult.success(player.getItemInHand(hand));
     }
 }

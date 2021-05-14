@@ -9,6 +9,8 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import io.github.ocelot.sonar.common.valuecontainer.ValueContainerEntry.InputType;
+
 /**
  * <p>A {@link NumberValueContainerEntry} that supports Minecraft {@link ResourceLocation}.</p>
  *
@@ -118,6 +120,6 @@ public class ResourceLocationValueContainerEntry implements ValueContainerEntry<
      */
     public static Predicate<String> createDefaultValidator()
     {
-        return value -> ResourceLocation.tryCreate(value) != null;
+        return value -> ResourceLocation.tryParse(value) != null;
     }
 }

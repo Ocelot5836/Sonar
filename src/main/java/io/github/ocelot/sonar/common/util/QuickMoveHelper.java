@@ -49,9 +49,9 @@ public class QuickMoveHelper
     {
         ItemStack lv = ItemStack.EMPTY;
         Slot lv2 = menu.getSlot(slot);
-        if (lv2 != null && lv2.getHasStack())
+        if (lv2 != null && lv2.hasItem())
         {
-            ItemStack lv3 = lv2.getStack();
+            ItemStack lv3 = lv2.getItem();
             lv = lv3.copy();
 
             for (Action action : this.actions)
@@ -64,11 +64,11 @@ public class QuickMoveHelper
 
             if (lv3.isEmpty())
             {
-                lv2.putStack(ItemStack.EMPTY);
+                lv2.set(ItemStack.EMPTY);
             }
             else
             {
-                lv2.onSlotChanged();
+                lv2.setChanged();
             }
 
             if (lv3.getCount() == lv.getCount())
@@ -133,23 +133,23 @@ public class QuickMoveHelper
                 }
 
                 Slot slot = menu.getSlot(i);
-                ItemStack itemstack = slot.getStack();
-                if (slot.isItemValid(stack) && !itemstack.isEmpty() && Container.areItemsAndTagsEqual(stack, itemstack))
+                ItemStack itemstack = slot.getItem();
+                if (slot.mayPlace(stack) && !itemstack.isEmpty() && Container.consideredTheSameItem(stack, itemstack))
                 {
                     int j = itemstack.getCount() + stack.getCount();
-                    int maxSize = Math.min(slot.getItemStackLimit(stack), stack.getMaxStackSize());
+                    int maxSize = Math.min(slot.getMaxStackSize(stack), stack.getMaxStackSize());
                     if (j <= maxSize)
                     {
                         stack.setCount(0);
                         itemstack.setCount(j);
-                        slot.onSlotChanged();
+                        slot.setChanged();
                         flag = true;
                     }
                     else if (itemstack.getCount() < maxSize)
                     {
                         stack.shrink(maxSize - itemstack.getCount());
                         itemstack.setCount(maxSize);
-                        slot.onSlotChanged();
+                        slot.setChanged();
                         flag = true;
                     }
                 }
@@ -191,19 +191,19 @@ public class QuickMoveHelper
                 }
 
                 Slot slot1 = menu.getSlot(i);
-                ItemStack itemstack1 = slot1.getStack();
-                if (itemstack1.isEmpty() && slot1.isItemValid(stack))
+                ItemStack itemstack1 = slot1.getItem();
+                if (itemstack1.isEmpty() && slot1.mayPlace(stack))
                 {
-                    if (stack.getCount() > slot1.getItemStackLimit(stack))
+                    if (stack.getCount() > slot1.getMaxStackSize(stack))
                     {
-                        slot1.putStack(stack.split(slot1.getItemStackLimit(stack)));
+                        slot1.set(stack.split(slot1.getMaxStackSize(stack)));
                     }
                     else
                     {
-                        slot1.putStack(stack.split(stack.getCount()));
+                        slot1.set(stack.split(stack.getCount()));
                     }
 
-                    slot1.onSlotChanged();
+                    slot1.setChanged();
                     flag = true;
                     break;
                 }

@@ -36,7 +36,7 @@ public class BaseTileEntity extends TileEntity
      */
     public CompoundNBT writeSyncTag(CompoundNBT nbt)
     {
-        return this.write(nbt);
+        return this.save(nbt);
     }
 
     /**
@@ -47,20 +47,20 @@ public class BaseTileEntity extends TileEntity
     @OnlyIn(Dist.CLIENT)
     public void readSyncTag(CompoundNBT nbt)
     {
-        this.read(nbt);
+        this.load(nbt);
     }
 
     @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt)
     {
-        this.readSyncTag(pkt.getNbtCompound());
+        this.readSyncTag(pkt.getTag());
     }
 
     @Nullable
     @Override
     public SUpdateTileEntityPacket getUpdatePacket()
     {
-        return new SUpdateTileEntityPacket(this.pos, 0, this.getUpdateTag());
+        return new SUpdateTileEntityPacket(this.worldPosition, 0, this.getUpdateTag());
     }
 
     @Override
@@ -72,7 +72,7 @@ public class BaseTileEntity extends TileEntity
     @OnlyIn(Dist.CLIENT)
     public Optional<ITextComponent> getTitle(World world, BlockPos pos)
     {
-        return Optional.of(this.getBlockState().getBlock().getNameTextComponent());
+        return Optional.of(this.getBlockState().getBlock().getName());
     }
 
     /**
@@ -80,8 +80,8 @@ public class BaseTileEntity extends TileEntity
      */
     public void sync()
     {
-        this.markDirty();
-        if (this.world != null)
-            this.world.notifyBlockUpdate(this.pos, this.getBlockState(), this.getBlockState(), Constants.BlockFlags.DEFAULT);
+        this.setChanged();
+        if (this.level != null)
+            this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), Constants.BlockFlags.DEFAULT);
     }
 }

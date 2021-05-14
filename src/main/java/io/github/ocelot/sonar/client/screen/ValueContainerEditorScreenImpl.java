@@ -90,16 +90,16 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
             if (y - scroll >= 160)
                 break;
             ValueContainerEntry<?> entry = this.getEntries().get(i);
-            this.getMinecraft().fontRenderer.drawStringWithShadow(entry.getDisplayName().getFormattedText(), 8, 18 + y, -1);
+            this.getMinecraft().font.drawShadow(entry.getDisplayName().getColoredString(), 8, 18 + y, -1);
         }
     }
 
     @Override
     protected void init()
     {
-        this.getMinecraft().keyboardListener.enableRepeatEvents(true);
+        this.getMinecraft().keyboardHandler.setSendRepeatsToGui(true);
 
-        this.addButton(new Button((this.width - this.xSize) / 2, (this.height + this.ySize) / 2 + 4, this.xSize, 20, I18n.format("gui.done"), button -> this.getMinecraft().displayGuiScreen(null)));
+        this.addButton(new Button((this.width - this.xSize) / 2, (this.height + this.ySize) / 2 + 4, this.xSize, 20, I18n.get("gui.done"), button -> this.getMinecraft().setScreen(null)));
 
         for (int i = 0; i < this.getEntries().size(); i++)
         {
@@ -109,9 +109,9 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
                 case TEXT_FIELD:
                 {
                     Optional<Predicate<String>> optional = entry.getValidator();
-                    TextFieldWidget textField = new TextFieldWidget(this.getMinecraft().fontRenderer, 8, 22 + this.getMinecraft().fontRenderer.FONT_HEIGHT + i * VALUE_HEIGHT, 144, 20, "");
-                    textField.setMaxStringLength(Integer.MAX_VALUE);
-                    textField.setText(entry.getDisplay());
+                    TextFieldWidget textField = new TextFieldWidget(this.getMinecraft().font, 8, 22 + this.getMinecraft().font.lineHeight + i * VALUE_HEIGHT, 144, 20, "");
+                    textField.setMaxLength(Integer.MAX_VALUE);
+                    textField.setValue(entry.getDisplay());
                     textField.setResponder(text ->
                     {
                         boolean valid = !optional.isPresent() || optional.get().test(text);
@@ -124,17 +124,17 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
                 }
                 case TOGGLE:
                 {
-                    this.entryWidgets.add(new ValueContainerEntryToggleImpl(entry, 8, 22 + this.getMinecraft().fontRenderer.FONT_HEIGHT + i * VALUE_HEIGHT, 144, 20));
+                    this.entryWidgets.add(new ValueContainerEntryToggleImpl(entry, 8, 22 + this.getMinecraft().font.lineHeight + i * VALUE_HEIGHT, 144, 20));
                     break;
                 }
                 case SWITCH:
                 {
-                    this.entryWidgets.add(new ValueContainerEntrySwitchImpl(entry, 8, 22 + this.getMinecraft().fontRenderer.FONT_HEIGHT + i * VALUE_HEIGHT, 144, 20));
+                    this.entryWidgets.add(new ValueContainerEntrySwitchImpl(entry, 8, 22 + this.getMinecraft().font.lineHeight + i * VALUE_HEIGHT, 144, 20));
                     break;
                 }
                 case SLIDER:
                 {
-                    this.entryWidgets.add(new ValueContainerEntrySliderImpl(entry, 8, 22 + this.getMinecraft().fontRenderer.FONT_HEIGHT + i * VALUE_HEIGHT, 144, 20));
+                    this.entryWidgets.add(new ValueContainerEntrySliderImpl(entry, 8, 22 + this.getMinecraft().font.lineHeight + i * VALUE_HEIGHT, 144, 20));
                     break;
                 }
             }
@@ -155,7 +155,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
             return;
 
         // Fixes the partial ticks actually being the tick length
-        partialTicks = this.getMinecraft().getRenderPartialTicks();
+        partialTicks = this.getMinecraft().getFrameTime();
 
         super.renderBackground();
         this.renderBackground(mouseX, mouseY, partialTicks);
@@ -199,16 +199,16 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     {
         float screenX = (this.width - this.xSize) / 2f;
         float screenY = (this.height - this.ySize) / 2f;
-        this.getMinecraft().getTextureManager().bindTexture(BACKGROUND_LOCATION);
+        this.getMinecraft().getTextureManager().bind(BACKGROUND_LOCATION);
         ShapeRenderer.drawRectWithTexture(MATRIX_STACK, screenX, screenY, 0, 0, this.xSize, this.ySize);
     }
 
     @Override
     protected void renderForeground(int mouseX, int mouseY, float partialTicks)
     {
-        this.getMinecraft().fontRenderer.drawString(this.getFormattedTitle(), (this.xSize - this.getMinecraft().fontRenderer.getStringWidth(this.getFormattedTitle())) / 2f, 6f, 4210752);
+        this.getMinecraft().font.draw(this.getFormattedTitle(), (this.xSize - this.getMinecraft().font.width(this.getFormattedTitle())) / 2f, 6f, 4210752);
 
-        this.getMinecraft().getTextureManager().bindTexture(BACKGROUND_LOCATION);
+        this.getMinecraft().getTextureManager().bind(BACKGROUND_LOCATION);
         boolean hasScroll = this.scrollHandler.getMaxScroll() > 0;
         float scrollbarY = hasScroll ? 127 * (this.scrollHandler.getInterpolatedScroll(partialTicks) / this.scrollHandler.getMaxScroll()) : 0;
         ShapeRenderer.drawRectWithTexture(MATRIX_STACK, 158, 18 + scrollbarY, hasScroll ? 176 : 188, 0, 12, 15);
@@ -226,7 +226,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     public void removed()
     {
         super.removed();
-        this.getMinecraft().keyboardListener.enableRepeatEvents(false);
+        this.getMinecraft().keyboardHandler.setSendRepeatsToGui(false);
     }
 
     @Override
@@ -239,7 +239,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     {
         mouseX -= (this.width - this.xSize) / 2f;
         mouseY -= (this.height - this.ySize) / 2f;
-        float scroll = this.scrollHandler.getInterpolatedScroll(Minecraft.getInstance().getRenderPartialTicks());
+        float scroll = this.scrollHandler.getInterpolatedScroll(Minecraft.getInstance().getFrameTime());
         if (mouseX >= 6 && mouseX < 148 && mouseY + scroll >= 18 && mouseY + scroll < 159)
         {
             for (IGuiEventListener iguieventlistener : this.entryWidgets)
@@ -270,7 +270,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
 
     private boolean entryComponentClicked(double mouseX, double mouseY, int mouseButton)
     {
-        float scroll = this.scrollHandler.getInterpolatedScroll(Minecraft.getInstance().getRenderPartialTicks());
+        float scroll = this.scrollHandler.getInterpolatedScroll(Minecraft.getInstance().getFrameTime());
         for (IGuiEventListener iguieventlistener : this.entryWidgets)
         {
             if (iguieventlistener.mouseClicked(mouseX - (this.width - this.xSize) / 2f, mouseY - (this.height - this.ySize) / 2f + scroll, mouseButton))
@@ -299,12 +299,12 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     }
 
     @Override
-    public void func_212932_b(@Nullable IGuiEventListener listener)
+    public void magicalSpecialHackyFocus(@Nullable IGuiEventListener listener)
     {
         for (Widget entryWidget : this.entryWidgets)
             if (entryWidget != listener && entryWidget instanceof TextFieldWidget)
-                ((TextFieldWidget) entryWidget).setFocused2(false);
-        super.func_212932_b(listener);
+                ((TextFieldWidget) entryWidget).setFocus(false);
+        super.magicalSpecialHackyFocus(listener);
     }
 
     @Override
@@ -353,7 +353,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     {
         if (super.mouseScrolled(mouseX, mouseY, amount))
             return true;
-        return this.getEventListenerForPos(mouseX, mouseY).filter(iguieventlistener -> iguieventlistener.mouseScrolled(mouseX - (this.width - this.xSize) / 2f, mouseY - (this.height - this.ySize) / 2f, amount)).isPresent() || this.scrollHandler.mouseScrolled(MAX_SCROLL, amount);
+        return this.getChildAt(mouseX, mouseY).filter(iguieventlistener -> iguieventlistener.mouseScrolled(mouseX - (this.width - this.xSize) / 2f, mouseY - (this.height - this.ySize) / 2f, amount)).isPresent() || this.scrollHandler.mouseScrolled(MAX_SCROLL, amount);
     }
 
     @Override

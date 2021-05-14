@@ -169,7 +169,7 @@ public class Scheduler implements ScheduledExecutorService
      */
     public static ScheduledExecutorService get(IWorld world)
     {
-        return get(world.isRemote() ? LogicalSide.CLIENT : LogicalSide.SERVER);
+        return get(world.isClientSide() ? LogicalSide.CLIENT : LogicalSide.SERVER);
     }
 
     /**

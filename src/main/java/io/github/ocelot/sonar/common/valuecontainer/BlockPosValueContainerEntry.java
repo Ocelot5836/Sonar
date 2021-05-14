@@ -54,13 +54,13 @@ public class BlockPosValueContainerEntry extends AbstractVectorValueContainerEnt
     @Override
     public void write(CompoundNBT nbt)
     {
-        nbt.putLong(this.getName(), this.value.toLong());
+        nbt.putLong(this.getName(), this.value.asLong());
     }
 
     @Override
     public void read(CompoundNBT nbt)
     {
-        this.value = nbt.contains(this.getName(), Constants.NBT.TAG_LONG) ? BlockPos.fromLong(nbt.getLong(this.getName())) : new BlockPos(0, 0, 0);
+        this.value = nbt.contains(this.getName(), Constants.NBT.TAG_LONG) ? BlockPos.of(nbt.getLong(this.getName())) : new BlockPos(0, 0, 0);
     }
 
     @Override

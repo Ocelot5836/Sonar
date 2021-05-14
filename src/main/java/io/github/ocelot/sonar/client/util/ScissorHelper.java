@@ -43,9 +43,9 @@ public final class ScissorHelper
         if (!stack.isEmpty())
         {
             Entry entry = stack.peek();
-            MainWindow window = Minecraft.getInstance().getMainWindow();
-            double scale = framebufferScale == 0 ? window.getGuiScaleFactor() : framebufferScale;
-            int frameHeight = framebufferHeight == 0 ? window.getFramebufferHeight() : framebufferHeight;
+            MainWindow window = Minecraft.getInstance().getWindow();
+            double scale = framebufferScale == 0 ? window.getGuiScale() : framebufferScale;
+            int frameHeight = framebufferHeight == 0 ? window.getHeight() : framebufferHeight;
             enableScissorInternal();
             glScissor((int) (entry.getX() * scale), (int) (frameHeight - (entry.getY() + entry.getHeight()) * scale), (int) Math.max(0, entry.getWidth() * scale), (int) Math.max(0, entry.getHeight() * scale));
         }

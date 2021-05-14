@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import io.github.ocelot.sonar.common.valuecontainer.ValueContainerEntry.InputType;
+
 /**
  * <p>A {@link ValueContainerEntry} that supports standard {@link Number} type</p>
  *

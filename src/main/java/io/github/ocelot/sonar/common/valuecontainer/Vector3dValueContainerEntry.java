@@ -35,28 +35,28 @@ public class Vector3dValueContainerEntry extends AbstractVectorValueContainerEnt
     @Override
     protected Number getX(Vec3d value)
     {
-        return value.getX();
+        return value.x();
     }
 
     @Override
     protected Number getY(Vec3d value)
     {
-        return value.getY();
+        return value.y();
     }
 
     @Override
     protected Number getZ(Vec3d value)
     {
-        return value.getZ();
+        return value.z();
     }
 
     @Override
     public void write(CompoundNBT nbt)
     {
         CompoundNBT valueNbt = new CompoundNBT();
-        valueNbt.putDouble("x", this.value.getX());
-        valueNbt.putDouble("y", this.value.getY());
-        valueNbt.putDouble("z", this.value.getZ());
+        valueNbt.putDouble("x", this.value.x());
+        valueNbt.putDouble("y", this.value.y());
+        valueNbt.putDouble("z", this.value.z());
         nbt.put(this.getName(), valueNbt);
     }
 

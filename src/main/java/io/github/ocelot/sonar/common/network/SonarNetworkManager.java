@@ -51,7 +51,7 @@ public class SonarNetworkManager
     {
         try
         {
-            msg.processPacket((T) (ctx.get().getDirection().getReceptionSide().isClient() ? this.clientMessageHandler.getValue().getValue() : this.serverMessageHandler.getValue().getValue()), ctx.get());
+            msg.processPacket((T) (ctx.get().getDirection().getReceptionSide().isClient() ? this.clientMessageHandler.get().get() : this.serverMessageHandler.get().get()), ctx.get());
         }
         catch (Exception e)
         {
@@ -59,24 +59,24 @@ public class SonarNetworkManager
 
             ITextComponent reason = new TranslationTextComponent("disconnect.genericReason", "Internal Exception: " + e);
             NetworkManager networkManager = ctx.get().getNetworkManager();
-            INetHandler netHandler = networkManager.getNetHandler();
-            boolean local = networkManager.isLocalChannel();
+            INetHandler netHandler = networkManager.getPacketListener();
+            boolean local = networkManager.isMemoryConnection();
 
             // Need to check the channel type to determine how to disconnect
             if (netHandler instanceof IServerStatusNetHandler)
-                networkManager.closeChannel(reason);
+                networkManager.disconnect(reason);
             if (netHandler instanceof ServerLoginNetHandler)
                 ((ServerLoginNetHandler) netHandler).disconnect(reason);
             if (netHandler instanceof ServerPlayNetHandler)
                 ((ServerPlayNetHandler) netHandler).disconnect(reason);
             if (netHandler instanceof IClientStatusNetHandler)
             {
-                networkManager.closeChannel(reason);
+                networkManager.disconnect(reason);
                 netHandler.onDisconnect(reason);
             }
             if (netHandler instanceof IClientLoginNetHandler)
             {
-                networkManager.closeChannel(reason);
+                networkManager.disconnect(reason);
                 netHandler.onDisconnect(reason);
             }
         }

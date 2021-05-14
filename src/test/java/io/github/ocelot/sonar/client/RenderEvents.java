@@ -21,7 +21,7 @@ public class RenderEvents
     {
         if (event.getKey() == GLFW_KEY_L)
         {
-            Minecraft.getInstance().displayGuiScreen(new TestScreen());
+            Minecraft.getInstance().setScreen(new TestScreen());
         }
     }
 }

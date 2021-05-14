@@ -173,8 +173,8 @@ public interface ValueContainer
      */
     static Optional<ValueContainer> get(IBlockReader world, BlockPos pos)
     {
-        if (world.getTileEntity(pos) instanceof ValueContainer)
-            return Optional.ofNullable((ValueContainer) world.getTileEntity(pos));
+        if (world.getBlockEntity(pos) instanceof ValueContainer)
+            return Optional.ofNullable((ValueContainer) world.getBlockEntity(pos));
         if (world.getBlockState(pos).getBlock() instanceof ValueContainer)
             return Optional.of((ValueContainer) world.getBlockState(pos).getBlock());
         return Optional.empty();

@@ -41,7 +41,7 @@ public class SkinHelper
     {
         if (input == null)
             return null;
-        return PROFILE_CACHE.computeIfAbsent(input, SkullTileEntity::updateGameProfile);
+        return PROFILE_CACHE.computeIfAbsent(input, SkullTileEntity::updateGameprofile);
     }
 
     /**
@@ -57,18 +57,18 @@ public class SkinHelper
         {
             if (input == null)
             {
-                consumer.accept(DefaultPlayerSkin.getDefaultSkinLegacy());
+                consumer.accept(DefaultPlayerSkin.getDefaultSkin());
                 return;
             }
-            Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = Minecraft.getInstance().getSkinManager().loadSkinFromCache(input);
+            Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = Minecraft.getInstance().getSkinManager().getInsecureSkinInformation(input);
             if (map.containsKey(type))
             {
-                RenderSystem.recordRenderCall(() -> consumer.accept(Minecraft.getInstance().getSkinManager().loadSkin(map.get(type), type)));
+                RenderSystem.recordRenderCall(() -> consumer.accept(Minecraft.getInstance().getSkinManager().registerTexture(map.get(type), type)));
             }
             else
             {
-                consumer.accept(DefaultPlayerSkin.getDefaultSkin(PlayerEntity.getUUID(input)));
+                consumer.accept(DefaultPlayerSkin.getDefaultSkin(PlayerEntity.createPlayerUUID(input)));
             }
-        }, Util.getServerExecutor());
+        }, Util.backgroundExecutor());
     }
 }

@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import net.minecraft.item.Item.Properties;
+
 /**
  * <p>A spawn egg that allows for deferred entity types.</p>
  *
@@ -24,7 +26,7 @@ import java.util.function.Supplier;
  */
 public class SpawnEggItemBase<T extends EntityType<?>> extends SpawnEggItem
 {
-    private static final Map<EntityType<?>, SpawnEggItem> SPAWN_EGGS = ObfuscationReflectionHelper.getPrivateValue(SpawnEggItem.class, null, "field_195987_b");
+    private static final Map<EntityType<?>, SpawnEggItem> SPAWN_EGGS = ObfuscationReflectionHelper.getPrivateValue(SpawnEggItem.class, null, "BY_ID");
     private final boolean addToMisc;
     private final Supplier<T> type;
 
@@ -44,9 +46,9 @@ public class SpawnEggItemBase<T extends EntityType<?>> extends SpawnEggItem
     }
 
     @Override
-    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items)
+    public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items)
     {
-        if (this.isInGroup(group) || (this.addToMisc && group == ItemGroup.MISC))
+        if (this.allowdedIn(group) || (this.addToMisc && group == ItemGroup.TAB_MISC))
         {
             if (items.stream().anyMatch(stack -> stack.getItem() instanceof SpawnEggItem))
             {
@@ -77,7 +79,7 @@ public class SpawnEggItemBase<T extends EntityType<?>> extends SpawnEggItem
             CompoundNBT compoundnbt = p_208076_1_.getCompound("EntityTag");
             if (compoundnbt.contains("id", 8))
             {
-                return EntityType.byKey(compoundnbt.getString("id")).orElseGet(this.type);
+                return EntityType.byString(compoundnbt.getString("id")).orElseGet(this.type);
             }
         }
 

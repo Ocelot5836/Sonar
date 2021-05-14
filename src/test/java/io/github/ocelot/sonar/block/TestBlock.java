@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TestBlock extends BaseBlock implements IWaterLoggable
 {
-    private static final VoxelShape SHAPE = new VoxelShapeHelper.Builder().append(Block.makeCuboidShape(4, 0, 4, 12, 8, 12), Block.makeCuboidShape(5, 8, 5, 11, 16, 11)).rotate(Direction.NORTH).build();
+    private static final VoxelShape SHAPE = new VoxelShapeHelper.Builder().append(Block.box(4, 0, 4, 12, 8, 12), Block.box(5, 8, 5, 11, 16, 11)).rotate(Direction.NORTH).build();
 
     public TestBlock(Block.Properties properties)
     {
@@ -33,9 +33,9 @@ public class TestBlock extends BaseBlock implements IWaterLoggable
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit)
+    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit)
     {
-        Scheduler.get(world).schedule(() -> System.out.println("Hello 2 seconds after right click on " + (world.isRemote() ? "Client" : "Server")), 2, TimeUnit.SECONDS);
+        Scheduler.get(world).schedule(() -> System.out.println("Hello 2 seconds after right click on " + (world.isClientSide() ? "Client" : "Server")), 2, TimeUnit.SECONDS);
         return ActionResultType.SUCCESS;
     }
 
@@ -60,7 +60,7 @@ public class TestBlock extends BaseBlock implements IWaterLoggable
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
+    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder)
     {
         builder.add(WATERLOGGED);
     }

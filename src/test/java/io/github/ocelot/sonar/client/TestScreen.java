@@ -15,22 +15,22 @@ public class TestScreen extends Screen
 
     public TestScreen()
     {
-        super(StringTextComponent.EMPTY);
+        super(new StringTextComponent("Test Screen"));
         this.fbo.create();
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(int mouseX, int mouseY, float partialTicks)
     {
         this.fbo.bind(true);
         this.fbo.clear();
-        AbstractGui.fill(matrixStack, 0, 0, 512, 512, 0xFFFF00FF);
-        Minecraft.getInstance().getFramebuffer().bindFramebuffer(true);
+        AbstractGui.fill(0, 0, 512, 512, 0xFFFF00FF);
+        Minecraft.getInstance().getMainRenderTarget().bindWrite(true);
 
         this.fbo.getColorTextureAttachment(0).bindAttachment();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        ShapeRenderer.drawRectWithTexture(matrixStack, 0, 0, 0, 0, this.width, this.height, 1, 1, 1, 1);
+        ShapeRenderer.drawRectWithTexture(new MatrixStack(), 0, 0, 0, 0, this.width, this.height, 1, 1, 1, 1);
     }
 
     @Override

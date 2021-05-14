@@ -77,6 +77,6 @@ public class ValueContainerEntryToggleImpl extends AbstractButton
     public void setToggled(boolean toggled)
     {
         this.toggled = toggled;
-        this.setMessage(toggled ? I18n.format("gui.yes") : I18n.format("gui.no"));
+        this.setMessage(toggled ? I18n.get("gui.yes") : I18n.get("gui.no"));
     }
 }

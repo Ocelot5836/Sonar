@@ -15,6 +15,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import net.minecraft.item.Item.Properties;
+
 /**
  * <p>A fish bucket that allows all entity types.</p>
  *
@@ -32,15 +34,15 @@ public class FishBucketItemBase extends FishBucketItem
     }
 
     @Override
-    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items)
+    public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items)
     {
         if (!this.addToMisc)
         {
-            super.fillItemGroup(group, items);
+            super.fillItemCategory(group, items);
             return;
         }
 
-        if (this.isInGroup(group) || group == ItemGroup.MISC)
+        if (this.allowdedIn(group) || group == ItemGroup.TAB_MISC)
         {
             if (items.stream().anyMatch(stack -> stack.getItem() instanceof FishBucketItem))
             {
@@ -56,9 +58,9 @@ public class FishBucketItemBase extends FishBucketItem
     }
 
     @Override
-    public void onLiquidPlaced(World world, ItemStack stack, BlockPos pos)
+    public void checkExtraContent(World world, ItemStack stack, BlockPos pos)
     {
-        if (!world.isRemote())
+        if (!world.isClientSide())
         {
             this.placeFish((ServerWorld) world, stack, pos);
         }

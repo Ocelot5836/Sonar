@@ -31,7 +31,7 @@ public interface IValueContainerClientHandler
     default void handleOpenValueContainerMessage(OpenValueContainerMessage msg, NetworkEvent.Context ctx)
     {
         Minecraft minecraft = Minecraft.getInstance();
-        World world = minecraft.world;
+        World world = minecraft.level;
 
         ctx.enqueueWork(() ->
         {
@@ -55,7 +55,7 @@ public interface IValueContainerClientHandler
             if (screen == null)
                 return;
 
-            minecraft.displayGuiScreen(screen);
+            minecraft.setScreen(screen);
         });
     }
 

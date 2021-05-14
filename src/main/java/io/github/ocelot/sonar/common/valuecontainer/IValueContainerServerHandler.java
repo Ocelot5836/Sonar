@@ -32,19 +32,19 @@ public interface IValueContainerServerHandler
         {
             if (player == null)
                 return;
-            World world = player.world;
+            World world = player.level;
             BlockPos pos = msg.getPos();
 
-            TileEntity te = world.getTileEntity(pos);
+            TileEntity te = world.getBlockEntity(pos);
             if (!(te instanceof ValueContainer) && !(world.getBlockState(pos).getBlock() instanceof ValueContainer))
             {
                 LOGGER.error("Tile Entity or Block at '" + pos + "' was expected to be a ValueContainer, but it was " + te + "!");
                 return;
             }
 
-            if (!player.canUseCommandBlock())
+            if (!player.canUseGameMasterBlocks())
             {
-                LOGGER.error("Player with id " + player.getUniqueID() + " does not have the permission to modify value containers!");
+                LOGGER.error("Player with id " + player.getUUID() + " does not have the permission to modify value containers!");
                 return;
             }
 
