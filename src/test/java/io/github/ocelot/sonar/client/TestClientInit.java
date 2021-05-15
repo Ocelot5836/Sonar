@@ -19,10 +19,6 @@ public class TestClientInit
     {
         ClientRegistry.bindTileEntityRenderer(TestMod.TEST_TILE_ENTITY.get(), TestTileEntityRenderer::new);
 
-        RenderingRegistry.registerEntityRenderingHandler(TestMod.TEST_ENTITY_A.get(), BeeRenderer::new);
-        RenderingRegistry.registerEntityRenderingHandler(TestMod.TEST_ENTITY_B.get(), BeeRenderer::new);
-        RenderingRegistry.registerEntityRenderingHandler(TestMod.TEST_ENTITY_C.get(), BeeRenderer::new);
-
         ClientRegistry.registerKeyBinding(DUMP_RESOURCEPACKS);
     }
 }
