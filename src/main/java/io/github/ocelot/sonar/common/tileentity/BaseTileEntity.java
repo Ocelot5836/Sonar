@@ -1,13 +1,13 @@
 package io.github.ocelot.sonar.common.tileentity;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
@@ -16,14 +16,14 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 /**
- * <p>Adds syncing capabilities to {@link TileEntity}. Nothing special happens, it just automatically handles .</p>
+ * <p>Adds syncing capabilities to {@link BlockEntity}. Nothing special happens, it just automatically handles .</p>
  *
  * @author Ocelot
  * @since 5.1.0
  */
-public class BaseTileEntity extends TileEntity
+public class BaseTileEntity extends BlockEntity
 {
-    public BaseTileEntity(TileEntityType<?> tileEntityType)
+    public BaseTileEntity(BlockEntityType<?> tileEntityType)
     {
         super(tileEntityType);
     }
@@ -34,9 +34,9 @@ public class BaseTileEntity extends TileEntity
      * @param nbt The tag to write to
      * @return The tag passed in
      */
-    public CompoundNBT writeSyncTag(CompoundNBT nbt)
+    public CompoundTag writeSyncTag(CompoundTag nbt)
     {
-        return this.write(nbt);
+        return this.save(nbt);
     }
 
     /**
@@ -45,34 +45,34 @@ public class BaseTileEntity extends TileEntity
      * @param nbt The tag to read from
      */
     @OnlyIn(Dist.CLIENT)
-    public void readSyncTag(CompoundNBT nbt)
+    public void readSyncTag(CompoundTag nbt)
     {
-        this.read(this.getBlockState(), nbt);
+        this.load(this.getBlockState(), nbt);
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt)
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt)
     {
-        this.readSyncTag(pkt.getNbtCompound());
+        this.readSyncTag(pkt.getTag());
     }
 
     @Nullable
     @Override
-    public SUpdateTileEntityPacket getUpdatePacket()
+    public ClientboundBlockEntityDataPacket getUpdatePacket()
     {
-        return new SUpdateTileEntityPacket(this.pos, 0, this.getUpdateTag());
+        return new ClientboundBlockEntityDataPacket(this.worldPosition, 0, this.getUpdateTag());
     }
 
     @Override
-    public CompoundNBT getUpdateTag()
+    public CompoundTag getUpdateTag()
     {
-        return this.writeSyncTag(new CompoundNBT());
+        return this.writeSyncTag(new CompoundTag());
     }
 
     @OnlyIn(Dist.CLIENT)
-    public Optional<ITextComponent> getTitle(World world, BlockPos pos)
+    public Optional<Component> getTitle(Level world, BlockPos pos)
     {
-        return Optional.of(this.getBlockState().getBlock().getTranslatedName());
+        return Optional.of(this.getBlockState().getBlock().getName());
     }
 
     /**
@@ -80,8 +80,8 @@ public class BaseTileEntity extends TileEntity
      */
     public void sync()
     {
-        this.markDirty();
-        if (this.world != null)
-            this.world.notifyBlockUpdate(this.pos, this.getBlockState(), this.getBlockState(), Constants.BlockFlags.DEFAULT);
+        this.setChanged();
+        if (this.level != null)
+            this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), Constants.BlockFlags.DEFAULT);
     }
 }

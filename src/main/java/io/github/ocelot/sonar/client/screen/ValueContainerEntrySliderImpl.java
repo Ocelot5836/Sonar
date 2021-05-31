@@ -2,8 +2,8 @@ package io.github.ocelot.sonar.client.screen;
 
 import io.github.ocelot.sonar.common.valuecontainer.SliderEntry;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainerEntry;
-import net.minecraft.client.gui.widget.AbstractSlider;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -14,13 +14,13 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
- * <p>A simple implementation of an {@link AbstractSlider} that can be used to modify {@link SliderEntry}.</p>
+ * <p>A simple implementation of an {@link AbstractSliderButton} that can be used to modify {@link SliderEntry}.</p>
  *
  * @author Ocelot
  * @since 2.2.0
  */
 @OnlyIn(Dist.CLIENT)
-public class ValueContainerEntrySliderImpl extends AbstractSlider
+public class ValueContainerEntrySliderImpl extends AbstractSliderButton
 {
     private final DecimalFormat format;
     private final ValueContainerEntry<?> entry;
@@ -34,29 +34,29 @@ public class ValueContainerEntrySliderImpl extends AbstractSlider
         this.format = this.createDecimalFormat();
         this.entry = entry;
         this.sliderEntry = (SliderEntry) entry;
-        this.sliderValue = (this.sliderEntry.getSliderValue() - this.sliderEntry.getMinSliderValue()) / (this.sliderEntry.getMaxSliderValue() - this.sliderEntry.getMinSliderValue());
-        this.func_230979_b_();
+        this.value = (this.sliderEntry.getSliderValue() - this.sliderEntry.getMinSliderValue()) / (this.sliderEntry.getMaxSliderValue() - this.sliderEntry.getMinSliderValue());
+        this.updateMessage();
     }
 
     @Override
-    protected void func_230979_b_()
+    protected void updateMessage()
     {
         if (this.sliderEntry.isPercentage())
         {
-            this.setMessage(new StringTextComponent(this.format.format(Math.floor(this.sliderValue * 100.0)) + "%"));
+            this.setMessage(new TextComponent(this.format.format(Math.floor(this.value * 100.0)) + "%"));
         }
         else
         {
-            double sliderValue = this.sliderValue * (this.sliderEntry.getMaxSliderValue() - this.sliderEntry.getMinSliderValue()) + this.sliderEntry.getMinSliderValue();
-            this.setMessage(new StringTextComponent(this.format.format(this.sliderEntry.isDecimal() ? sliderValue : Math.floor(sliderValue))));
+            double sliderValue = this.value * (this.sliderEntry.getMaxSliderValue() - this.sliderEntry.getMinSliderValue()) + this.sliderEntry.getMinSliderValue();
+            this.setMessage(new TextComponent(this.format.format(this.sliderEntry.isDecimal() ? sliderValue : Math.floor(sliderValue))));
         }
     }
 
     @Override
-    protected void func_230972_a_()
+    protected void applyValue()
     {
         Optional<Predicate<String>> optional = this.entry.getValidator();
-        double sliderValue = this.sliderValue * (this.sliderEntry.getMaxSliderValue() - this.sliderEntry.getMinSliderValue()) + this.sliderEntry.getMinSliderValue();
+        double sliderValue = this.value * (this.sliderEntry.getMaxSliderValue() - this.sliderEntry.getMinSliderValue()) + this.sliderEntry.getMinSliderValue();
         String value = String.valueOf(this.sliderEntry.isDecimal() ? sliderValue : Math.floor(sliderValue));
         if (optional.isPresent() && !optional.get().test(value))
             return;

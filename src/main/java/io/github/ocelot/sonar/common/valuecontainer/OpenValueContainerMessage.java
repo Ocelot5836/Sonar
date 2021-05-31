@@ -1,10 +1,10 @@
 package io.github.ocelot.sonar.common.valuecontainer;
 
 import io.github.ocelot.sonar.common.network.message.SonarMessage;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -20,32 +20,32 @@ import javax.annotation.Nullable;
 public class OpenValueContainerMessage implements SonarMessage<IValueContainerClientHandler>
 {
     private BlockPos pos;
-    private CompoundNBT nbt;
+    private CompoundTag nbt;
 
     public OpenValueContainerMessage()
     {
     }
 
-    public OpenValueContainerMessage(World world, BlockPos pos)
+    public OpenValueContainerMessage(Level world, BlockPos pos)
     {
         this.pos = pos;
         this.nbt = ValueContainer.get(world, pos).map(container -> container.writeClientValueContainer(world, pos)).orElse(null);
     }
 
     @Override
-    public void readPacketData(PacketBuffer buf)
+    public void readPacketData(FriendlyByteBuf buf)
     {
         this.pos = buf.readBlockPos();
-        this.nbt = buf.readBoolean() ? buf.readCompoundTag() : null;
+        this.nbt = buf.readBoolean() ? buf.readNbt() : null;
     }
 
     @Override
-    public void writePacketData(PacketBuffer buf)
+    public void writePacketData(FriendlyByteBuf buf)
     {
         buf.writeBlockPos(this.pos);
         buf.writeBoolean(this.nbt != null);
         if (this.nbt != null)
-            buf.writeCompoundTag(this.nbt);
+            buf.writeNbt(this.nbt);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class OpenValueContainerMessage implements SonarMessage<IValueContainerCl
      */
     @Nullable
     @OnlyIn(Dist.CLIENT)
-    public CompoundNBT getNbt()
+    public CompoundTag getNbt()
     {
         return nbt;
     }

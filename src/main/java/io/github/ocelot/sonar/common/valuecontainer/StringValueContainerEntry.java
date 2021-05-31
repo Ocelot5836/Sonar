@@ -1,7 +1,7 @@
 package io.github.ocelot.sonar.common.valuecontainer;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
@@ -16,13 +16,13 @@ import java.util.function.Predicate;
  */
 public class StringValueContainerEntry implements ValueContainerEntry<String>
 {
-    private final ITextComponent displayName;
+    private final Component displayName;
     private final String name;
     private final String previousValue;
     private String value;
     private Predicate<String> validator;
 
-    public StringValueContainerEntry(ITextComponent displayName, String name, String value)
+    public StringValueContainerEntry(Component displayName, String name, String value)
     {
         this.displayName = displayName;
         this.name = name;
@@ -32,7 +32,7 @@ public class StringValueContainerEntry implements ValueContainerEntry<String>
     }
 
     @Override
-    public ITextComponent getDisplayName()
+    public Component getDisplayName()
     {
         return displayName;
     }
@@ -76,13 +76,13 @@ public class StringValueContainerEntry implements ValueContainerEntry<String>
     }
 
     @Override
-    public void write(CompoundNBT nbt)
+    public void write(CompoundTag nbt)
     {
         nbt.putString(this.getName(), this.value);
     }
 
     @Override
-    public void read(CompoundNBT nbt)
+    public void read(CompoundTag nbt)
     {
         this.value = nbt.contains(this.getName(), Constants.NBT.TAG_STRING) ? nbt.getString(this.getName()) : this.previousValue;
     }

@@ -5,15 +5,15 @@ import io.github.ocelot.sonar.SonarModule;
 import io.github.ocelot.sonar.common.network.inbuilt.SonarInbuiltMessages;
 import io.github.ocelot.sonar.common.valuecontainer.OpenValueContainerMessage;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainer;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 import java.util.Optional;
@@ -39,9 +39,9 @@ public class ValueContainerEditorItem extends Item
      * @param player The player to check
      * @return Whether or not that player can use this container editor
      */
-    protected boolean canPlayerUse(ValueContainer valueContainer, World world, BlockPos pos, PlayerEntity player)
+    protected boolean canPlayerUse(ValueContainer valueContainer, Level world, BlockPos pos, Player player)
     {
-        return player.canUseCommandBlock();
+        return player.canUseGameMasterBlocks();
     }
 
     /**
@@ -53,7 +53,7 @@ public class ValueContainerEditorItem extends Item
      * @param player         The player who opened the container
      * @return Whether or not the packet was sent successfully
      */
-    protected boolean sendPacket(ValueContainer valueContainer, ServerWorld world, BlockPos pos, ServerPlayerEntity player)
+    protected boolean sendPacket(ValueContainer valueContainer, ServerLevel world, BlockPos pos, ServerPlayer player)
     {
         if (!Sonar.isModuleLoaded(SonarModule.INBUILT_NETWORK))
             throw new IllegalStateException("There is no implementation to send a packet! Enable INBUILT_NETWORK Sonar Module to automatically handle.");
@@ -62,33 +62,33 @@ public class ValueContainerEditorItem extends Item
     }
 
     @Override
-    public ActionResultType onItemUse(ItemUseContext context)
+    public InteractionResult useOn(UseOnContext context)
     {
-        World world = context.getWorld();
-        BlockPos pos = context.getPos();
-        PlayerEntity player = context.getPlayer();
+        Level world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        Player player = context.getPlayer();
         if (player != null && player.isCreative())
         {
             Optional<ValueContainer> valueContainerOptional = ValueContainer.get(world, pos);
             if (valueContainerOptional.isPresent())
             {
                 ValueContainer valueContainer = valueContainerOptional.get();
-                if (!world.isRemote())
+                if (!world.isClientSide())
                 {
                     if (!this.canPlayerUse(valueContainer, world, pos, player))
                     {
-                        player.sendStatusMessage(new TranslationTextComponent(this.getTranslationKey(context.getItem()) + ".cannot_edit"), false);
-                        return ActionResultType.SUCCESS;
+                        player.displayClientMessage(new TranslatableComponent(this.getDescriptionId(context.getItemInHand()) + ".cannot_edit"), false);
+                        return InteractionResult.SUCCESS;
                     }
-                    if (this.sendPacket(valueContainer, (ServerWorld) world, pos, (ServerPlayerEntity) player))
-                        return ActionResultType.SUCCESS;
+                    if (this.sendPacket(valueContainer, (ServerLevel) world, pos, (ServerPlayer) player))
+                        return InteractionResult.SUCCESS;
                 }
                 else if (this.canPlayerUse(valueContainer, world, pos, player))
                 {
-                    return ActionResultType.SUCCESS;
+                    return InteractionResult.SUCCESS;
                 }
             }
         }
-        return ActionResultType.FAIL;
+        return InteractionResult.FAIL;
     }
 }

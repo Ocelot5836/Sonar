@@ -1,9 +1,9 @@
 package io.github.ocelot.sonar.common.valuecontainer;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3i;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.util.Constants;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -15,12 +15,12 @@ import org.apache.commons.lang3.math.NumberUtils;
  */
 public class BlockPosValueContainerEntry extends AbstractVectorValueContainerEntry<BlockPos>
 {
-    public BlockPosValueContainerEntry(ITextComponent displayName, String name, Vector3i value)
+    public BlockPosValueContainerEntry(Component displayName, String name, Vec3i value)
     {
         this(displayName, name, value, null, null);
     }
 
-    public BlockPosValueContainerEntry(ITextComponent displayName, String name, Vector3i value, Vector3i minValue, Vector3i maxValue)
+    public BlockPosValueContainerEntry(Component displayName, String name, Vec3i value, Vec3i minValue, Vec3i maxValue)
     {
         super(displayName, name, new BlockPos(value), minValue == null ? null : new BlockPos(minValue), maxValue == null ? null : new BlockPos(maxValue), false);
     }
@@ -50,15 +50,15 @@ public class BlockPosValueContainerEntry extends AbstractVectorValueContainerEnt
     }
 
     @Override
-    public void write(CompoundNBT nbt)
+    public void write(CompoundTag nbt)
     {
-        nbt.putLong(this.getName(), this.value.toLong());
+        nbt.putLong(this.getName(), this.value.asLong());
     }
 
     @Override
-    public void read(CompoundNBT nbt)
+    public void read(CompoundTag nbt)
     {
-        this.value = nbt.contains(this.getName(), Constants.NBT.TAG_LONG) ? BlockPos.fromLong(nbt.getLong(this.getName())) : new BlockPos(0, 0, 0);
+        this.value = nbt.contains(this.getName(), Constants.NBT.TAG_LONG) ? BlockPos.of(nbt.getLong(this.getName())) : new BlockPos(0, 0, 0);
     }
 
     @Override

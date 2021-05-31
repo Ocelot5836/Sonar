@@ -1,7 +1,7 @@
 package io.github.ocelot.sonar.common.valuecontainer;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.util.Constants;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +20,7 @@ import java.util.function.Predicate;
  */
 public class ArrayValueContainerEntry<T> implements ValueContainerEntry<T>, SwitchEntry
 {
-    private final ITextComponent displayName;
+    private final Component displayName;
     private final String name;
     private final T[] values;
     private final int previousIndex;
@@ -28,17 +28,17 @@ public class ArrayValueContainerEntry<T> implements ValueContainerEntry<T>, Swit
     private Function<T, String> displayGenerator;
     private Predicate<String> validator;
 
-    public ArrayValueContainerEntry(ITextComponent displayName, String name, T[] values)
+    public ArrayValueContainerEntry(Component displayName, String name, T[] values)
     {
         this(displayName, name, values, 0);
     }
 
-    public ArrayValueContainerEntry(ITextComponent displayName, String name, T[] values, T value)
+    public ArrayValueContainerEntry(Component displayName, String name, T[] values, T value)
     {
         this(displayName, name, values, getIndex(values, value));
     }
 
-    public ArrayValueContainerEntry(ITextComponent displayName, String name, T[] values, int index)
+    public ArrayValueContainerEntry(Component displayName, String name, T[] values, int index)
     {
         this.displayName = displayName;
         this.name = name;
@@ -50,7 +50,7 @@ public class ArrayValueContainerEntry<T> implements ValueContainerEntry<T>, Swit
     }
 
     @Override
-    public ITextComponent getDisplayName()
+    public Component getDisplayName()
     {
         return displayName;
     }
@@ -94,13 +94,13 @@ public class ArrayValueContainerEntry<T> implements ValueContainerEntry<T>, Swit
     }
 
     @Override
-    public void write(CompoundNBT nbt)
+    public void write(CompoundTag nbt)
     {
         nbt.putInt(this.getName(), this.index);
     }
 
     @Override
-    public void read(CompoundNBT nbt)
+    public void read(CompoundTag nbt)
     {
         this.index = nbt.contains(this.getName(), Constants.NBT.TAG_ANY_NUMERIC) ? nbt.getInt(this.getName()) : this.previousIndex;
     }

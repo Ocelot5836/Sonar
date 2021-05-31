@@ -1,10 +1,10 @@
 package io.github.ocelot.sonar.common.valuecontainer;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.network.NetworkEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,7 +31,7 @@ public interface IValueContainerClientHandler
     default void handleOpenValueContainerMessage(OpenValueContainerMessage msg, NetworkEvent.Context ctx)
     {
         Minecraft minecraft = Minecraft.getInstance();
-        World world = minecraft.world;
+        Level world = minecraft.level;
 
         ctx.enqueueWork(() ->
         {
@@ -39,7 +39,7 @@ public interface IValueContainerClientHandler
                 return;
 
             BlockPos pos = msg.getPos();
-            CompoundNBT nbt = msg.getNbt();
+            CompoundTag nbt = msg.getNbt();
 
             Optional<ValueContainer> valueContainerOptional = ValueContainer.get(world, pos);
             if (!valueContainerOptional.isPresent())
@@ -55,7 +55,7 @@ public interface IValueContainerClientHandler
             if (screen == null)
                 return;
 
-            minecraft.displayGuiScreen(screen);
+            minecraft.setScreen(screen);
         });
     }
 

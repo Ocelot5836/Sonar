@@ -1,11 +1,11 @@
 package io.github.ocelot.sonar.common.item;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.SpawnEggItem;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.NonNullList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
@@ -44,9 +44,9 @@ public class SpawnEggItemBase<T extends EntityType<?>> extends SpawnEggItem
     }
 
     @Override
-    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items)
+    public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items)
     {
-        if (this.isInGroup(group) || (this.addToMisc && group == ItemGroup.MISC))
+        if (this.allowdedIn(group) || (this.addToMisc && group == CreativeModeTab.TAB_MISC))
         {
             if (items.stream().anyMatch(stack -> stack.getItem() instanceof SpawnEggItem))
             {
@@ -70,14 +70,14 @@ public class SpawnEggItemBase<T extends EntityType<?>> extends SpawnEggItem
     }
 
     @Override
-    public EntityType<?> getType(@Nullable CompoundNBT p_208076_1_)
+    public EntityType<?> getType(@Nullable CompoundTag p_208076_1_)
     {
         if (p_208076_1_ != null && p_208076_1_.contains("EntityTag", 10))
         {
-            CompoundNBT compoundnbt = p_208076_1_.getCompound("EntityTag");
+            CompoundTag compoundnbt = p_208076_1_.getCompound("EntityTag");
             if (compoundnbt.contains("id", 8))
             {
-                return EntityType.byKey(compoundnbt.getString("id")).orElseGet(this.type);
+                return EntityType.byString(compoundnbt.getString("id")).orElseGet(this.type);
             }
         }
 

@@ -1,14 +1,14 @@
 package io.github.ocelot.sonar.client.render;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix4f;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11C;
@@ -45,9 +45,9 @@ public final class ShapeRenderer
      * @param height The y size of the quad
      * @param sprite The sprite to render to the screen
      */
-    public static void drawRectWithTexture(MatrixStack matrixStack, float x, float y, float width, float height, TextureAtlasSprite sprite)
+    public static void drawRectWithTexture(PoseStack matrixStack, float x, float y, float width, float height, TextureAtlasSprite sprite)
     {
-        drawRectWithTexture(matrixStack, x, y, sprite.getMinU(), sprite.getMinV(), width, height, sprite.getMaxU() - sprite.getMinU(), sprite.getMaxV() - sprite.getMinV(), 1f, 1f);
+        drawRectWithTexture(matrixStack, x, y, sprite.getU0(), sprite.getV0(), width, height, sprite.getU1() - sprite.getU0(), sprite.getV1() - sprite.getV0(), 1f, 1f);
     }
 
     /**
@@ -60,7 +60,7 @@ public final class ShapeRenderer
      * @param width  The x size of the quad
      * @param height The y size of the quad
      */
-    public static void drawRectWithTexture(MatrixStack matrixStack, float x, float y, float u, float v, float width, float height)
+    public static void drawRectWithTexture(PoseStack matrixStack, float x, float y, float u, float v, float width, float height)
     {
         drawRectWithTexture(matrixStack, x, y, u, v, width, height, width, height, 256f, 256f);
     }
@@ -77,7 +77,7 @@ public final class ShapeRenderer
      * @param textureWidth  The x size of the selection area on the texture
      * @param textureHeight The y size on the selection area on the texture
      */
-    public static void drawRectWithTexture(MatrixStack matrixStack, float x, float y, float u, float v, float width, float height, float textureWidth, float textureHeight)
+    public static void drawRectWithTexture(PoseStack matrixStack, float x, float y, float u, float v, float width, float height, float textureWidth, float textureHeight)
     {
         drawRectWithTexture(matrixStack, x, y, u, v, width, height, textureWidth, textureHeight, 256f, 256f);
     }
@@ -96,7 +96,7 @@ public final class ShapeRenderer
      * @param sourceWidth   The width of the texture source
      * @param sourceHeight  The height of the texture source
      */
-    public static void drawRectWithTexture(MatrixStack matrixStack, float x, float y, float u, float v, float width, float height, float textureWidth, float textureHeight, float sourceWidth, float sourceHeight)
+    public static void drawRectWithTexture(PoseStack matrixStack, float x, float y, float u, float v, float width, float height, float textureWidth, float textureHeight, float sourceWidth, float sourceHeight)
     {
         drawRectWithTexture(begin(), matrixStack, x, y, u, v, width, height, textureWidth, textureHeight, sourceWidth, sourceHeight);
         end();
@@ -107,10 +107,10 @@ public final class ShapeRenderer
      *
      * @return The buffer to render into
      */
-    public static IVertexBuilder begin()
+    public static VertexConsumer begin()
     {
-        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        buffer.begin(GL_QUADS, DefaultVertexFormats.POSITION_COLOR_TEX);
+        BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+        buffer.begin(GL_QUADS, DefaultVertexFormat.POSITION_COLOR_TEX);
         return buffer;
     }
 
@@ -119,7 +119,7 @@ public final class ShapeRenderer
      */
     public static void end()
     {
-        Tessellator.getInstance().draw();
+        Tesselator.getInstance().end();
         zLevel = 0;
         resetColor();
     }
@@ -134,9 +134,9 @@ public final class ShapeRenderer
      * @param height The y size of the quad
      * @param sprite The sprite to render to the screen
      */
-    public static void drawRectWithTexture(IVertexBuilder buffer, MatrixStack matrixStack, float x, float y, float width, float height, TextureAtlasSprite sprite)
+    public static void drawRectWithTexture(VertexConsumer buffer, PoseStack matrixStack, float x, float y, float width, float height, TextureAtlasSprite sprite)
     {
-        drawRectWithTexture(buffer, matrixStack, x, y, sprite.getMinU(), sprite.getMinV(), width, height, sprite.getMaxU() - sprite.getMinU(), sprite.getMaxV() - sprite.getMinV(), 1f, 1f);
+        drawRectWithTexture(buffer, matrixStack, x, y, sprite.getU0(), sprite.getV0(), width, height, sprite.getU1() - sprite.getU0(), sprite.getV1() - sprite.getV0(), 1f, 1f);
     }
 
     /**
@@ -150,7 +150,7 @@ public final class ShapeRenderer
      * @param width  The x size of the quad
      * @param height The y size of the quad
      */
-    public static void drawRectWithTexture(IVertexBuilder buffer, MatrixStack matrixStack, float x, float y, float u, float v, float width, float height)
+    public static void drawRectWithTexture(VertexConsumer buffer, PoseStack matrixStack, float x, float y, float u, float v, float width, float height)
     {
         drawRectWithTexture(buffer, matrixStack, x, y, u, v, width, height, width, height, 256f, 256f);
     }
@@ -168,7 +168,7 @@ public final class ShapeRenderer
      * @param textureWidth  The x size of the selection area on the texture
      * @param textureHeight The y size on the selection area on the texture
      */
-    public static void drawRectWithTexture(IVertexBuilder buffer, MatrixStack matrixStack, float x, float y, float u, float v, float width, float height, float textureWidth, float textureHeight)
+    public static void drawRectWithTexture(VertexConsumer buffer, PoseStack matrixStack, float x, float y, float u, float v, float width, float height, float textureWidth, float textureHeight)
     {
         drawRectWithTexture(buffer, matrixStack, x, y, u, v, width, height, textureWidth, textureHeight, 256f, 256f);
     }
@@ -188,15 +188,15 @@ public final class ShapeRenderer
      * @param sourceWidth   The width of the texture source
      * @param sourceHeight  The height of the texture source
      */
-    public static void drawRectWithTexture(IVertexBuilder buffer, MatrixStack matrixStack, float x, float y, float u, float v, float width, float height, float textureWidth, float textureHeight, float sourceWidth, float sourceHeight)
+    public static void drawRectWithTexture(VertexConsumer buffer, PoseStack matrixStack, float x, float y, float u, float v, float width, float height, float textureWidth, float textureHeight, float sourceWidth, float sourceHeight)
     {
         float scaleWidth = 1f / sourceWidth;
         float scaleHeight = 1f / sourceHeight;
-        Matrix4f matrix4f = matrixStack.getLast().getMatrix();
-        buffer.pos(matrix4f, x, y + height, zLevel).color(red, green, blue, alpha).tex(u * scaleWidth, (v + textureHeight) * scaleHeight).endVertex();
-        buffer.pos(matrix4f, x + width, y + height, zLevel).color(red, green, blue, alpha).tex((u + textureWidth) * scaleWidth, (v + textureHeight) * scaleHeight).endVertex();
-        buffer.pos(matrix4f, x + width, y, zLevel).color(red, green, blue, alpha).tex((u + textureWidth) * scaleWidth, v * scaleHeight).endVertex();
-        buffer.pos(matrix4f, x, y, zLevel).color(red, green, blue, alpha).tex(u * scaleWidth, v * scaleHeight).endVertex();
+        Matrix4f matrix4f = matrixStack.last().pose();
+        buffer.vertex(matrix4f, x, y + height, zLevel).color(red, green, blue, alpha).uv(u * scaleWidth, (v + textureHeight) * scaleHeight).endVertex();
+        buffer.vertex(matrix4f, x + width, y + height, zLevel).color(red, green, blue, alpha).uv((u + textureWidth) * scaleWidth, (v + textureHeight) * scaleHeight).endVertex();
+        buffer.vertex(matrix4f, x + width, y, zLevel).color(red, green, blue, alpha).uv((u + textureWidth) * scaleWidth, v * scaleHeight).endVertex();
+        buffer.vertex(matrix4f, x, y, zLevel).color(red, green, blue, alpha).uv(u * scaleWidth, v * scaleHeight).endVertex();
     }
 
     /**
@@ -208,19 +208,19 @@ public final class ShapeRenderer
      * @param height   The y size of the burst
      * @param segments The number of beams to have
      */
-    public static void drawSunburst(MatrixStack matrixStack, float x, float y, float width, float height, int segments)
+    public static void drawSunburst(PoseStack matrixStack, float x, float y, float width, float height, int segments)
     {
-        BufferBuilder builder = Tessellator.getInstance().getBuffer();
-        builder.begin(GL_TRIANGLES, DefaultVertexFormats.POSITION_COLOR);
+        BufferBuilder builder = Tesselator.getInstance().getBuilder();
+        builder.begin(GL_TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
 
-        Matrix4f matrix4f = matrixStack.getLast().getMatrix();
+        Matrix4f matrix4f = matrixStack.last().pose();
         float burstAngleOffset = (float) (Math.PI * (1.0F / segments / 2F));
         for (int i = 0; i < segments; i++)
         {
             float angle = (float) (Math.PI * 2 * i / segments + Math.PI / 2);
-            builder.pos(matrix4f, x, y, zLevel).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix4f, x + MathHelper.cos(angle + burstAngleOffset) * width / 2.0F, y + MathHelper.sin(angle + burstAngleOffset) * height / 2.0F, zLevel).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix4f, x + MathHelper.cos(angle - burstAngleOffset) * width / 2.0F, y + MathHelper.sin(angle - burstAngleOffset) * height / 2.0F, zLevel).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix4f, x, y, zLevel).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix4f, x + Mth.cos(angle + burstAngleOffset) * width / 2.0F, y + Mth.sin(angle + burstAngleOffset) * height / 2.0F, zLevel).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix4f, x + Mth.cos(angle - burstAngleOffset) * width / 2.0F, y + Mth.sin(angle - burstAngleOffset) * height / 2.0F, zLevel).color(red, green, blue, alpha).endVertex();
         }
 
         RenderSystem.enableBlend();

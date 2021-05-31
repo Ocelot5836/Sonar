@@ -1,7 +1,7 @@
 package io.github.ocelot.sonar.common.valuecontainer;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.util.Constants;
 
 /**
@@ -12,16 +12,16 @@ import net.minecraftforge.common.util.Constants;
  */
 public class LongValueContainerEntry extends NumberValueContainerEntry<Long>
 {
-    private final ITextComponent displayName;
+    private final Component displayName;
     private boolean bounds;
 
-    public LongValueContainerEntry(ITextComponent displayName, String name, long value)
+    public LongValueContainerEntry(Component displayName, String name, long value)
     {
         this(displayName, name, value, Long.MIN_VALUE, Long.MAX_VALUE);
         this.bounds = false;
     }
 
-    public LongValueContainerEntry(ITextComponent displayName, String name, long value, long minValue, long maxValue)
+    public LongValueContainerEntry(Component displayName, String name, long value, long minValue, long maxValue)
     {
         super(name, value, minValue, maxValue);
         this.displayName = displayName;
@@ -51,19 +51,19 @@ public class LongValueContainerEntry extends NumberValueContainerEntry<Long>
     }
 
     @Override
-    public ITextComponent getDisplayName()
+    public Component getDisplayName()
     {
         return displayName;
     }
 
     @Override
-    public void write(CompoundNBT nbt)
+    public void write(CompoundTag nbt)
     {
         nbt.putLong(this.getName(), this.value);
     }
 
     @Override
-    public void read(CompoundNBT nbt)
+    public void read(CompoundTag nbt)
     {
         this.value = nbt.contains(this.getName(), Constants.NBT.TAG_LONG) ? nbt.getLong(this.getName()) : this.getPreviousValue();
     }

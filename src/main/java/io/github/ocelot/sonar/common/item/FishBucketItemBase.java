@@ -1,19 +1,18 @@
 package io.github.ocelot.sonar.common.item;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.FishBucketItem;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.FishBucketItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluid;
 
 /**
  * <p>A fish bucket that allows all entity types.</p>
@@ -32,15 +31,15 @@ public class FishBucketItemBase extends FishBucketItem
     }
 
     @Override
-    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items)
+    public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items)
     {
         if (!this.addToMisc)
         {
-            super.fillItemGroup(group, items);
+            super.fillItemCategory(group, items);
             return;
         }
 
-        if (this.isInGroup(group) || group == ItemGroup.MISC)
+        if (this.allowdedIn(group) || group == CreativeModeTab.TAB_MISC)
         {
             if (items.stream().anyMatch(stack -> stack.getItem() instanceof FishBucketItem))
             {
@@ -56,16 +55,16 @@ public class FishBucketItemBase extends FishBucketItem
     }
 
     @Override
-    public void onLiquidPlaced(World world, ItemStack stack, BlockPos pos)
+    public void checkExtraContent(Level world, ItemStack stack, BlockPos pos)
     {
-        if (!world.isRemote())
+        if (!world.isClientSide())
         {
-            this.placeFish((ServerWorld) world, stack, pos);
+            this.spawn((ServerLevel) world, stack, pos);
         }
     }
 
-    protected void placeFish(ServerWorld world, ItemStack stack, BlockPos pos)
+    protected void spawn(ServerLevel world, ItemStack stack, BlockPos pos)
     {
-        this.getFishType().spawn(world, stack, null, pos, SpawnReason.BUCKET, true, false);
+        this.getFishType().spawn(world, stack, null, pos, MobSpawnType.BUCKET, true, false);
     }
 }

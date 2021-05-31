@@ -1,18 +1,18 @@
 package io.github.ocelot.sonar.client.screen;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.ocelot.sonar.Sonar;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainer;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainerEntry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.util.InputMappings;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -37,16 +37,16 @@ public abstract class ValueContainerEditorScreen extends Screen
 
     public ValueContainerEditorScreen(ValueContainer container, BlockPos pos)
     {
-        this(container, pos, () -> new TranslationTextComponent("screen." + Sonar.DOMAIN + ".value_container"));
+        this(container, pos, () -> new TranslatableComponent("screen." + Sonar.DOMAIN + ".value_container"));
     }
 
     @Deprecated
-    public ValueContainerEditorScreen(ValueContainer container, BlockPos pos, Supplier<ITextComponent> defaultTitle)
+    public ValueContainerEditorScreen(ValueContainer container, BlockPos pos, Supplier<Component> defaultTitle)
     {
-        super(container.getTitle(Objects.requireNonNull(Minecraft.getInstance().world), pos).orElseGet(defaultTitle));
+        super(container.getTitle(Objects.requireNonNull(Minecraft.getInstance().level), pos).orElseGet(defaultTitle));
         this.container = container;
         this.pos = pos;
-        this.entries = container.getEntries(Minecraft.getInstance().world, pos);
+        this.entries = container.getEntries(Minecraft.getInstance().level, pos);
         this.formattedTitle = this.getTitle().getString();
     }
 
@@ -63,7 +63,7 @@ public abstract class ValueContainerEditorScreen extends Screen
      * @param mouseY       The y position of the mouse
      * @param partialTicks The percentage from last tick and this tick
      */
-    protected abstract void renderBackground(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks);
+    protected abstract void renderBackground(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks);
 
     /**
      * Draws the foreground of the screen and any elements that should be drawn in front of buttons.
@@ -73,18 +73,18 @@ public abstract class ValueContainerEditorScreen extends Screen
      * @param mouseY       The y position of the mouse
      * @param partialTicks The percentage from last tick and this tick
      */
-    protected abstract void renderForeground(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks);
+    protected abstract void renderForeground(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks);
 
     /**
      * Ticks the specified child element if it needs ticking.
      *
      * @param child The child to tick
      */
-    protected void tickChild(IGuiEventListener child)
+    protected void tickChild(GuiEventListener child)
     {
-        if (child instanceof TextFieldWidget)
+        if (child instanceof EditBox)
         {
-            ((TextFieldWidget) child).tick();
+            ((EditBox) child).tick();
         }
     }
 
@@ -93,31 +93,31 @@ public abstract class ValueContainerEditorScreen extends Screen
      */
     protected boolean shouldStayOpen()
     {
-        return this.minecraft == null || this.minecraft.world == null || this.minecraft.world.getBlockState(this.pos).getBlock() instanceof ValueContainer || this.minecraft.world.getTileEntity(this.pos) instanceof ValueContainer;
+        return this.minecraft == null || this.minecraft.level == null || this.minecraft.level.getBlockState(this.pos).getBlock() instanceof ValueContainer || this.minecraft.level.getBlockEntity(this.pos) instanceof ValueContainer;
     }
 
     @Override
     public void tick()
     {
-        if (this.minecraft == null || this.minecraft.player == null || this.minecraft.world == null)
+        if (this.minecraft == null || this.minecraft.player == null || this.minecraft.level == null)
             return;
 
         this.children.forEach(this::tickChild);
 
         if (!this.shouldStayOpen())
         {
-            this.minecraft.player.closeScreen();
+            this.minecraft.player.closeContainer();
         }
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         if (this.minecraft == null)
             return;
 
         // Fixes the partial ticks actually being the tick length
-        partialTicks = this.getMinecraft().getRenderPartialTicks();
+        partialTicks = this.getMinecraft().getFrameTime();
 
         super.renderBackground(matrixStack);
         this.renderBackground(matrixStack, mouseX, mouseY, partialTicks);
@@ -125,16 +125,16 @@ public abstract class ValueContainerEditorScreen extends Screen
         this.renderForeground(matrixStack, mouseX, mouseY, partialTicks);
     }
 
-    public void renderWidgets(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void renderWidgets(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        for (Widget button : this.buttons)
+        for (AbstractWidget button : this.buttons)
         {
             button.render(matrixStack, mouseX, mouseY, partialTicks);
         }
     }
 
     @Override
-    public void onClose()
+    public void removed()
     {
         if (this.entries.stream().anyMatch(ValueContainerEntry::isDirty))
             this.sendDataToServer();
@@ -145,13 +145,13 @@ public abstract class ValueContainerEditorScreen extends Screen
     {
         if (this.minecraft == null || this.minecraft.player == null)
             return super.keyPressed(keyCode, scanCode, modifiers);
-        if (super.keyPressed(keyCode, scanCode, modifiers) || this.getListener() != null)
+        if (super.keyPressed(keyCode, scanCode, modifiers) || this.getFocused() != null)
             return true;
 
-        InputMappings.Input mouseKey = InputMappings.getInputByCode(keyCode, scanCode);
-        if (keyCode == 256 || this.minecraft.gameSettings.keyBindInventory.isActiveAndMatches(mouseKey))
+        InputConstants.Key mouseKey = InputConstants.getKey(keyCode, scanCode);
+        if (keyCode == 256 || this.minecraft.options.keyInventory.isActiveAndMatches(mouseKey))
         {
-            this.minecraft.player.closeScreen();
+            this.minecraft.player.closeContainer();
             return true;
         }
 
@@ -161,11 +161,11 @@ public abstract class ValueContainerEditorScreen extends Screen
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
     {
-        if (!this.getEventListenerForPos(mouseX, mouseY).isPresent() || !super.mouseClicked(mouseX, mouseY, mouseButton))
+        if (!this.getChildAt(mouseX, mouseY).isPresent() || !super.mouseClicked(mouseX, mouseY, mouseButton))
         {
-            if (this.getListener() != null && !this.getListener().isMouseOver(mouseX, mouseY))
+            if (this.getFocused() != null && !this.getFocused().isMouseOver(mouseX, mouseY))
             {
-                this.setListener(null);
+                this.setFocused(null);
                 return true;
             }
             return false;

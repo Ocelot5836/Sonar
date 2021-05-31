@@ -1,6 +1,6 @@
 package io.github.ocelot.sonar.common.util;
 
-import net.minecraft.world.IWorld;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
@@ -167,9 +167,9 @@ public class Scheduler implements ScheduledExecutorService
      * @param world The world to check the side of
      * @return The scheduler for that world
      */
-    public static ScheduledExecutorService get(IWorld world)
+    public static ScheduledExecutorService get(LevelAccessor world)
     {
-        return get(world.isRemote() ? LogicalSide.CLIENT : LogicalSide.SERVER);
+        return get(world.isClientSide() ? LogicalSide.CLIENT : LogicalSide.SERVER);
     }
 
     /**

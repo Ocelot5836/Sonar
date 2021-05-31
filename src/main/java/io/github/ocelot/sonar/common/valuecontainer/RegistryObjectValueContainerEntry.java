@@ -1,8 +1,8 @@
 package io.github.ocelot.sonar.common.valuecontainer;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -20,14 +20,14 @@ import java.util.function.Predicate;
  */
 public class RegistryObjectValueContainerEntry<T extends IForgeRegistryEntry<T>> implements ValueContainerEntry<ResourceLocation>
 {
-    private final ITextComponent displayName;
+    private final Component displayName;
     private final String name;
     private final IForgeRegistry<T> registry;
     private final T previousValue;
     private T value;
     private Predicate<String> validator;
 
-    public RegistryObjectValueContainerEntry(ITextComponent displayName, String name, IForgeRegistry<T> registry, T value)
+    public RegistryObjectValueContainerEntry(Component displayName, String name, IForgeRegistry<T> registry, T value)
     {
         this.displayName = displayName;
         this.name = name;
@@ -44,7 +44,7 @@ public class RegistryObjectValueContainerEntry<T extends IForgeRegistryEntry<T>>
     }
 
     @Override
-    public ITextComponent getDisplayName()
+    public Component getDisplayName()
     {
         return displayName;
     }
@@ -82,13 +82,13 @@ public class RegistryObjectValueContainerEntry<T extends IForgeRegistryEntry<T>>
     }
 
     @Override
-    public void write(CompoundNBT nbt)
+    public void write(CompoundTag nbt)
     {
         nbt.putString(this.getName(), Objects.requireNonNull(this.value.getRegistryName()).toString());
     }
 
     @Override
-    public void read(CompoundNBT nbt)
+    public void read(CompoundTag nbt)
     {
         this.value = nbt.contains(this.getName(), Constants.NBT.TAG_STRING) ? this.registry.getValue(new ResourceLocation(nbt.getString(this.getName()))) : this.previousValue;
     }
@@ -126,7 +126,7 @@ public class RegistryObjectValueContainerEntry<T extends IForgeRegistryEntry<T>>
     {
         return s ->
         {
-            if (!ResourceLocation.isResouceNameValid(s))
+            if (!ResourceLocation.isValidResourceLocation(s))
                 return false;
             return entry.registry.containsKey(new ResourceLocation(s));
         };

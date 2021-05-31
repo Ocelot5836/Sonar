@@ -1,10 +1,10 @@
 package io.github.ocelot.sonar.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.github.ocelot.sonar.TestMod;
 import io.github.ocelot.sonar.client.render.TestTileEntityRenderer;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.renderer.entity.BeeRenderer;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.client.util.InputMappings;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -13,7 +13,7 @@ import org.lwjgl.glfw.GLFW;
 
 public class TestClientInit
 {
-    public static final KeyBinding DUMP_RESOURCEPACKS = new KeyBinding("key." + TestMod.MOD_ID + ".dump_resourcepacks", KeyConflictContext.UNIVERSAL, KeyModifier.ALT, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_J, "key.categories.misc");
+    public static final KeyMapping DUMP_RESOURCEPACKS = new KeyMapping("key." + TestMod.MOD_ID + ".dump_resourcepacks", KeyConflictContext.UNIVERSAL, KeyModifier.ALT, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_J, "key.categories.misc");
 
     public static void init()
     {

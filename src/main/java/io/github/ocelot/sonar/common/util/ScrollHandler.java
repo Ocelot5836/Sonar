@@ -1,6 +1,6 @@
 package io.github.ocelot.sonar.common.util;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -80,7 +80,7 @@ public final class ScrollHandler
         {
             float scrollAmount = (float) Math.min(Math.abs(amount), maxScroll) * this.getScrollSpeed();
             float finalScroll = (amount < 0 ? -1 : 1) * scrollAmount;
-            double scroll = MathHelper.clamp(this.getScroll() - finalScroll, 0, this.getMaxScroll());
+            double scroll = Mth.clamp(this.getScroll() - finalScroll, 0, this.getMaxScroll());
             if (this.getScroll() != scroll)
             {
                 this.scroll(finalScroll);
@@ -142,7 +142,7 @@ public final class ScrollHandler
     @OnlyIn(Dist.CLIENT)
     public float getInterpolatedScroll(float partialTicks)
     {
-        return (float) MathHelper.lerp(partialTicks, this.lastScroll, this.scroll);
+        return (float) Mth.lerp(partialTicks, this.lastScroll, this.scroll);
     }
 
     /**
@@ -200,7 +200,7 @@ public final class ScrollHandler
      */
     public ScrollHandler setScroll(double scroll)
     {
-        this.scroll = MathHelper.clamp(scroll, 0, this.height - this.visibleHeight);
+        this.scroll = Mth.clamp(scroll, 0, this.height - this.visibleHeight);
         this.nextScroll = this.scroll;
         this.lastScroll = this.scroll;
         return this;

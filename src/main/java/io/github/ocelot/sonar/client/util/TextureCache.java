@@ -1,13 +1,13 @@
 package io.github.ocelot.sonar.client.util;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.ocelot.sonar.common.util.OnlineRequest;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.renderer.texture.MissingTextureSprite;
-import net.minecraft.client.renderer.texture.NativeImage;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -33,20 +33,20 @@ public interface TextureCache
     {
         Logger logger = LogManager.getLogger();
         logger.info("Requesting image from '" + url + "'");
-        return OnlineRequest.request(url, Util.getServerExecutor()).thenApplyAsync(stream ->
+        return OnlineRequest.request(url, Util.backgroundExecutor()).thenApplyAsync(stream ->
         {
             try
             {
                 NativeImage image = NativeImage.read(stream);
                 ResourceLocation location = new ResourceLocation(DigestUtils.md5Hex(url));
-                Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
+                Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(image));
                 return location;
             }
             catch (Exception e)
             {
                 logger.error("Failed to load image from '" + url + "'", e);
             }
-            return MissingTextureSprite.getLocation();
+            return MissingTextureAtlasSprite.getLocation();
         }, task -> RenderSystem.recordRenderCall(task::run));
     };
 
