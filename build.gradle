@@ -8,7 +8,7 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-version = "${project.minecraft}-${project.mod_version}"
+version = "${project.minecraft_version}-${project.mod_version}"
 group = 'io.github.ocelot'
 archivesBaseName = 'sonar'
 
@@ -43,6 +43,9 @@ dependencies {
 
     // your forge dependency, this is **required** when using Forge Loom in forge mode!
     forge "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
+
+    // I shouldn't need this, but it won't build otherwise soooo
+    implementation "com.google.code.findbugs:jsr305:3.0.2"
 }
 
 tasks.withType(JavaCompile).configureEach {
