@@ -2,6 +2,8 @@
 
 General 1.16 Mod utilties in one spot so they can be added to future mods without having to clone code over.
 
+## 1.16.1 is no longer maintained. Use 1.16.3+ or use at your own risk
+
 # How to add to your workspace
 
 Insert the `plugins` block just below `buildscript`.
