@@ -31,7 +31,7 @@ public class TestMod
     public static final SortedItemGroup TEST_GROUP = new SortedItemGroup(MOD_ID)
     {
         @Override
-        public ItemStack createIcon()
+        public ItemStack makeIcon()
         {
             return new ItemStack(TEST_BLOCK.get());
         }

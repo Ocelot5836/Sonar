@@ -32,9 +32,9 @@ public class TestBlock extends BaseBlock implements SimpleWaterloggedBlock
     }
 
     @Override
-    public InteractionResult onBlockActivated(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
     {
-        Scheduler.get(world).schedule(() -> System.out.println("Hello 2 seconds after right click on " + (world.isRemote() ? "Client" : "Server")), 2, TimeUnit.SECONDS);
+        Scheduler.get(world).schedule(() -> System.out.println("Hello 2 seconds after right click on " + (world.isClientSide() ? "Client" : "Server")), 2, TimeUnit.SECONDS);
         return InteractionResult.SUCCESS;
     }
 
@@ -59,7 +59,7 @@ public class TestBlock extends BaseBlock implements SimpleWaterloggedBlock
     }
 
     @Override
-    protected void fillStateContainer(StateDefinition.Builder<Block, BlockState> builder)
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
     {
         builder.add(WATERLOGGED);
     }
