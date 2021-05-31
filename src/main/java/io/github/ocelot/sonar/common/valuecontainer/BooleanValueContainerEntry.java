@@ -1,7 +1,7 @@
 package io.github.ocelot.sonar.common.valuecontainer;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
@@ -16,14 +16,14 @@ import java.util.function.Predicate;
  */
 public class BooleanValueContainerEntry implements ValueContainerEntry<Boolean>, ToggleEntry
 {
-    private final ITextComponent displayName;
+    private final Component displayName;
     private final String name;
     private final Boolean previousValue;
     private Boolean value;
     private Predicate<String> validator;
     private boolean toggle;
 
-    public BooleanValueContainerEntry(ITextComponent displayName, String name, boolean value)
+    public BooleanValueContainerEntry(Component displayName, String name, boolean value)
     {
         this.displayName = displayName;
         this.name = name;
@@ -34,7 +34,7 @@ public class BooleanValueContainerEntry implements ValueContainerEntry<Boolean>,
     }
 
     @Override
-    public ITextComponent getDisplayName()
+    public Component getDisplayName()
     {
         return displayName;
     }
@@ -95,13 +95,13 @@ public class BooleanValueContainerEntry implements ValueContainerEntry<Boolean>,
     }
 
     @Override
-    public void write(CompoundNBT nbt)
+    public void write(CompoundTag nbt)
     {
         nbt.putBoolean(this.getName(), this.value);
     }
 
     @Override
-    public void read(CompoundNBT nbt)
+    public void read(CompoundTag nbt)
     {
         this.value = nbt.contains(this.getName(), Constants.NBT.TAG_BYTE) ? nbt.getBoolean(this.getName()) : this.previousValue;
     }

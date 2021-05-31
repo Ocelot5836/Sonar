@@ -1,6 +1,6 @@
 package io.github.ocelot.sonar.common.network.message;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 /**
@@ -17,14 +17,14 @@ public interface SonarMessage<T>
      *
      * @param buf The buffer to read from
      */
-    void readPacketData(PacketBuffer buf);
+    void readPacketData(FriendlyByteBuf buf);
 
     /**
      * Writes the raw message data to the data stream.
      *
      * @param buf The buffer to write to
      */
-    void writePacketData(PacketBuffer buf);
+    void writePacketData(FriendlyByteBuf buf);
 
     /**
      * Passes this message into the specified handler to process the message.

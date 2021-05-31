@@ -8,12 +8,12 @@ import io.github.ocelot.sonar.common.util.SortedItemGroup;
 import io.github.ocelot.sonar.item.CrashItem;
 import io.github.ocelot.sonar.network.TestMessageHandler;
 import io.github.ocelot.sonar.tileentity.TestTileEntity;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
@@ -38,17 +38,17 @@ public class TestMod
     };
 
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MOD_ID);
-    public static final DeferredRegister<TileEntityType<?>> TILE_ENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, MOD_ID);
+    public static final DeferredRegister<BlockEntityType<?>> TILE_ENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, MOD_ID);
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
 
-    public static final RegistryObject<TestBlock> TEST_BLOCK = BLOCKS.register("test", () -> new TestBlock(Block.Properties.from(Blocks.IRON_BLOCK)));
-    public static final RegistryObject<TestStateBlock> TEST_STATE_BLOCK = BLOCKS.register("test_state", () -> new TestStateBlock(Block.Properties.from(Blocks.IRON_BLOCK)));
-    public static final RegistryObject<BlockItem> TEST_BLOCK_ITEM = ITEMS.register("test", () -> new BlockItem(TEST_BLOCK.get(), new Item.Properties().group(TEST_GROUP)));
-    public static final RegistryObject<BlockItem> TEST_STATE_BLOCK_ITEM = ITEMS.register("test_state", () -> new BlockItem(TEST_STATE_BLOCK.get(), new Item.Properties().group(TEST_GROUP)));
-    public static final RegistryObject<Item> TEST_EDITOR_ITEM = ITEMS.register("test_value_container_editor", () -> new ValueContainerEditorItem(new Item.Properties().group(TEST_GROUP)));
-    public static final RegistryObject<CrashItem> TEST_CRASH_ITEM = ITEMS.register("test_crash", () -> new CrashItem(new Item.Properties().group(TEST_GROUP)));
+    public static final RegistryObject<TestBlock> TEST_BLOCK = BLOCKS.register("test", () -> new TestBlock(Block.Properties.copy(Blocks.IRON_BLOCK)));
+    public static final RegistryObject<TestStateBlock> TEST_STATE_BLOCK = BLOCKS.register("test_state", () -> new TestStateBlock(Block.Properties.copy(Blocks.IRON_BLOCK)));
+    public static final RegistryObject<BlockItem> TEST_BLOCK_ITEM = ITEMS.register("test", () -> new BlockItem(TEST_BLOCK.get(), new Item.Properties().tab(TEST_GROUP)));
+    public static final RegistryObject<BlockItem> TEST_STATE_BLOCK_ITEM = ITEMS.register("test_state", () -> new BlockItem(TEST_STATE_BLOCK.get(), new Item.Properties().tab(TEST_GROUP)));
+    public static final RegistryObject<Item> TEST_EDITOR_ITEM = ITEMS.register("test_value_container_editor", () -> new ValueContainerEditorItem(new Item.Properties().tab(TEST_GROUP)));
+    public static final RegistryObject<CrashItem> TEST_CRASH_ITEM = ITEMS.register("test_crash", () -> new CrashItem(new Item.Properties().tab(TEST_GROUP)));
 
-    public static final RegistryObject<TileEntityType<TestTileEntity>> TEST_TILE_ENTITY = TILE_ENTITIES.register("test", () -> TileEntityType.Builder.create(TestTileEntity::new, TEST_BLOCK.get()).build(null));
+    public static final RegistryObject<BlockEntityType<TestTileEntity>> TEST_TILE_ENTITY = TILE_ENTITIES.register("test", () -> BlockEntityType.Builder.of(TestTileEntity::new, TEST_BLOCK.get()).build(null));
 
     public TestMod()
     {

@@ -2,13 +2,12 @@ package io.github.ocelot.sonar.block;
 
 import io.github.ocelot.sonar.common.block.BaseBlock;
 import io.github.ocelot.sonar.common.valuecontainer.*;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3i;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -25,30 +24,30 @@ public class TestStateBlock extends BaseBlock implements ValueContainer
     }
 
     @Override
-    public void getEntries(World world, BlockPos pos, List<ValueContainerEntry<?>> entries)
+    public void getEntries(Level world, BlockPos pos, List<ValueContainerEntry<?>> entries)
     {
-        entries.add(new Vector3dValueContainerEntry(new StringTextComponent("test"), "test", new Vector3d(0, 1, 0)));
-        entries.add(new Vector3iValueContainerEntry(new StringTextComponent("test"), "test", new Vector3i(0, 1, 0)));
-        entries.add(new BlockPosValueContainerEntry(new StringTextComponent("test"), "test", new Vector3i(0, 1, 0)));
-        entries.add(new IntValueContainerEntry(new StringTextComponent("test"), "test", 1, 0, 10));
+        entries.add(new Vector3dValueContainerEntry(new TextComponent("test"), "test", new Vec3(0, 1, 0)));
+        entries.add(new Vector3iValueContainerEntry(new TextComponent("test"), "test", new Vec3i(0, 1, 0)));
+        entries.add(new BlockPosValueContainerEntry(new TextComponent("test"), "test", new Vec3i(0, 1, 0)));
+        entries.add(new IntValueContainerEntry(new TextComponent("test"), "test", 1, 0, 10));
     }
 
     @Override
-    public void readEntries(World world, BlockPos pos, Map<String, ValueContainerEntry<?>> entries)
+    public void readEntries(Level world, BlockPos pos, Map<String, ValueContainerEntry<?>> entries)
     {
     }
 
     @Nullable
     @Override
-    public CompoundNBT writeClientValueContainer(World world, BlockPos pos)
+    public CompoundTag writeClientValueContainer(Level world, BlockPos pos)
     {
-        CompoundNBT nbt = new CompoundNBT();
+        CompoundTag nbt = new CompoundTag();
         nbt.putInt("Test", 7);
         return nbt;
     }
 
     @Override
-    public void readClientValueContainer(World world, BlockPos pos, CompoundNBT nbt)
+    public void readClientValueContainer(Level world, BlockPos pos, CompoundTag nbt)
     {
         System.out.println("Received " + nbt.getInt("Test"));
     }

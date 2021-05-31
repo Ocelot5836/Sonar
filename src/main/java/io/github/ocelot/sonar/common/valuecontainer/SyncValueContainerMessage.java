@@ -1,9 +1,9 @@
 package io.github.ocelot.sonar.common.valuecontainer;
 
 import io.github.ocelot.sonar.common.network.message.SonarMessage;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.List;
 public class SyncValueContainerMessage implements SonarMessage<IValueContainerServerHandler>
 {
     private BlockPos pos;
-    private CompoundNBT data;
+    private CompoundTag data;
 
     public SyncValueContainerMessage()
     {
@@ -28,24 +28,24 @@ public class SyncValueContainerMessage implements SonarMessage<IValueContainerSe
         this(pos, ValueContainer.serialize(entries));
     }
 
-    public SyncValueContainerMessage(BlockPos pos, CompoundNBT data)
+    public SyncValueContainerMessage(BlockPos pos, CompoundTag data)
     {
         this.pos = pos;
         this.data = data;
     }
 
     @Override
-    public void readPacketData(PacketBuffer buf)
+    public void readPacketData(FriendlyByteBuf buf)
     {
         this.pos = buf.readBlockPos();
-        this.data = buf.readCompoundTag();
+        this.data = buf.readNbt();
     }
 
     @Override
-    public void writePacketData(PacketBuffer buf)
+    public void writePacketData(FriendlyByteBuf buf)
     {
         buf.writeBlockPos(this.pos);
-        buf.writeCompoundTag(this.data);
+        buf.writeNbt(this.data);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class SyncValueContainerMessage implements SonarMessage<IValueContainerSe
     /**
      * @return The tag full of container data
      */
-    public CompoundNBT getData()
+    public CompoundTag getData()
     {
         return data;
     }

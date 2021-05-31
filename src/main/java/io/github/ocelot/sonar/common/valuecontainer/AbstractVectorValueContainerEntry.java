@@ -1,10 +1,10 @@
 package io.github.ocelot.sonar.common.valuecontainer;
 
-import net.minecraft.util.text.ITextComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import javax.annotation.Nullable;
+import net.minecraft.network.chat.Component;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -17,7 +17,7 @@ import java.util.function.Predicate;
  */
 public abstract class AbstractVectorValueContainerEntry<T> implements ValueContainerEntry<T>
 {
-    private final ITextComponent displayName;
+    private final Component displayName;
     private final String name;
     private final T minValue;
     private final T maxValue;
@@ -25,7 +25,7 @@ public abstract class AbstractVectorValueContainerEntry<T> implements ValueConta
     protected T value;
     private Predicate<String> validator;
 
-    public AbstractVectorValueContainerEntry(ITextComponent displayName, String name, T value, @Nullable T minValue, @Nullable T maxValue, boolean allowDecimals)
+    public AbstractVectorValueContainerEntry(Component displayName, String name, T value, @Nullable T minValue, @Nullable T maxValue, boolean allowDecimals)
     {
         this.displayName = displayName;
         this.name = name;
@@ -108,7 +108,7 @@ public abstract class AbstractVectorValueContainerEntry<T> implements ValueConta
     protected abstract Number getZ(T value);
 
     @Override
-    public ITextComponent getDisplayName()
+    public Component getDisplayName()
     {
         return displayName;
     }

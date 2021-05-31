@@ -1,26 +1,26 @@
 package io.github.ocelot.sonar.common.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.IWaterLoggable;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 /**
- * <p>Adds common functionality to blocks that use waterlogging or facing properties. To properly be able to waterlog a block, implement {@link IWaterLoggable} on the implementation.</p>
+ * <p>Adds common functionality to blocks that use waterlogging or facing properties. To properly be able to waterlog a block, implement {@link SimpleWaterloggedBlock} on the implementation.</p>
  *
  * @author Ocelot
  * @since 2.3.0
@@ -49,29 +49,29 @@ public class BaseBlock extends Block
     }
 
     @Override
-    public int getComparatorInputOverride(BlockState state, World world, BlockPos pos)
+    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos)
     {
-        return getComparatorInputOverride(world.getTileEntity(pos));
+        return getComparatorInputOverride(world.getBlockEntity(pos));
     }
 
     @Override
-    public BlockState updatePostPlacement(BlockState state, Direction facing, BlockState facingState, IWorld world, BlockPos currentPos, BlockPos facingPos)
+    public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor world, BlockPos currentPos, BlockPos facingPos)
     {
-        if (state.hasProperty(WATERLOGGED) && state.get(WATERLOGGED))
-            world.getPendingFluidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(world));
-        return super.updatePostPlacement(state, facing, facingState, world, currentPos, facingPos);
+        if (state.hasProperty(WATERLOGGED) && state.getValue(WATERLOGGED))
+            world.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
+        return super.updateShape(state, facing, facingState, world, currentPos, facingPos);
     }
 
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context)
+    public BlockState getStateForPlacement(BlockPlaceContext context)
     {
-        BlockState state = this.getDefaultState();
+        BlockState state = this.defaultBlockState();
         if (state.hasProperty(HORIZONTAL_FACING))
-            state = state.with(HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
+            state = state.setValue(HORIZONTAL_FACING, context.getHorizontalDirection().getOpposite());
         if (state.hasProperty(FACING))
-            state = state.with(FACING, context.getNearestLookingDirection().getOpposite());
+            state = state.setValue(FACING, context.getNearestLookingDirection().getOpposite());
         if (state.hasProperty(WATERLOGGED))
-            state = state.with(WATERLOGGED, context.getWorld().getFluidState(context.getPos()).getFluid() == Fluids.WATER);
+            state = state.setValue(WATERLOGGED, context.getLevel().getFluidState(context.getClickedPos()).getType() == Fluids.WATER);
         return state;
     }
 
@@ -79,9 +79,9 @@ public class BaseBlock extends Block
     public BlockState rotate(BlockState state, Rotation rotation)
     {
         if (state.hasProperty(HORIZONTAL_FACING))
-            state = state.with(HORIZONTAL_FACING, rotation.rotate(state.get(HORIZONTAL_FACING)));
+            state = state.setValue(HORIZONTAL_FACING, rotation.rotate(state.getValue(HORIZONTAL_FACING)));
         if (state.hasProperty(FACING))
-            state = state.with(FACING, rotation.rotate(state.get(FACING)));
+            state = state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
         return state;
     }
 
@@ -89,22 +89,22 @@ public class BaseBlock extends Block
     public BlockState mirror(BlockState state, Mirror mirror)
     {
         if (state.hasProperty(HORIZONTAL_FACING))
-            state.rotate(mirror.toRotation(state.get(HORIZONTAL_FACING)));
+            state.rotate(mirror.getRotation(state.getValue(HORIZONTAL_FACING)));
         if (state.hasProperty(FACING))
-            state.rotate(mirror.toRotation(state.get(FACING)));
+            state.rotate(mirror.getRotation(state.getValue(FACING)));
         return state;
     }
 
     @Override
     public FluidState getFluidState(BlockState state)
     {
-        return state.hasProperty(WATERLOGGED) && state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
+        return state.hasProperty(WATERLOGGED) && state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @OnlyIn(Dist.CLIENT)
-    public Optional<ITextComponent> getTitle(World world, BlockPos pos)
+    public Optional<Component> getTitle(Level world, BlockPos pos)
     {
-        return Optional.of(this.getTranslatedName());
+        return Optional.of(this.getName());
     }
 
     /**
@@ -113,7 +113,7 @@ public class BaseBlock extends Block
      * @param te The tile entity to get the override for
      * @return The redstone level output for that tile entity
      */
-    public static int getComparatorInputOverride(@Nullable TileEntity te)
+    public static int getComparatorInputOverride(@Nullable BlockEntity te)
     {
         if (te == null)
             return 0;
@@ -135,8 +135,8 @@ public class BaseBlock extends Block
                 }
             }
 
-            return MathHelper.floor((fillPercentage / (float) inventory.getSlots()) * 14.0F) + (!empty ? 1 : 0);
+            return Mth.floor((fillPercentage / (float) inventory.getSlots()) * 14.0F) + (!empty ? 1 : 0);
         }
-        return te instanceof IInventory ? Container.calcRedstoneFromInventory((IInventory) te) : 0;
+        return te instanceof Container ? AbstractContainerMenu.getRedstoneSignalFromContainer((Container) te) : 0;
     }
 }

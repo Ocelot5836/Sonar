@@ -1,12 +1,12 @@
 package io.github.ocelot.sonar.client.util;
 
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.resources.ReloadListener;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -24,9 +24,9 @@ import java.util.stream.Stream;
  * @since 6.1.0
  */
 @OnlyIn(Dist.CLIENT)
-public class SonarSpriteUploader extends ReloadListener<AtlasTexture.SheetData> implements AutoCloseable
+public class SonarSpriteUploader extends SimplePreparableReloadListener<TextureAtlas.Preparations> implements AutoCloseable
 {
-    private final AtlasTexture textureAtlas;
+    private final TextureAtlas textureAtlas;
     private final String prefix;
     private final Set<ResourceLocation> registeredSprites;
     private final Set<Supplier<Collection<ResourceLocation>>> registeredSpriteSuppliers;
@@ -35,11 +35,11 @@ public class SonarSpriteUploader extends ReloadListener<AtlasTexture.SheetData> 
     public SonarSpriteUploader(TextureManager textureManager, ResourceLocation textureLocation, String prefix)
     {
         this.prefix = prefix;
-        this.textureAtlas = new AtlasTexture(textureLocation);
+        this.textureAtlas = new TextureAtlas(textureLocation);
         this.registeredSprites = new HashSet<>();
         this.registeredSpriteSuppliers = new HashSet<>();
         this.mipmapLevels = 0;
-        textureManager.loadTexture(this.textureAtlas.getTextureLocation(), this.textureAtlas);
+        textureManager.register(this.textureAtlas.location(), this.textureAtlas);
     }
 
     /**
@@ -86,30 +86,30 @@ public class SonarSpriteUploader extends ReloadListener<AtlasTexture.SheetData> 
     }
 
     @Override
-    protected AtlasTexture.SheetData prepare(IResourceManager resourceManager, IProfiler profiler)
+    protected TextureAtlas.Preparations prepare(ResourceManager resourceManager, ProfilerFiller profiler)
     {
         profiler.startTick();
-        profiler.startSection("stitching");
-        AtlasTexture.SheetData atlastexture$sheetdata = this.textureAtlas.stitch(resourceManager, this.getResourceLocations().map(this::resolveLocation), profiler, this.mipmapLevels);
-        profiler.endSection();
+        profiler.push("stitching");
+        TextureAtlas.Preparations atlastexture$sheetdata = this.textureAtlas.prepareToStitch(resourceManager, this.getResourceLocations().map(this::resolveLocation), profiler, this.mipmapLevels);
+        profiler.pop();
         profiler.endTick();
         return atlastexture$sheetdata;
     }
 
     @Override
-    protected void apply(AtlasTexture.SheetData object, IResourceManager resourceManager, IProfiler profiler)
+    protected void apply(TextureAtlas.Preparations object, ResourceManager resourceManager, ProfilerFiller profiler)
     {
         profiler.startTick();
-        profiler.startSection("upload");
-        this.textureAtlas.upload(object);
-        profiler.endSection();
+        profiler.push("upload");
+        this.textureAtlas.reload(object);
+        profiler.pop();
         profiler.endTick();
     }
 
     @Override
     public void close()
     {
-        this.textureAtlas.clear();
+        this.textureAtlas.clearTextureData();
     }
 
     /**

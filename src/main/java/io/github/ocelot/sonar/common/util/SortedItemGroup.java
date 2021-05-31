@@ -1,39 +1,38 @@
 package io.github.ocelot.sonar.common.util;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.LazyValue;
-import net.minecraft.util.NonNullList;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import net.minecraft.core.NonNullList;
+import net.minecraft.util.LazyLoadedValue;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * <p>Automatically indexes and sorts an item group by.</p>
  *
  * @since 5.1.0
  */
-public abstract class SortedItemGroup extends ItemGroup
+public abstract class SortedItemGroup extends CreativeModeTab
 {
     private final List<Supplier<? extends Item>> orderedItems;
-    private final LazyValue<Map<Item, Integer>> indexedItems;
+    private final LazyLoadedValue<Map<Item, Integer>> indexedItems;
 
     public SortedItemGroup(String label)
     {
         super(label);
         this.orderedItems = new ArrayList<>();
-        this.indexedItems = new LazyValue<>(this::indexItems);
+        this.indexedItems = new LazyLoadedValue<>(this::indexItems);
     }
 
     public SortedItemGroup(int index, String label)
     {
         super(index, label);
         this.orderedItems = new ArrayList<>();
-        this.indexedItems = new LazyValue<>(this::indexItems);
+        this.indexedItems = new LazyLoadedValue<>(this::indexItems);
     }
 
     private Map<Item, Integer> indexItems()
@@ -46,19 +45,19 @@ public abstract class SortedItemGroup extends ItemGroup
 
     private int getIndex(Item item)
     {
-        Map<Item, Integer> indexes = this.indexedItems.getValue();
+        Map<Item, Integer> indexes = this.indexedItems.get();
         return indexes.containsKey(item) ? indexes.get(item) : indexes.size();
     }
 
     @Override
-    public void fill(NonNullList<ItemStack> items)
+    public void fillItemList(NonNullList<ItemStack> items)
     {
-        super.fill(items);
+        super.fillItemList(items);
         items.sort((stack1, stack2) ->
         {
             int index1 = this.getIndex(stack1.getItem());
             int index2 = this.getIndex(stack2.getItem());
-            if (this.indexedItems.getValue().containsKey(stack1.getItem()) || this.indexedItems.getValue().containsKey(stack2.getItem()))
+            if (this.indexedItems.get().containsKey(stack1.getItem()) || this.indexedItems.get().containsKey(stack2.getItem()))
                 return Integer.compare(index1, index2); // Index by specified position
 
             if (stack1.getItem().getRegistryName() == null || stack2.getItem().getRegistryName() == null)

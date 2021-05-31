@@ -1,16 +1,15 @@
 package io.github.ocelot.sonar.common.util;
 
-import net.minecraft.block.Block;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * <p>Contains simple, useful methods for creating a {@link VoxelShape} with provided {@link Direction}.</p>
@@ -69,17 +68,17 @@ public final class VoxelShapeHelper
         switch (direction)
         {
             case UP:
-                return Block.makeCuboidShape(x1, z1, y1, x2, z2, y2);
+                return Block.box(x1, z1, y1, x2, z2, y2);
             case DOWN:
-                return Block.makeCuboidShape(x1, 16 - z1, y1, x2, 16 - z2, y2);
+                return Block.box(x1, 16 - z1, y1, x2, 16 - z2, y2);
             case NORTH:
-                return Block.makeCuboidShape(16 - x1, y1, 16 - z2, 16 - x2, y2, 16 - z1);
+                return Block.box(16 - x1, y1, 16 - z2, 16 - x2, y2, 16 - z1);
             case EAST:
-                return Block.makeCuboidShape(z1, y1, 16 - x1, z2, y2, 16 - x2);
+                return Block.box(z1, y1, 16 - x1, z2, y2, 16 - x2);
             case SOUTH:
-                return Block.makeCuboidShape(x1, y1, z1, x2, y2, z2);
+                return Block.box(x1, y1, z1, x2, y2, z2);
             case WEST:
-                return Block.makeCuboidShape(16 - z2, y1, x1, 16 - z1, y2, x2);
+                return Block.box(16 - z2, y1, x1, 16 - z1, y2, x2);
             default:
                 throw new IllegalStateException("Unexpected value: " + direction);
         }
@@ -106,22 +105,22 @@ public final class VoxelShapeHelper
             this.shapes = new HashSet<>(other.shapes);
         }
 
-        private Builder transformRaw(Function<AxisAlignedBB, VoxelShape> transformer)
+        private Builder transformRaw(Function<AABB, VoxelShape> transformer)
         {
             Builder newBuilder = new Builder();
             for (VoxelShape shape : this.shapes)
             {
                 Set<VoxelShape> rotatedShapes = new HashSet<>();
-                for (AxisAlignedBB box : shape.toBoundingBoxList())
+                for (AABB box : shape.toAabbs())
                 {
                     rotatedShapes.add(transformer.apply(box));
                 }
-                VoxelShape result = VoxelShapes.empty();
+                VoxelShape result = Shapes.empty();
                 for (VoxelShape rotatedShape : rotatedShapes)
                 {
-                    result = VoxelShapes.combine(result, rotatedShape, IBooleanFunction.OR);
+                    result = Shapes.joinUnoptimized(result, rotatedShape, BooleanOp.OR);
                 }
-                newBuilder.append(result.simplify());
+                newBuilder.append(result.optimize());
             }
             return newBuilder;
         }
@@ -160,7 +159,7 @@ public final class VoxelShapeHelper
          */
         public Builder translate(double x, double y, double z)
         {
-            return transformRaw(box -> Block.makeCuboidShape(box.minX * 16.0 + x, box.minY * 16.0 + y, box.minZ * 16.0 + z, box.maxX * 16.0 + x, box.maxY * 16.0 + y, box.maxZ * 16.0 + z));
+            return transformRaw(box -> Block.box(box.minX * 16.0 + x, box.minY * 16.0 + y, box.minZ * 16.0 + z, box.maxX * 16.0 + x, box.maxY * 16.0 + y, box.maxZ * 16.0 + z));
         }
 
         /**
@@ -195,15 +194,15 @@ public final class VoxelShapeHelper
          */
         public Builder scale(double x, double y, double z)
         {
-            return transformRaw(box -> Block.makeCuboidShape(box.minX * 16.0 * x, box.minY * 16.0 * y, box.minZ * 16.0 * z, box.maxX * 16.0 * x, box.maxY * 16.0 * y, box.maxZ * 16.0 * z));
+            return transformRaw(box -> Block.box(box.minX * 16.0 * x, box.minY * 16.0 * y, box.minZ * 16.0 * z, box.maxX * 16.0 * x, box.maxY * 16.0 * y, box.maxZ * 16.0 * z));
         }
 
         /**
-         * @return A combined shape using {@link IBooleanFunction#OR}
+         * @return A combined shape using {@link BooleanOp#OR}
          */
         public VoxelShape build()
         {
-            return this.build(IBooleanFunction.OR);
+            return this.build(BooleanOp.OR);
         }
 
         /**
@@ -212,16 +211,16 @@ public final class VoxelShapeHelper
          * @param combineFunction The function to use when combining the shapes together
          * @return A combined shape using the provided function
          */
-        public VoxelShape build(IBooleanFunction combineFunction)
+        public VoxelShape build(BooleanOp combineFunction)
         {
             if (this.shapes.isEmpty())
-                return VoxelShapes.empty();
-            VoxelShape result = VoxelShapes.empty();
+                return Shapes.empty();
+            VoxelShape result = Shapes.empty();
             for (VoxelShape shape : this.shapes)
             {
-                result = VoxelShapes.combine(result, shape, combineFunction);
+                result = Shapes.joinUnoptimized(result, shape, combineFunction);
             }
-            return result.simplify();
+            return result.optimize();
         }
     }
 }

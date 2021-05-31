@@ -1,11 +1,11 @@
 package io.github.ocelot.sonar.common.valuecontainer;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
@@ -31,7 +31,7 @@ public interface ValueContainer
      * @param pos     The pos this container is in
      * @param entries The list to add entries to
      */
-    void getEntries(World world, BlockPos pos, List<ValueContainerEntry<?>> entries);
+    void getEntries(Level world, BlockPos pos, List<ValueContainerEntry<?>> entries);
 
     /**
      * Reads the data from the provided entries.
@@ -40,7 +40,7 @@ public interface ValueContainer
      * @param pos     The pos this container is in
      * @param entries The entries to read from
      */
-    void readEntries(World world, BlockPos pos, Map<String, ValueContainerEntry<?>> entries);
+    void readEntries(Level world, BlockPos pos, Map<String, ValueContainerEntry<?>> entries);
 
     /**
      * Writes data into a new tag.
@@ -50,7 +50,7 @@ public interface ValueContainer
      * @return A tag of data to send or null to not send any
      */
     @Nullable
-    default CompoundNBT writeClientValueContainer(World world, BlockPos pos)
+    default CompoundTag writeClientValueContainer(Level world, BlockPos pos)
     {
         return null;
     }
@@ -63,7 +63,7 @@ public interface ValueContainer
      * @param nbt   The server data tag
      */
     @OnlyIn(Dist.CLIENT)
-    default void readClientValueContainer(World world, BlockPos pos, CompoundNBT nbt)
+    default void readClientValueContainer(Level world, BlockPos pos, CompoundTag nbt)
     {
     }
 
@@ -72,9 +72,9 @@ public interface ValueContainer
      *
      * @param world The world this container is in
      * @param pos   The pos this container is in
-     * @return A list full of the entries from {@link #getEntries(World, BlockPos, List)}
+     * @return A list full of the entries from {@link #getEntries(Level, BlockPos, List)}
      */
-    default List<ValueContainerEntry<?>> getEntries(World world, BlockPos pos)
+    default List<ValueContainerEntry<?>> getEntries(Level world, BlockPos pos)
     {
         List<ValueContainerEntry<?>> entries = new ArrayList<>();
         this.getEntries(world, pos, entries);
@@ -89,7 +89,7 @@ public interface ValueContainer
      * @return An optional containing the title for this container
      */
     @OnlyIn(Dist.CLIENT)
-    Optional<ITextComponent> getTitle(World world, BlockPos pos);
+    Optional<Component> getTitle(Level world, BlockPos pos);
 
     /**
      * Serializes the container entry data.
@@ -97,22 +97,22 @@ public interface ValueContainer
      * @param entries The entries to serialize
      * @return The tag full of data
      */
-    static CompoundNBT serialize(List<ValueContainerEntry<?>> entries)
+    static CompoundTag serialize(List<ValueContainerEntry<?>> entries)
     {
-        CompoundNBT nbt = new CompoundNBT();
+        CompoundTag nbt = new CompoundTag();
 
-        ListNBT entriesNbt = new ListNBT();
+        ListTag entriesNbt = new ListTag();
         entries.forEach(valueContainerEntry ->
         {
             if (!valueContainerEntry.isDirty())
                 return;
             try
             {
-                CompoundNBT valueContainerEntryNbt = new CompoundNBT();
+                CompoundTag valueContainerEntryNbt = new CompoundTag();
 
                 valueContainerEntryNbt.putString("name", valueContainerEntry.getName());
 
-                CompoundNBT entryDataNbt = new CompoundNBT();
+                CompoundTag entryDataNbt = new CompoundTag();
                 valueContainerEntry.write(entryDataNbt);
                 valueContainerEntryNbt.put("data", entryDataNbt);
 
@@ -134,17 +134,17 @@ public interface ValueContainer
      * @param container The container to deserialize
      * @param nbt       The tag full of data
      */
-    static void deserialize(World world, BlockPos pos, ValueContainer container, CompoundNBT nbt)
+    static void deserialize(Level world, BlockPos pos, ValueContainer container, CompoundTag nbt)
     {
         Map<String, ValueContainerEntry<?>> entries = new HashMap<>();
         container.getEntries(world, pos).forEach(valueContainerEntry -> entries.put(valueContainerEntry.getName(), valueContainerEntry));
 
         Map<String, ValueContainerEntry<?>> deserializedEntries = new HashMap<>();
 
-        ListNBT entriesNbt = nbt.getList("entries", Constants.NBT.TAG_COMPOUND);
+        ListTag entriesNbt = nbt.getList("entries", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < entriesNbt.size(); i++)
         {
-            CompoundNBT valueContainerEntryNbt = entriesNbt.getCompound(i);
+            CompoundTag valueContainerEntryNbt = entriesNbt.getCompound(i);
             String name = valueContainerEntryNbt.getString("name");
             try
             {
@@ -171,10 +171,10 @@ public interface ValueContainer
      * @param pos   The position of the container
      * @return An optional containing the value container at that position
      */
-    static Optional<ValueContainer> get(IBlockReader world, BlockPos pos)
+    static Optional<ValueContainer> get(BlockGetter world, BlockPos pos)
     {
-        if (world.getTileEntity(pos) instanceof ValueContainer)
-            return Optional.ofNullable((ValueContainer) world.getTileEntity(pos));
+        if (world.getBlockEntity(pos) instanceof ValueContainer)
+            return Optional.ofNullable((ValueContainer) world.getBlockEntity(pos));
         if (world.getBlockState(pos).getBlock() instanceof ValueContainer)
             return Optional.of((ValueContainer) world.getBlockState(pos).getBlock());
         return Optional.empty();

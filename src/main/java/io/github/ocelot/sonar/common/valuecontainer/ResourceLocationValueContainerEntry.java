@@ -1,8 +1,8 @@
 package io.github.ocelot.sonar.common.valuecontainer;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
@@ -17,13 +17,13 @@ import java.util.function.Predicate;
  */
 public class ResourceLocationValueContainerEntry implements ValueContainerEntry<ResourceLocation>
 {
-    private final ITextComponent displayName;
+    private final Component displayName;
     private final String name;
     private final ResourceLocation previousValue;
     private ResourceLocation value;
     private Predicate<String> validator;
 
-    public ResourceLocationValueContainerEntry(ITextComponent displayName, String name, ResourceLocation value)
+    public ResourceLocationValueContainerEntry(Component displayName, String name, ResourceLocation value)
     {
         this.displayName = displayName;
         this.name = name;
@@ -39,7 +39,7 @@ public class ResourceLocationValueContainerEntry implements ValueContainerEntry<
     }
 
     @Override
-    public ITextComponent getDisplayName()
+    public Component getDisplayName()
     {
         return displayName;
     }
@@ -77,13 +77,13 @@ public class ResourceLocationValueContainerEntry implements ValueContainerEntry<
     }
 
     @Override
-    public void write(CompoundNBT nbt)
+    public void write(CompoundTag nbt)
     {
         nbt.putString(this.getName(), this.value.toString());
     }
 
     @Override
-    public void read(CompoundNBT nbt)
+    public void read(CompoundTag nbt)
     {
         this.value = nbt.contains(this.getName(), Constants.NBT.TAG_STRING) ? new ResourceLocation(nbt.getString(this.getName())) : this.previousValue;
     }
@@ -118,6 +118,6 @@ public class ResourceLocationValueContainerEntry implements ValueContainerEntry<
      */
     public static Predicate<String> createDefaultValidator()
     {
-        return value -> ResourceLocation.tryCreate(value) != null;
+        return value -> ResourceLocation.tryParse(value) != null;
     }
 }

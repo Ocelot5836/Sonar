@@ -1,10 +1,10 @@
 package io.github.ocelot.sonar.client.framebuffer;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.renderer.texture.Texture;
-import net.minecraft.client.renderer.texture.TextureUtil;
-import net.minecraft.resources.IResourceManager;
+import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.Validate;
@@ -20,7 +20,7 @@ import static org.lwjgl.opengl.GL30.glFramebufferTexture2D;
  * @since 2.4.0
  */
 @OnlyIn(Dist.CLIENT)
-public class AdvancedFboAttachmentDepthTexture2D extends Texture implements AdvancedFboTextureAttachment
+public class AdvancedFboAttachmentDepthTexture2D extends AbstractTexture implements AdvancedFboTextureAttachment
 {
     private final int width;
     private final int height;
@@ -41,13 +41,13 @@ public class AdvancedFboAttachmentDepthTexture2D extends Texture implements Adva
             RenderSystem.recordRenderCall(() ->
             {
                 this.setBlurMipmap(false, this.mipmapLevels > 1);
-                TextureUtil.prepareImage(this.getGlTextureId(), this.mipmapLevels, this.width, this.height);
+                TextureUtil.prepareImage(this.getId(), this.mipmapLevels, this.width, this.height);
             });
         }
         else
         {
             this.setBlurMipmap(false, this.mipmapLevels > 1);
-            TextureUtil.prepareImage(this.getGlTextureId(), this.mipmapLevels, this.width, this.height);
+            TextureUtil.prepareImage(this.getId(), this.mipmapLevels, this.width, this.height);
         }
     }
 
@@ -58,11 +58,11 @@ public class AdvancedFboAttachmentDepthTexture2D extends Texture implements Adva
 
         if (!RenderSystem.isOnRenderThreadOrInit())
         {
-            RenderSystem.recordRenderCall(() -> glFramebufferTexture2D(target, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this.getGlTextureId(), level));
+            RenderSystem.recordRenderCall(() -> glFramebufferTexture2D(target, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this.getId(), level));
         }
         else
         {
-            glFramebufferTexture2D(target, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this.getGlTextureId(), level);
+            glFramebufferTexture2D(target, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this.getId(), level);
         }
     }
 
@@ -81,7 +81,7 @@ public class AdvancedFboAttachmentDepthTexture2D extends Texture implements Adva
     @Override
     public void bindAttachment()
     {
-        this.bindTexture();
+        this.bind();
     }
 
     @Override
@@ -89,11 +89,11 @@ public class AdvancedFboAttachmentDepthTexture2D extends Texture implements Adva
     {
         if (!RenderSystem.isOnRenderThreadOrInit())
         {
-            RenderSystem.recordRenderCall(() -> GlStateManager.bindTexture(0));
+            RenderSystem.recordRenderCall(() -> GlStateManager._bindTexture(0));
         }
         else
         {
-            GlStateManager.bindTexture(0);
+            GlStateManager._bindTexture(0);
         }
     }
 
@@ -124,11 +124,11 @@ public class AdvancedFboAttachmentDepthTexture2D extends Texture implements Adva
     @Override
     public void free()
     {
-        this.deleteGlTexture();
+        this.releaseId();
     }
 
     @Override
-    public void loadTexture(IResourceManager manager)
+    public void load(ResourceManager manager)
     {
         this.create();
     }

@@ -3,8 +3,8 @@ package io.github.ocelot.sonar.client.screen;
 import io.github.ocelot.sonar.common.valuecontainer.SwitchEntry;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainerEntry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.button.AbstractButton;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -27,7 +27,7 @@ public class ValueContainerEntrySwitchImpl extends AbstractButton
             throw new IllegalStateException("Entry '" + entry + "' needs to implement ToggleEntry in order to use the SWITCH type");
         this.switchEntry = (SwitchEntry) entry;
         this.entry = entry;
-        this.setMessage(new StringTextComponent(this.entry.getDisplay()));
+        this.setMessage(new TextComponent(this.entry.getDisplay()));
     }
 
     private void onPress(int mouseButton)
@@ -36,7 +36,7 @@ public class ValueContainerEntrySwitchImpl extends AbstractButton
             this.switchEntry.showNext();
         if (mouseButton == 1)
             this.switchEntry.showPrevious();
-        this.setMessage(new StringTextComponent(this.entry.getDisplay()));
+        this.setMessage(new TextComponent(this.entry.getDisplay()));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class ValueContainerEntrySwitchImpl extends AbstractButton
         {
             if (this.clicked(mouseX, mouseY))
             {
-                this.playDownSound(Minecraft.getInstance().getSoundHandler());
+                this.playDownSound(Minecraft.getInstance().getSoundManager());
                 this.onPress(mouseButton);
                 return true;
             }

@@ -4,28 +4,27 @@ import io.github.ocelot.sonar.common.block.BaseBlock;
 import io.github.ocelot.sonar.common.util.Scheduler;
 import io.github.ocelot.sonar.common.util.VoxelShapeHelper;
 import io.github.ocelot.sonar.tileentity.TestTileEntity;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.IWaterLoggable;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-
 import javax.annotation.Nullable;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import java.util.concurrent.TimeUnit;
 
-public class TestBlock extends BaseBlock implements IWaterLoggable
+public class TestBlock extends BaseBlock implements SimpleWaterloggedBlock
 {
-    private static final VoxelShape SHAPE = new VoxelShapeHelper.Builder().append(Block.makeCuboidShape(4, 0, 4, 12, 8, 12), Block.makeCuboidShape(5, 8, 5, 11, 16, 11)).rotate(Direction.NORTH).build();
+    private static final VoxelShape SHAPE = new VoxelShapeHelper.Builder().append(Block.box(4, 0, 4, 12, 8, 12), Block.box(5, 8, 5, 11, 16, 11)).rotate(Direction.NORTH).build();
 
     public TestBlock(Block.Properties properties)
     {
@@ -33,15 +32,15 @@ public class TestBlock extends BaseBlock implements IWaterLoggable
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit)
+    public InteractionResult onBlockActivated(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
     {
         Scheduler.get(world).schedule(() -> System.out.println("Hello 2 seconds after right click on " + (world.isRemote() ? "Client" : "Server")), 2, TimeUnit.SECONDS);
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Deprecated
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context)
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
     {
         return SHAPE;
     }
@@ -54,13 +53,13 @@ public class TestBlock extends BaseBlock implements IWaterLoggable
 
     @Nullable
     @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world)
+    public BlockEntity createTileEntity(BlockState state, BlockGetter world)
     {
         return new TestTileEntity();
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
+    protected void fillStateContainer(StateDefinition.Builder<Block, BlockState> builder)
     {
         builder.add(WATERLOGGED);
     }

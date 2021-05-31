@@ -1,9 +1,9 @@
 package io.github.ocelot.sonar.common.valuecontainer;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fml.network.NetworkEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,25 +26,25 @@ public interface IValueContainerServerHandler
      */
     default void handleSyncValueContainerMessage(SyncValueContainerMessage msg, NetworkEvent.Context ctx)
     {
-        ServerPlayerEntity player = ctx.getSender();
+        ServerPlayer player = ctx.getSender();
 
         ctx.enqueueWork(() ->
         {
             if (player == null)
                 return;
-            World world = player.world;
+            Level world = player.level;
             BlockPos pos = msg.getPos();
 
-            TileEntity te = world.getTileEntity(pos);
+            BlockEntity te = world.getBlockEntity(pos);
             if (!(te instanceof ValueContainer) && !(world.getBlockState(pos).getBlock() instanceof ValueContainer))
             {
                 LOGGER.error("Tile Entity or Block at '" + pos + "' was expected to be a ValueContainer, but it was " + te + "!");
                 return;
             }
 
-            if (!player.canUseCommandBlock())
+            if (!player.canUseGameMasterBlocks())
             {
-                LOGGER.error("Player with id " + player.getUniqueID() + " does not have the permission to modify value containers!");
+                LOGGER.error("Player with id " + player.getUUID() + " does not have the permission to modify value containers!");
                 return;
             }
 

@@ -1,11 +1,10 @@
 package io.github.ocelot.sonar.common.util;
 
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * <p>Quick moves items from one slot to another in an easier way than manually checking for slot indices.</p>
@@ -45,13 +44,13 @@ public class QuickMoveHelper
      * @param slot The slot to move from
      * @return The remaining items after the move
      */
-    public ItemStack performAction(Container menu, int slot)
+    public ItemStack performAction(AbstractContainerMenu menu, int slot)
     {
         ItemStack lv = ItemStack.EMPTY;
         Slot lv2 = menu.getSlot(slot);
-        if (lv2 != null && lv2.getHasStack())
+        if (lv2 != null && lv2.hasItem())
         {
-            ItemStack lv3 = lv2.getStack();
+            ItemStack lv3 = lv2.getItem();
             lv = lv3.copy();
 
             for (Action action : this.actions)
@@ -64,11 +63,11 @@ public class QuickMoveHelper
 
             if (lv3.isEmpty())
             {
-                lv2.putStack(ItemStack.EMPTY);
+                lv2.set(ItemStack.EMPTY);
             }
             else
             {
-                lv2.onSlotChanged();
+                lv2.setChanged();
             }
 
             if (lv3.getCount() == lv.getCount())
@@ -105,9 +104,9 @@ public class QuickMoveHelper
     }
 
     /**
-     * Custom implementation of {@link Container#mergeItemStack(ItemStack, int, int, boolean)} that respects slot restrictions.
+     * Custom implementation of {@link AbstractContainerMenu#moveItemStackTo(ItemStack, int, int, boolean)} that respects slot restrictions.
      */
-    private static boolean mergeItemStack(Container menu, ItemStack stack, int startIndex, int endIndex, boolean reverse)
+    private static boolean mergeItemStack(AbstractContainerMenu menu, ItemStack stack, int startIndex, int endIndex, boolean reverse)
     {
         boolean flag = false;
         int i = startIndex;
@@ -133,23 +132,23 @@ public class QuickMoveHelper
                 }
 
                 Slot slot = menu.getSlot(i);
-                ItemStack itemstack = slot.getStack();
-                if (slot.isItemValid(stack) && !itemstack.isEmpty() && Container.areItemsAndTagsEqual(stack, itemstack))
+                ItemStack itemstack = slot.getItem();
+                if (slot.mayPlace(stack) && !itemstack.isEmpty() && AbstractContainerMenu.consideredTheSameItem(stack, itemstack))
                 {
                     int j = itemstack.getCount() + stack.getCount();
-                    int maxSize = Math.min(slot.getItemStackLimit(stack), stack.getMaxStackSize());
+                    int maxSize = Math.min(slot.getMaxStackSize(stack), stack.getMaxStackSize());
                     if (j <= maxSize)
                     {
                         stack.setCount(0);
                         itemstack.setCount(j);
-                        slot.onSlotChanged();
+                        slot.setChanged();
                         flag = true;
                     }
                     else if (itemstack.getCount() < maxSize)
                     {
                         stack.shrink(maxSize - itemstack.getCount());
                         itemstack.setCount(maxSize);
-                        slot.onSlotChanged();
+                        slot.setChanged();
                         flag = true;
                     }
                 }
@@ -191,19 +190,19 @@ public class QuickMoveHelper
                 }
 
                 Slot slot1 = menu.getSlot(i);
-                ItemStack itemstack1 = slot1.getStack();
-                if (itemstack1.isEmpty() && slot1.isItemValid(stack))
+                ItemStack itemstack1 = slot1.getItem();
+                if (itemstack1.isEmpty() && slot1.mayPlace(stack))
                 {
-                    if (stack.getCount() > slot1.getItemStackLimit(stack))
+                    if (stack.getCount() > slot1.getMaxStackSize(stack))
                     {
-                        slot1.putStack(stack.split(slot1.getItemStackLimit(stack)));
+                        slot1.set(stack.split(slot1.getMaxStackSize(stack)));
                     }
                     else
                     {
-                        slot1.putStack(stack.split(stack.getCount()));
+                        slot1.set(stack.split(stack.getCount()));
                     }
 
-                    slot1.onSlotChanged();
+                    slot1.setChanged();
                     flag = true;
                     break;
                 }

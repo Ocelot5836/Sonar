@@ -1,10 +1,9 @@
 package io.github.ocelot.sonar.common.valuecontainer;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
-
 import java.util.Optional;
 import java.util.function.Predicate;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 
 /**
  * <p>Handles the serialization and deserialization of {@link ValueContainer} entries to/from the screen.</p>
@@ -23,7 +22,7 @@ public interface ValueContainerEntry<T>
     /**
      * @return The display name of this entry.
      */
-    ITextComponent getDisplayName();
+    Component getDisplayName();
 
     /**
      * @return The type of input that will be used to handle user input
@@ -60,14 +59,14 @@ public interface ValueContainerEntry<T>
      *
      * @param nbt The tag to put data into
      */
-    void write(CompoundNBT nbt);
+    void write(CompoundTag nbt);
 
     /**
      * Reads this entry value from NBT.
      *
      * @param nbt The tag containing data
      */
-    void read(CompoundNBT nbt);
+    void read(CompoundTag nbt);
 
     /**
      * Parses this type of data from the provided data.

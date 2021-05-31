@@ -3,12 +3,12 @@ package io.github.ocelot.sonar.client.util;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.DefaultPlayerSkin;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tileentity.SkullTileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 /**
- * <p>Loads and caches game profiles from {@link SkullTileEntity}.</p>
+ * <p>Loads and caches game profiles from {@link SkullBlockEntity}.</p>
  *
  * @author Ocelot
  * @since 3.1.0
@@ -29,7 +29,7 @@ public class SkinHelper
     private static final Map<GameProfile, GameProfile> PROFILE_CACHE = new WeakHashMap<>();
 
     /**
-     * Caches the results of {@link SkullTileEntity#updateGameProfile(GameProfile)}. Use {@link SkinHelper#updateGameProfileAsync(GameProfile)} to fill the profile without blocking the current thread.
+     * Caches the results of {@link SkullBlockEntity#updateGameprofile(GameProfile)}. Use {@link SkinHelper#updateGameProfileAsync(GameProfile)} to fill the profile without blocking the current thread.
      *
      * @param input The input game profile
      * @return The filled game profile with properties
@@ -39,11 +39,11 @@ public class SkinHelper
     {
         if (input == null)
             return null;
-        return PROFILE_CACHE.computeIfAbsent(input, SkullTileEntity::updateGameProfile);
+        return PROFILE_CACHE.computeIfAbsent(input, SkullBlockEntity::updateGameprofile);
     }
 
     /**
-     * Caches the results of {@link SkullTileEntity#updateGameProfile(GameProfile)}.
+     * Caches the results of {@link SkullBlockEntity#updateGameprofile(GameProfile)}.
      *
      * @param input The input game profile
      * @return The filled game profile with properties
@@ -69,18 +69,18 @@ public class SkinHelper
         {
             if (input == null)
             {
-                consumer.accept(DefaultPlayerSkin.getDefaultSkinLegacy());
+                consumer.accept(DefaultPlayerSkin.getDefaultSkin());
                 return;
             }
-            Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = Minecraft.getInstance().getSkinManager().loadSkinFromCache(input);
+            Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = Minecraft.getInstance().getSkinManager().getInsecureSkinInformation(input);
             if (map.containsKey(type))
             {
-                RenderSystem.recordRenderCall(() -> consumer.accept(Minecraft.getInstance().getSkinManager().loadSkin(map.get(type), type)));
+                RenderSystem.recordRenderCall(() -> consumer.accept(Minecraft.getInstance().getSkinManager().registerTexture(map.get(type), type)));
             }
             else
             {
-                consumer.accept(DefaultPlayerSkin.getDefaultSkin(PlayerEntity.getUUID(input)));
+                consumer.accept(DefaultPlayerSkin.getDefaultSkin(Player.createPlayerUUID(input)));
             }
-        }, Util.getServerExecutor());
+        }, Util.backgroundExecutor());
     }
 }

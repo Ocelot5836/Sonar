@@ -4,7 +4,7 @@ import io.github.ocelot.sonar.Sonar;
 import io.github.ocelot.sonar.common.network.SonarNetworkManager;
 import io.github.ocelot.sonar.common.valuecontainer.OpenValueContainerMessage;
 import io.github.ocelot.sonar.common.valuecontainer.SyncValueContainerMessage;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
