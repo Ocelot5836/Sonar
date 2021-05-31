@@ -19,9 +19,11 @@ loom {
 
     runs {
         client {
+            source sourceSets.test
             runDir "run/client"
         }
         server {
+            source sourceSets.test
             runDir "run/server"
         }
     }
