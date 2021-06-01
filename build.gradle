@@ -78,17 +78,10 @@ jar {
         rename { "${it}_${project.archivesBaseName}" }
     }
 
-    // add some additional metadata to the jar manifest
     manifest {
-        attributes([
-                "Specification-Title"     : "Sonar",
-                "Specification-Vendor"    : "Ocelot",
-                "Specification-Version"   : "1",
-                "Implementation-Title"    : project.name,
-                "Implementation-Version"  : version,
-                "Implementation-Vendor"   : "Ocelot",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
+        attributes(
+                'FMLModType': 'LIBRARY'
+        )
     }
 }
 
@@ -106,7 +99,7 @@ publishing {
         }
     }
     repositories {
-        if(project.hasProperty("jacksonMavenUser") && project.hasProperty("jacksonMavenPass")) {
+        if (project.hasProperty("jacksonMavenUser") && project.hasProperty("jacksonMavenPass")) {
             maven {
                 url "https://maven.jaackson.me"
                 credentials {
