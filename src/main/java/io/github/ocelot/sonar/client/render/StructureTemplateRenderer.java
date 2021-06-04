@@ -1,10 +1,7 @@
 package io.github.ocelot.sonar.client.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexBuffer;
+import com.mojang.blaze3d.vertex.*;
 import io.github.ocelot.sonar.common.util.OnlineRequest;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import net.minecraft.CrashReport;
@@ -343,10 +340,13 @@ public class StructureTemplateRenderer implements NativeResource
                             bufferbuilder.begin(7, DefaultVertexFormat.BLOCK);
                         }
 
-                        if (blockrendererdispatcher.renderLiquid(blockpos2, this, bufferbuilder, fluidstate))
+                        matrixstack.pushPose();
+                        matrixstack.translate((int) (blockpos2.getX() / 16.0), (int) (blockpos2.getY() / 16.0), (int) (blockpos2.getZ() / 16.0));
+                        if (blockrendererdispatcher.renderLiquid(blockpos2, this, new SheetedDecalTextureGenerator(bufferbuilder, matrixstack.last().pose(), matrixstack.last().normal()), fluidstate))
                         {
                             compiledChunkIn.layersUsed.add(rendertype);
                         }
+                        matrixstack.popPose();
                     }
 
                     if (blockstate.getRenderShape() != RenderShape.INVISIBLE && ItemBlockRenderTypes.canRenderInLayer(blockstate, rendertype))
