@@ -131,14 +131,12 @@ public class StructureTemplateRenderer implements NativeResource
     @Override
     public void free()
     {
-        if (!this.level.isDone())
-            this.level.cancel(false);
-
-        LoadedWorld level = this.level.join();
-        if (level == null)
-            return;
-
-        level.vertexBuffers.values().forEach(VertexBuffer::close);
+        this.level.thenAcceptAsync(level ->
+        {
+            if (level == null)
+                return;
+            level.vertexBuffers.values().forEach(VertexBuffer::close);
+        }, Util.backgroundExecutor());
     }
 
     /**
@@ -219,7 +217,7 @@ public class StructureTemplateRenderer implements NativeResource
                 this.lightManager.runUpdates(Integer.MAX_VALUE, true, true);
 
                 return positions;
-            }, Util.ioPool()).thenAcceptAsync(positions ->
+            }, Util.backgroundExecutor()).thenAcceptAsync(positions ->
             {
                 CompiledChunk compiledChunk = new CompiledChunk();
                 this.compile(compiledChunk, positions);
@@ -419,7 +417,7 @@ public class StructureTemplateRenderer implements NativeResource
 
     private static CompletableFuture<LoadedWorld> loadLevel(CompletableFuture<StructureTemplate> templateFuture, BiFunction<BlockPos, ColorResolver, Integer> colorResolver)
     {
-        return templateFuture.thenApply(template -> new LoadedWorld(template, colorResolver)).thenCompose(level -> level.completeFuture.thenApply(__ -> level)).exceptionally(e ->
+        return templateFuture.thenApplyAsync(template -> new LoadedWorld(template, colorResolver), Util.backgroundExecutor()).thenComposeAsync(level -> level.completeFuture.thenApplyAsync(__ -> level, Util.backgroundExecutor()), Util.backgroundExecutor()).exceptionally(e ->
         {
             LOGGER.error("Failed to load level template data", e);
             return null;
