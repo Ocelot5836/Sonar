@@ -432,7 +432,7 @@ public class StructureTemplateRenderer implements NativeResource
         @Override
         public VertexConsumer uv2(int u, int v)
         {
-            this.delegate.overlayCoords(u, v);
+            this.delegate.uv2(u, v);
             return this;
         }
 
