@@ -7,20 +7,20 @@ import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import com.mojang.math.Vector4f;
 import io.github.ocelot.sonar.common.util.OnlineRequest;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import net.minecraft.CrashReport;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockTintCache;
+import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.client.renderer.ChunkBufferBuilderPack;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.SectionPos;
-import net.minecraft.core.Vec3i;
+import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtUtils;
@@ -168,6 +168,7 @@ public class StructureTemplateRenderer implements NativeResource
     {
         private final BiFunction<BlockPos, ColorResolver, Integer> colorResolver;
         private final LevelLightEngine lightManager;
+        private final Object2ObjectArrayMap<ColorResolver, BlockTintCache> tintCaches = new Object2ObjectArrayMap<>(3);
         private final Vec3i size;
         private final Map<Long, BlockState> blocks;
         private final Map<BlockPos, BlockEntity> tileEntities;
@@ -246,15 +247,15 @@ public class StructureTemplateRenderer implements NativeResource
         }
 
         @Override
-        public float getShade(Direction p_230487_1_, boolean p_230487_2_)
+        public float getShade(Direction direction, boolean shade)
         {
-            if (!p_230487_2_)
+            if (!shade)
             {
                 return 1.0F;
             }
             else
             {
-                switch (p_230487_1_)
+                switch (direction)
                 {
                     case DOWN:
                         return 0.5F;
@@ -277,9 +278,37 @@ public class StructureTemplateRenderer implements NativeResource
         }
 
         @Override
-        public int getBlockTint(BlockPos blockPos, ColorResolver colorResolver)
+        public int getBlockTint(BlockPos pos, ColorResolver colorResolver)
         {
-            return this.colorResolver.apply(blockPos, colorResolver);
+            return this.tintCaches.computeIfAbsent(colorResolver, key -> new BlockTintCache()).getColor(pos, () -> this.calculateBlockTint(pos, colorResolver));
+        }
+
+        private int calculateBlockTint(BlockPos pos, ColorResolver colorResolver)
+        {
+            int i = Minecraft.getInstance().options.biomeBlendRadius;
+            if (i == 0)
+            {
+                return this.colorResolver.apply(pos, colorResolver);
+            }
+            else
+            {
+                int j = (i * 2 + 1) * (i * 2 + 1);
+                int k = 0;
+                int l = 0;
+                int i1 = 0;
+                Cursor3D cubecoordinateiterator = new Cursor3D(pos.getX() - i, pos.getY(), pos.getZ() - i, pos.getX() + i, pos.getY(), pos.getZ() + i);
+
+                int j1;
+                for (BlockPos.MutableBlockPos blockpos$mutable = new BlockPos.MutableBlockPos(); cubecoordinateiterator.advance(); i1 += j1 & 255)
+                {
+                    blockpos$mutable.set(cubecoordinateiterator.nextX(), cubecoordinateiterator.nextY(), cubecoordinateiterator.nextZ());
+                    j1 = this.colorResolver.apply(blockpos$mutable, colorResolver);
+                    k += (j1 & 16711680) >> 16;
+                    l += (j1 & '\uff00') >> 8;
+                }
+
+                return (k / j & 255) << 16 | (l / j & 255) << 8 | i1 / j & 255;
+            }
         }
 
         @Nullable
