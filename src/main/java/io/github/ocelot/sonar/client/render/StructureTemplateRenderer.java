@@ -2,6 +2,10 @@ package io.github.ocelot.sonar.client.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
+import com.mojang.math.Vector4f;
 import io.github.ocelot.sonar.common.util.OnlineRequest;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import net.minecraft.CrashReport;
@@ -341,8 +345,8 @@ public class StructureTemplateRenderer implements NativeResource
                         }
 
                         matrixstack.pushPose();
-                        matrixstack.translate((int) (blockpos2.getX() / 16.0), (int) (blockpos2.getY() / 16.0), (int) (blockpos2.getZ() / 16.0));
-                        if (blockrendererdispatcher.renderLiquid(blockpos2, this, new SheetedDecalTextureGenerator(bufferbuilder, matrixstack.last().pose(), matrixstack.last().normal()), fluidstate))
+                        matrixstack.translate((int) (blockpos2.getX() / 16.0) * 16.0, (int) (blockpos2.getY() / 16.0) * 16.0, (int) (blockpos2.getZ() / 16.0) * 16.0);
+                        if (blockrendererdispatcher.renderLiquid(blockpos2, this, new LiquidVertexBuffer(bufferbuilder, matrixstack.last().pose(), matrixstack.last().normal()), fluidstate))
                         {
                             compiledChunkIn.layersUsed.add(rendertype);
                         }
@@ -379,6 +383,72 @@ public class StructureTemplateRenderer implements NativeResource
 
             compiledChunkIn.layersStarted.stream().map(builderIn::builder).forEach(BufferBuilder::end);
             ModelBlockRenderer.clearCache();
+        }
+    }
+
+    private static class LiquidVertexBuffer implements VertexConsumer
+    {
+        private final VertexConsumer delegate;
+        private final Matrix4f position;
+        private final Matrix3f normal;
+
+        private LiquidVertexBuffer(VertexConsumer delegate, Matrix4f position, Matrix3f normal)
+        {
+            this.delegate = delegate;
+            this.position = position;
+            this.normal = normal;
+        }
+
+        @Override
+        public VertexConsumer vertex(double x, double y, double z)
+        {
+            Vector4f vector4f = new Vector4f((float) x, (float) y, (float) z, 1.0F);
+            vector4f.transform(this.position);
+            this.delegate.vertex(vector4f.x(), vector4f.y(), vector4f.z());
+            return this;
+        }
+
+        @Override
+        public VertexConsumer color(int red, int green, int blue, int alpha)
+        {
+            this.delegate.color(red, green, blue, alpha);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer uv(float u, float v)
+        {
+            this.delegate.uv(u, v);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer overlayCoords(int u, int v)
+        {
+            this.delegate.overlayCoords(u, v);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer uv2(int u, int v)
+        {
+            this.delegate.overlayCoords(u, v);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer normal(float x, float y, float z)
+        {
+            Vector3f vector3f = new Vector3f(x, y, z);
+            vector3f.transform(this.normal);
+            this.delegate.normal(vector3f.x(), vector3f.y(), vector3f.z());
+            return this;
+        }
+
+        @Override
+        public void endVertex()
+        {
+            this.delegate.endVertex();
         }
     }
 
