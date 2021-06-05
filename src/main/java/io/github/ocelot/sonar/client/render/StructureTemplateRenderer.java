@@ -13,7 +13,6 @@ import net.minecraft.CrashReport;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockTintCache;
-import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.client.renderer.ChunkBufferBuilderPack;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
@@ -49,6 +48,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -65,14 +65,24 @@ public class StructureTemplateRenderer implements NativeResource
 
     private final CompletableFuture<LoadedWorld> level;
 
+    public StructureTemplateRenderer(CompletableFuture<StructureTemplate> template, boolean constantAmbientLight, Function<LightChunkGetter, LevelLightEngine> lightManager, BiFunction<BlockPos, ColorResolver, Integer> colorResolver)
+    {
+        this.level = loadLevel(template, constantAmbientLight, lightManager, colorResolver);
+    }
+
     public StructureTemplateRenderer(CompletableFuture<StructureTemplate> template, BiFunction<BlockPos, ColorResolver, Integer> colorResolver)
     {
-        this.level = loadLevel(template, colorResolver);
+        this.level = loadLevel(template, false, level -> new LevelLightEngine(level, true, true), colorResolver);
+    }
+
+    public StructureTemplateRenderer(String templateLocation, boolean constantAmbientLight, Function<LightChunkGetter, LevelLightEngine> lightManager, BiFunction<BlockPos, ColorResolver, Integer> colorResolver)
+    {
+        this(downloadTemplate(templateLocation), constantAmbientLight, lightManager, colorResolver);
     }
 
     public StructureTemplateRenderer(String templateLocation, BiFunction<BlockPos, ColorResolver, Integer> colorResolver)
     {
-        this(downloadTemplate(templateLocation), colorResolver);
+        this(downloadTemplate(templateLocation), false, level -> new LevelLightEngine(level, true, true), colorResolver);
     }
 
     @SuppressWarnings("deprecation")
@@ -167,6 +177,7 @@ public class StructureTemplateRenderer implements NativeResource
     private static class LoadedWorld implements BlockAndTintGetter, LightChunkGetter
     {
         private final BiFunction<BlockPos, ColorResolver, Integer> colorResolver;
+        private final boolean constantAmbientLight;
         private final LevelLightEngine lightManager;
         private final Object2ObjectArrayMap<ColorResolver, BlockTintCache> tintCaches = new Object2ObjectArrayMap<>(3);
         private final Vec3i size;
@@ -175,10 +186,11 @@ public class StructureTemplateRenderer implements NativeResource
         private final Map<RenderType, VertexBuffer> vertexBuffers = RenderType.chunkBufferLayers().stream().collect(Collectors.toMap(it -> it, __ -> new VertexBuffer(DefaultVertexFormat.BLOCK)));
         private final CompletableFuture<?> completeFuture;
 
-        private LoadedWorld(StructureTemplate template, BiFunction<BlockPos, ColorResolver, Integer> colorResolver)
+        private LoadedWorld(StructureTemplate template, boolean constantAmbientLight, Function<LightChunkGetter, LevelLightEngine> lightManager, BiFunction<BlockPos, ColorResolver, Integer> colorResolver)
         {
             this.colorResolver = colorResolver;
-            this.lightManager = new LevelLightEngine(this, true, true);
+            this.constantAmbientLight = constantAmbientLight;
+            this.lightManager = lightManager.apply(this);
             this.size = template.getSize();
             this.blocks = new HashMap<>();
             this.tileEntities = new HashMap<>();
@@ -250,25 +262,21 @@ public class StructureTemplateRenderer implements NativeResource
         public float getShade(Direction direction, boolean shade)
         {
             if (!shade)
+                return this.constantAmbientLight ? 0.9f : 1.0f;
+            switch (direction)
             {
-                return 1.0F;
+                case DOWN:
+                    return this.constantAmbientLight ? 0.9f : 0.5f;
+                case UP:
+                    return this.constantAmbientLight ? 0.9f : 1.0f;
+                case NORTH:
+                case SOUTH:
+                    return 0.8f;
+                case WEST:
+                case EAST:
+                    return 0.6f;
             }
-            else
-            {
-                switch (direction)
-                {
-                    case DOWN:
-                        return 0.5F;
-                    case NORTH:
-                    case SOUTH:
-                        return 0.8F;
-                    case WEST:
-                    case EAST:
-                        return 0.6F;
-                    default:
-                        return 1.0F;
-                }
-            }
+            return 1.0f;
         }
 
         @Override
@@ -514,9 +522,9 @@ public class StructureTemplateRenderer implements NativeResource
         });
     }
 
-    private static CompletableFuture<LoadedWorld> loadLevel(CompletableFuture<StructureTemplate> templateFuture, BiFunction<BlockPos, ColorResolver, Integer> colorResolver)
+    private static CompletableFuture<LoadedWorld> loadLevel(CompletableFuture<StructureTemplate> templateFuture, boolean constantAmbientLight, Function<LightChunkGetter, LevelLightEngine> lightManager, BiFunction<BlockPos, ColorResolver, Integer> colorResolver)
     {
-        return templateFuture.thenApplyAsync(template -> new LoadedWorld(template, colorResolver), Util.backgroundExecutor()).thenComposeAsync(level -> level.completeFuture.thenApplyAsync(__ -> level, Util.backgroundExecutor()), Util.backgroundExecutor()).exceptionally(e ->
+        return templateFuture.thenApplyAsync(template -> new LoadedWorld(template, constantAmbientLight, lightManager, colorResolver), Util.backgroundExecutor()).thenComposeAsync(level -> level.completeFuture.thenApplyAsync(__ -> level, Util.backgroundExecutor()), Util.backgroundExecutor()).exceptionally(e ->
         {
             LOGGER.error("Failed to load level template data", e);
             return null;
