@@ -1,0 +1,20 @@
+{
+	"block.examplemod.test": "Test Block",
+	"block.examplemod.test_state": "Test State Block",
+
+	"item.examplemod.test_value_container_editor": "Test Value Container Editor",
+	"item.examplemod.test_crash": "Test Crasher",
+	"item.examplemod.test_entity_a_spawn_egg": "Test Entity A Spawn Egg",
+	"item.examplemod.test_entity_b_spawn_egg": "Test Entity B Spawn Egg",
+	"item.examplemod.test_entity_c_spawn_egg": "Test Entity C Spawn Egg",
+	"item.examplemod.zee_spawn_egg": "Z E E Spawn Egg",
+
+	"key.examplemod.dump_resourcepacks": "Dump Resourcepacks",
+
+	"examplemod.resource_pack_dump.already_saving": "Already dumping resource packs",
+	"examplemod.resource_pack_dump.none": "No ZIP resource packs are currently loaded",
+	"examplemod.resource_pack_dump.saving": "Saving %s resource pack(s)",
+	"examplemod.resource_pack_dump.complete": "Completed resource pack dump in %s",
+
+	"itemGroup.examplemod": "Test Mod"
+}
