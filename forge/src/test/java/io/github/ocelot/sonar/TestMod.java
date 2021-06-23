@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -53,7 +54,7 @@ public class TestMod
     public TestMod()
     {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-        Sonar.init(MOD_ID, SonarModule.values());
+        Sonar.init(SonarModContext.get(ModLoadingContext.get()), SonarModule.values());
         BLOCKS.register(modBus);
         TILE_ENTITIES.register(modBus);
         ITEMS.register(modBus);

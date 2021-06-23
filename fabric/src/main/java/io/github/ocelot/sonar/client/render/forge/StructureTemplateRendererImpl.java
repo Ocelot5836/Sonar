@@ -52,7 +52,7 @@ public class StructureTemplateRendererImpl
         }
     }
 
-    private static void renderBlocks(PoseStack matrixstack, BlockAndTintGetter level, Set<BlockPos> positions, StructureTemplateRenderer.CompiledChunk compiledChunkIn, ChunkBufferBuilderPack builderIn, Random random)
+    public static void renderBlocks(PoseStack matrixstack, BlockAndTintGetter level, Set<BlockPos> positions, StructureTemplateRenderer.CompiledChunk compiledChunkIn, ChunkBufferBuilderPack builderIn, Random random)
     {
         throw new UnsupportedOperationException("TODO fix");
 //        BlockRenderDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRenderer();

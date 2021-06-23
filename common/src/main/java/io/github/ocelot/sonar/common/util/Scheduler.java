@@ -40,7 +40,7 @@ public class Scheduler implements ScheduledExecutorService
 
     private Scheduler(boolean client)
     {
-        this.serverExecutor = Sonar.getSidedExecutor(client);
+        this.serverExecutor = Sonar.context().getSidedExecutor(client);
         this.service = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, (client ? "Client" : "Server") + " Scheduler"));
         if (!client)
         {

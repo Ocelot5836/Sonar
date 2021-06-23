@@ -23,7 +23,7 @@ public class FabricSonarNetworkContext implements SonarNetworkContext
     @Override
     public CompletableFuture<Void> enqueueWork(Runnable runnable)
     {
-        return Sonar.getSidedExecutor(this.getDirection().isClientbound()).submit(runnable);
+        return Sonar.context().getSidedExecutor(this.getDirection().isClientbound()).submit(runnable);
     }
 
     @Override

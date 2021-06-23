@@ -1,10 +1,8 @@
 package io.github.ocelot.sonar;
 
 import me.shedaniel.architectury.annotations.ExpectPlatform;
-import net.minecraft.util.thread.BlockableEventLoop;
 
 import java.util.Arrays;
-import java.util.concurrent.Executor;
 
 /**
  * <p>Contains static information about Sonar.</p>
@@ -18,7 +16,7 @@ public final class Sonar
      * The domain (modid) used for resource locations.
      */
     public static final String DOMAIN = "sonar";
-    private static String parentModId;
+    private static SonarModContext context;
     private static SonarModule[] modules;
 
     private Sonar()
@@ -26,25 +24,25 @@ public final class Sonar
     }
 
     @ExpectPlatform
-    private static void initClient(Runnable clientInit)
+    private static void initClient(SonarModContext context, Runnable clientInit)
     {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    private static void initCommon(Runnable commonInit)
+    private static void initCommon(SonarModContext context, Runnable commonInit)
     {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    private static void setupClient(Runnable clientSetup)
+    private static void setupClient(SonarModContext context, Runnable clientSetup)
     {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    private static void setupCommon(Runnable commonSetup)
+    private static void setupCommon(SonarModContext context, Runnable commonSetup)
     {
         throw new AssertionError();
     }
@@ -54,20 +52,22 @@ public final class Sonar
      *
      * @param modules The modules to load. Duplicate modules are ignored
      */
-    public static void init(String modId, SonarModule... modules)
+    public static void init(SonarModContext context, SonarModule... modules)
     {
-        Sonar.parentModId = modId;
+        Sonar.context = context;
         Sonar.modules = Arrays.stream(modules).distinct().toArray(SonarModule[]::new);
-        initCommon(() -> Arrays.stream(Sonar.modules).filter(SonarModule::isCommonOnly).forEach(SonarModule::init));
-        initClient(() -> Arrays.stream(Sonar.modules).filter(SonarModule::isClientOnly).forEach(SonarModule::init));
-        setupCommon(() -> Arrays.stream(modules).filter(SonarModule::isCommonOnly).forEach(SonarModule::setup));
-        setupClient(() -> Arrays.stream(modules).filter(SonarModule::isClientOnly).forEach(SonarModule::setup));
+        initCommon(context, () -> Arrays.stream(Sonar.modules).filter(SonarModule::isCommonOnly).forEach(SonarModule::init));
+        initClient(context, () -> Arrays.stream(Sonar.modules).filter(SonarModule::isClientOnly).forEach(SonarModule::init));
+        setupCommon(context, () -> Arrays.stream(modules).filter(SonarModule::isCommonOnly).forEach(SonarModule::setup));
+        setupClient(context, () -> Arrays.stream(modules).filter(SonarModule::isClientOnly).forEach(SonarModule::setup));
     }
 
-    @ExpectPlatform
-    public static BlockableEventLoop<?> getSidedExecutor(boolean client)
+    /**
+     * @return The context of the mod hosting Sonar
+     */
+    public static SonarModContext context()
     {
-        throw new AssertionError();
+        return context;
     }
 
     /**
@@ -79,14 +79,6 @@ public final class Sonar
     public static boolean isModuleLoaded(SonarModule module)
     {
         return Arrays.stream(modules).anyMatch(m -> m == module);
-    }
-
-    /**
-     * @return The id of the mod hosting Sonar
-     */
-    public static String getParentModId()
-    {
-        return parentModId;
     }
 
     /**

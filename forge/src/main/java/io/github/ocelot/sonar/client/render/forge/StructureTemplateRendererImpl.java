@@ -39,7 +39,7 @@ public class StructureTemplateRendererImpl
         return blocks;
     }
 
-    private static void renderBlocks(PoseStack matrixstack, BlockAndTintGetter level, Set<BlockPos> positions, StructureTemplateRenderer.CompiledChunk compiledChunkIn, ChunkBufferBuilderPack builderIn, Random random)
+    public static void renderBlocks(PoseStack matrixstack, BlockAndTintGetter level, Set<BlockPos> positions, StructureTemplateRenderer.CompiledChunk compiledChunkIn, ChunkBufferBuilderPack builderIn, Random random)
     {
         BlockRenderDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRenderer();
         for (BlockPos blockpos2 : positions)

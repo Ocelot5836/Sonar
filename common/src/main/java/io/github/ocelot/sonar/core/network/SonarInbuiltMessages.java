@@ -5,7 +5,6 @@ import io.github.ocelot.sonar.common.network.SonarNetworkChannel;
 import io.github.ocelot.sonar.common.network.message.SonarPacketDirection;
 import io.github.ocelot.sonar.common.valuecontainer.OpenValueContainerMessage;
 import io.github.ocelot.sonar.common.valuecontainer.SyncValueContainerMessage;
-import me.shedaniel.architectury.annotations.ExpectPlatform;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -16,7 +15,7 @@ import org.jetbrains.annotations.ApiStatus;
 @ApiStatus.Internal
 public class SonarInbuiltMessages
 {
-    public static SonarNetworkChannel PLAY = SonarNetworkChannel.create(new ResourceLocation(Sonar.getParentModId(), Sonar.DOMAIN + "_play"), "1", () -> SonarInbuiltMessageClientHandler::new, () -> SonarInbuiltMessageServerHandler::new);
+    public static SonarNetworkChannel PLAY = SonarNetworkChannel.create(new ResourceLocation(Sonar.context().getParentModId(), Sonar.DOMAIN + "_play"), "1", () -> SonarInbuiltMessageClientHandler::new, () -> SonarInbuiltMessageServerHandler::new);
 
     public static void register()
     {
