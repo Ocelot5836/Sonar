@@ -1,17 +1,13 @@
 package io.github.ocelot.sonar.client.util;
 
+import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.Validate;
 import org.lwjgl.opengl.GL11C;
 
 import java.util.EmptyStackException;
 import java.util.Stack;
-
-import static org.lwjgl.opengl.GL11C.*;
-
-import com.mojang.blaze3d.platform.Window;
 
 /**
  * <p>Handles scissoring parts of the screen based on GUI coordinates instead of raw screen coordinates.</p>
@@ -20,11 +16,9 @@ import com.mojang.blaze3d.platform.Window;
  * @see GL11C <a target="_blank" href="http://docs.gl/gl4/glScissor">OpenGL Scissor Test Reference Page</a>
  * @since 2.0.0
  */
-@OnlyIn(Dist.CLIENT)
 public final class ScissorHelper
 {
     private static final Stack<Entry> stack = new Stack<>();
-    private static boolean scissor = glGetBoolean(GL_SCISSOR_TEST);
 
     /**
      * Specifies the height of the entire non-scaled FBO. This should only be used if rendering into a custom frame buffer and reset back to 0 when rendering with the minecraft frame buffer.
@@ -47,30 +41,11 @@ public final class ScissorHelper
             Window window = Minecraft.getInstance().getWindow();
             double scale = framebufferScale == 0 ? window.getGuiScale() : framebufferScale;
             int frameHeight = framebufferHeight == 0 ? window.getHeight() : framebufferHeight;
-            enableScissorInternal();
-            glScissor((int) (entry.getX() * scale), (int) (frameHeight - (entry.getY() + entry.getHeight()) * scale), (int) Math.max(0, entry.getWidth() * scale), (int) Math.max(0, entry.getHeight() * scale));
+            RenderSystem.enableScissor((int) (entry.getX() * scale), (int) (frameHeight - (entry.getY() + entry.getHeight()) * scale), (int) Math.max(0, entry.getWidth() * scale), (int) Math.max(0, entry.getHeight() * scale));
         }
         else
         {
-            disableScissorInternal();
-        }
-    }
-
-    private static void enableScissorInternal()
-    {
-        if (!scissor)
-        {
-            glEnable(GL_SCISSOR_TEST);
-            scissor = true;
-        }
-    }
-
-    private static void disableScissorInternal()
-    {
-        if (scissor)
-        {
-            glDisable(GL_SCISSOR_TEST);
-            scissor = false;
+            RenderSystem.disableScissor();
         }
     }
 
@@ -128,7 +103,7 @@ public final class ScissorHelper
      */
     public static void clear()
     {
-        disableScissorInternal();
+        RenderSystem.disableScissor();
         stack.clear();
     }
 

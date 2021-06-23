@@ -1,12 +1,8 @@
 package io.github.ocelot.sonar.common.util;
 
 import io.github.ocelot.sonar.Sonar;
+import me.shedaniel.architectury.annotations.ExpectPlatform;
 import net.minecraft.world.level.LevelReader;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.LogicalSidedProvider;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 
 import java.util.Collection;
 import java.util.List;
@@ -39,34 +35,39 @@ public class Scheduler implements ScheduledExecutorService
         }));
     }
 
-    private final boolean client;
     private final Executor serverExecutor;
     private final ScheduledExecutorService service;
 
     private Scheduler(boolean client)
     {
-        this.client = client;
         this.serverExecutor = Sonar.getSidedExecutor(client);
         this.service = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, (client ? "Client" : "Server") + " Scheduler"));
         if (!client)
-            MinecraftForge.EVENT_BUS.register(this);
+        {
+            registerServerStoppedHook(this, () ->
+            {
+                this.shutdownInternal();
+                SIDED_SCHEDULERS[1] = null;
+            });
+        }
     }
 
-    private static void registerHook(Runnable onServerStopped){
+    @ExpectPlatform
+    private static void registerServerStoppedHook(Scheduler scheduler, Runnable onServerStopped)
+    {
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
+    private static void unregisterServerStoppedHook(Scheduler scheduler)
+    {
         throw new AssertionError();
     }
 
     private void shutdownInternal()
     {
         this.service.shutdown();
-        MinecraftForge.EVENT_BUS.unregister(this);
-    }
-
-    @SubscribeEvent
-    public void onServerStopped(FMLServerStoppingEvent event)
-    {
-        this.shutdownInternal();
-        SIDED_SCHEDULERS[1] = null;
+        unregisterServerStoppedHook(this);
     }
 
     @Override
@@ -185,11 +186,14 @@ public class Scheduler implements ScheduledExecutorService
     /**
      * Retrieves the scheduler for the specified side.
      *
-     * @param side The side to get the scheduler for
+     * @param client Whether or not to get the client side scheduler
      * @return The scheduler for that side
      */
     public static ScheduledExecutorService get(boolean client)
     {
-        return SIDED_SCHEDULERS.computeIfAbsent(side, Scheduler::new);
+        int index = client ? 0 : 1;
+        if (SIDED_SCHEDULERS[index] == null)
+            SIDED_SCHEDULERS[index] = new Scheduler(client);
+        return SIDED_SCHEDULERS[index];
     }
 }

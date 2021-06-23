@@ -16,8 +16,6 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface SonarNetworkContext
 {
-    void reply(SonarMessage<?> message);
-
     /**
      * Defers work if not on the main thread.
      *

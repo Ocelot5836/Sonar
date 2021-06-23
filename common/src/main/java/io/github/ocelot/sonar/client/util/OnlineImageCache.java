@@ -7,22 +7,18 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.ocelot.sonar.Sonar;
 import io.github.ocelot.sonar.common.util.OnlineRequest;
+import me.shedaniel.architectury.annotations.ExpectPlatform;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -43,7 +39,6 @@ import java.util.concurrent.TimeUnit;
  * @author Ocelot
  * @since 3.1.0
  */
-@OnlyIn(Dist.CLIENT)
 public class OnlineImageCache implements TextureCache
 {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -99,7 +94,25 @@ public class OnlineImageCache implements TextureCache
             this.cacheFileData = new JsonObject();
         }
 
-        MinecraftForge.EVENT_BUS.register(this);
+        registerClientTick(() ->
+        {
+            this.locationCache.entrySet().removeIf(entry -> Minecraft.getInstance().getTextureManager().getTexture(entry.getValue()) == null);
+            this.locationCache.forEach((hash, location) ->
+            {
+                if (this.hasTextureExpired(hash))
+                {
+                    Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().release(location));
+                }
+            });
+            this.errored.removeIf(this::hasTextureExpired);
+            this.requested.values().removeIf(CompletableFuture::isDone);
+        });
+    }
+
+    @ExpectPlatform
+    private static void registerClientTick(Runnable task)
+    {
+        throw new AssertionError();
     }
 
     private boolean hasTextureExpired(String hash)
@@ -286,20 +299,5 @@ public class OnlineImageCache implements TextureCache
         }, command -> RenderSystem.recordRenderCall(command::run));
         this.requested.put(hash, future);
         return future;
-    }
-
-    @SubscribeEvent
-    public void onEvent(TickEvent.ClientTickEvent event)
-    {
-        this.locationCache.entrySet().removeIf(entry -> Minecraft.getInstance().getTextureManager().getTexture(entry.getValue()) == null);
-        this.locationCache.forEach((hash, location) ->
-        {
-            if (this.hasTextureExpired(hash))
-            {
-                Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().release(location));
-            }
-        });
-        this.errored.removeIf(this::hasTextureExpired);
-        this.requested.values().removeIf(CompletableFuture::isDone);
     }
 }

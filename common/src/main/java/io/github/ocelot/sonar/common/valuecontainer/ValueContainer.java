@@ -89,7 +89,7 @@ public interface ValueContainer
      * @return An optional containing the title for this container
      */
     @Environment(EnvType.CLIENT)
-    Optional<Component> getTitle(Level world, BlockPos pos);
+    Optional<Component> getValueContainerTitle(Level world, BlockPos pos);
 
     /**
      * Serializes the container entry data.

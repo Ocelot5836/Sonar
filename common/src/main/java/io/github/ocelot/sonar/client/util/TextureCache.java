@@ -8,13 +8,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -23,7 +20,6 @@ import java.util.concurrent.CompletableFuture;
  * @author Ocelot
  * @since 6.1.0
  */
-@OnlyIn(Dist.CLIENT)
 public interface TextureCache
 {
     /**
@@ -49,19 +45,6 @@ public interface TextureCache
             return MissingTextureAtlasSprite.getLocation();
         }, task -> RenderSystem.recordRenderCall(task::run));
     };
-
-    /**
-     * Fetches an image from the specified url and caches the result as long as this cache specifies.
-     *
-     * @param url The url to get the image from
-     * @return The location of the texture downloaded or <code>null</code> if it is currently being processed
-     * @deprecated Use {@link #requestTexture(String)} instead. TODO remove in 7.0.0
-     */
-    @Nullable
-    default ResourceLocation getTextureLocation(String url)
-    {
-        return this.requestTexture(url).getNow(null);
-    }
 
     /**
      * Fetches an image from the specified url and caches the result as long as this cache specifies.

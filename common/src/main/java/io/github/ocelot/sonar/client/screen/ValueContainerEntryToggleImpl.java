@@ -4,8 +4,6 @@ import io.github.ocelot.sonar.common.valuecontainer.ToggleEntry;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainerEntry;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -16,7 +14,6 @@ import java.util.function.Predicate;
  * @author Ocelot
  * @since 2.2.0
  */
-@OnlyIn(Dist.CLIENT)
 public class ValueContainerEntryToggleImpl extends AbstractButton
 {
     private final ValueContainerEntry<?> entry;
@@ -40,7 +37,7 @@ public class ValueContainerEntryToggleImpl extends AbstractButton
         String value = Boolean.toString(!this.toggled);
         if (optional.isPresent() && !optional.get().test(value))
             return;
-        
+
         this.setToggled(!this.toggled);
         this.entry.parse(value);
     }

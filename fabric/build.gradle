@@ -2,6 +2,8 @@ plugins {
     id "com.github.johnrengelman.shadow" version "5.0.0"
 }
 
+version = "${project.minecraft_version}-${project.mod_version}-fabric"
+
 configurations {
     shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
 }
@@ -62,13 +64,14 @@ sourcesJar {
 publishing {
     publications {
         mavenFabric(MavenPublication) {
-            artifactId = "sonar-" + project.name
+            artifactId = "Sonar"
             // add all the jars that should be included when publishing to maven
             artifact(remapJar) {
                 classifier null
             }
             artifact(sourcesJar) {
                 builtBy remapSourcesJar
+                classifier "sources"
             }
         }
     }

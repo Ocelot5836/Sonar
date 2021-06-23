@@ -1,12 +1,11 @@
 package io.github.ocelot.sonar.common.block;
 
+import me.shedaniel.architectury.annotations.ExpectPlatform;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
-import net.minecraft.world.Container;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -21,13 +20,8 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 /**
@@ -101,8 +95,8 @@ public class BaseBlock extends Block
         return state.hasProperty(WATERLOGGED) && state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
-    @OnlyIn(Dist.CLIENT)
-    public Optional<Component> getTitle(Level world, BlockPos pos)
+    @Environment(EnvType.CLIENT)
+    public Optional<Component> getValueContainerTitle(Level world, BlockPos pos)
     {
         return Optional.of(this.getName());
     }
@@ -113,30 +107,9 @@ public class BaseBlock extends Block
      * @param te The tile entity to get the override for
      * @return The redstone level output for that tile entity
      */
+    @ExpectPlatform
     public static int getComparatorInputOverride(@Nullable BlockEntity te)
     {
-        if (te == null)
-            return 0;
-
-        LazyOptional<IItemHandler> itemCapability = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
-        if (itemCapability.isPresent())
-        {
-            IItemHandler inventory = itemCapability.orElseThrow(() -> new NullPointerException("Inventory Capability was null when present!"));
-            boolean empty = true;
-            float fillPercentage = 0.0F;
-
-            for (int j = 0; j < inventory.getSlots(); ++j)
-            {
-                ItemStack itemstack = inventory.getStackInSlot(j);
-                if (!itemstack.isEmpty())
-                {
-                    fillPercentage += (float) itemstack.getCount() / (float) Math.min(inventory.getSlotLimit(j), itemstack.getMaxStackSize());
-                    empty = false;
-                }
-            }
-
-            return Mth.floor((fillPercentage / (float) inventory.getSlots()) * 14.0F) + (!empty ? 1 : 0);
-        }
-        return te instanceof Container ? AbstractContainerMenu.getRedstoneSignalFromContainer((Container) te) : 0;
+        throw new AssertionError();
     }
 }

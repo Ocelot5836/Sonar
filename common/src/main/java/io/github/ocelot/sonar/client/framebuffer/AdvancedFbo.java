@@ -5,12 +5,10 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.NativeResource;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -23,7 +21,6 @@ import static org.lwjgl.opengl.GL30.*;
  * @author Ocelot
  * @since 2.4.0
  */
-@OnlyIn(Dist.CLIENT)
 public class AdvancedFbo implements NativeResource
 {
     private int id;

@@ -19,10 +19,8 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -38,7 +36,6 @@ import java.util.function.Supplier;
  * @see ValueContainerEditorScreen
  * @since 2.2.0
  */
-@OnlyIn(Dist.CLIENT)
 public abstract class ValueContainerEditorScreenImpl extends ValueContainerEditorScreen
 {
     public static final ResourceLocation BACKGROUND_LOCATION = new ResourceLocation(Sonar.DOMAIN, "textures/gui/value_container_editor.png");
@@ -90,16 +87,16 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
             if (y - scroll >= 160)
                 break;
             ValueContainerEntry<?> entry = this.getEntries().get(i);
-            this.getMinecraft().font.drawShadow(matrixStack, entry.getDisplayName().getString(), 8, 18 + y, -1);
+            this.minecraft.font.drawShadow(matrixStack, entry.getDisplayName().getString(), 8, 18 + y, -1);
         }
     }
 
     @Override
     protected void init()
     {
-        this.getMinecraft().keyboardHandler.setSendRepeatsToGui(true);
+        this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
 
-        this.addButton(new Button((this.width - this.xSize) / 2, (this.height + this.ySize) / 2 + 4, this.xSize, 20, new TranslatableComponent("gui.done"), button -> this.getMinecraft().setScreen(null)));
+        this.addButton(new Button((this.width - this.xSize) / 2, (this.height + this.ySize) / 2 + 4, this.xSize, 20, new TranslatableComponent("gui.done"), button -> this.minecraft.setScreen(null)));
 
         for (int i = 0; i < this.getEntries().size(); i++)
         {
@@ -109,7 +106,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
                 case TEXT_FIELD:
                 {
                     Optional<Predicate<String>> optional = entry.getValidator();
-                    EditBox textField = new EditBox(this.getMinecraft().font, 8, 22 + this.getMinecraft().font.lineHeight + i * VALUE_HEIGHT, 144, 20, new TextComponent(""));
+                    EditBox textField = new EditBox(this.minecraft.font, 8, 22 + this.minecraft.font.lineHeight + i * VALUE_HEIGHT, 144, 20, new TextComponent(""));
                     textField.setMaxLength(Integer.MAX_VALUE);
                     textField.setValue(entry.getDisplay());
                     textField.setResponder(text ->
@@ -124,17 +121,17 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
                 }
                 case TOGGLE:
                 {
-                    this.entryWidgets.add(new ValueContainerEntryToggleImpl(entry, 8, 22 + this.getMinecraft().font.lineHeight + i * VALUE_HEIGHT, 144, 20));
+                    this.entryWidgets.add(new ValueContainerEntryToggleImpl(entry, 8, 22 + this.minecraft.font.lineHeight + i * VALUE_HEIGHT, 144, 20));
                     break;
                 }
                 case SWITCH:
                 {
-                    this.entryWidgets.add(new ValueContainerEntrySwitchImpl(entry, 8, 22 + this.getMinecraft().font.lineHeight + i * VALUE_HEIGHT, 144, 20));
+                    this.entryWidgets.add(new ValueContainerEntrySwitchImpl(entry, 8, 22 + this.minecraft.font.lineHeight + i * VALUE_HEIGHT, 144, 20));
                     break;
                 }
                 case SLIDER:
                 {
-                    this.entryWidgets.add(new ValueContainerEntrySliderImpl(entry, 8, 22 + this.getMinecraft().font.lineHeight + i * VALUE_HEIGHT, 144, 20));
+                    this.entryWidgets.add(new ValueContainerEntrySliderImpl(entry, 8, 22 + this.minecraft.font.lineHeight + i * VALUE_HEIGHT, 144, 20));
                     break;
                 }
             }
@@ -156,7 +153,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
             return;
 
         // Fixes the partial ticks actually being the tick length
-        partialTicks = this.getMinecraft().getFrameTime();
+        partialTicks = this.minecraft.getFrameTime();
 
         super.renderBackground(matrixStack);
         this.renderBackground(matrixStack, mouseX, mouseY, partialTicks);
@@ -200,16 +197,16 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     {
         float screenX = (this.width - this.xSize) / 2f;
         float screenY = (this.height - this.ySize) / 2f;
-        this.getMinecraft().getTextureManager().bind(BACKGROUND_LOCATION);
+        this.minecraft.getTextureManager().bind(BACKGROUND_LOCATION);
         ShapeRenderer.drawRectWithTexture(matrixStack, screenX, screenY, 0, 0, this.xSize, this.ySize);
     }
 
     @Override
     protected void renderForeground(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        this.getMinecraft().font.draw(matrixStack, this.getFormattedTitle(), (this.xSize - this.getMinecraft().font.width(this.getFormattedTitle())) / 2f, 6f, 4210752);
+        this.minecraft.font.draw(matrixStack, this.getFormattedTitle(), (this.xSize - this.minecraft.font.width(this.getFormattedTitle())) / 2f, 6f, 4210752);
 
-        this.getMinecraft().getTextureManager().bind(BACKGROUND_LOCATION);
+        this.minecraft.getTextureManager().bind(BACKGROUND_LOCATION);
         boolean hasScroll = this.scrollHandler.getMaxScroll() > 0;
         float scrollbarY = hasScroll ? 127 * (this.scrollHandler.getInterpolatedScroll(partialTicks) / this.scrollHandler.getMaxScroll()) : 0;
         ShapeRenderer.drawRectWithTexture(matrixStack, 158, 18 + scrollbarY, hasScroll ? 176 : 188, 0, 12, 15);
@@ -227,7 +224,7 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     public void removed()
     {
         super.removed();
-        this.getMinecraft().keyboardHandler.setSendRepeatsToGui(false);
+        this.minecraft.keyboardHandler.setSendRepeatsToGui(false);
     }
 
     @Override

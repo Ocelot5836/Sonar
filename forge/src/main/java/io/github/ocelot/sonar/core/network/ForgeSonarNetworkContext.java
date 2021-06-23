@@ -1,15 +1,16 @@
 package io.github.ocelot.sonar.core.network;
 
-import io.github.ocelot.sonar.common.network.message.SonarMessage;
 import io.github.ocelot.sonar.common.network.message.SonarNetworkContext;
 import io.github.ocelot.sonar.common.network.message.SonarPacketDirection;
 import net.minecraft.network.Connection;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+@ApiStatus.Internal
 public class ForgeSonarNetworkContext implements SonarNetworkContext
 {
     private final Supplier<NetworkEvent.Context> ctx;
@@ -17,12 +18,6 @@ public class ForgeSonarNetworkContext implements SonarNetworkContext
     public ForgeSonarNetworkContext(Supplier<NetworkEvent.Context> ctx)
     {
         this.ctx = ctx;
-    }
-
-    @Override
-    public void reply(SonarMessage<?> message)
-    {
-        // TODO implement
     }
 
     @Override
@@ -54,5 +49,10 @@ public class ForgeSonarNetworkContext implements SonarNetworkContext
     public Connection getNetworkManager()
     {
         return this.ctx.get().getNetworkManager();
+    }
+
+    public NetworkEvent.Context getContext()
+    {
+        return this.ctx.get();
     }
 }

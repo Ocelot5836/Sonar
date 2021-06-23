@@ -4,8 +4,6 @@ import io.github.ocelot.sonar.common.valuecontainer.SliderEntry;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainerEntry;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -19,7 +17,6 @@ import java.util.function.Predicate;
  * @author Ocelot
  * @since 2.2.0
  */
-@OnlyIn(Dist.CLIENT)
 public class ValueContainerEntrySliderImpl extends AbstractSliderButton
 {
     private final DecimalFormat format;

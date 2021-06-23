@@ -7,8 +7,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -23,7 +21,6 @@ import java.util.stream.Stream;
  * @author Ocelot
  * @since 6.1.0
  */
-@OnlyIn(Dist.CLIENT)
 public class SonarSpriteUploader extends SimplePreparableReloadListener<TextureAtlas.Preparations> implements AutoCloseable
 {
     private final TextureAtlas textureAtlas;

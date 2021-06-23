@@ -9,6 +9,7 @@ import com.mojang.math.Vector4f;
 import io.github.ocelot.sonar.common.util.OnlineRequest;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import me.shedaniel.architectury.annotations.ExpectPlatform;
 import net.minecraft.CrashReport;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -16,9 +17,7 @@ import net.minecraft.client.color.block.BlockTintCache;
 import net.minecraft.client.renderer.ChunkBufferBuilderPack;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
@@ -30,21 +29,19 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LightChunkGetter;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraftforge.client.model.data.EmptyModelData;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.NativeResource;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
@@ -129,9 +126,7 @@ public class StructureTemplateRenderer implements NativeResource
         RenderSystem.runAsFancy(() ->
         {
             this.renderBlockLayer(loadedWorld, RenderType.solid(), matrixStack, cameraX, cameraY, cameraZ);
-            minecraft.getModelManager().getAtlas(TextureAtlas.LOCATION_BLOCKS).setBlurMipmap(false, minecraft.options.mipmapLevels > 0); // FORGE: fix flickering leaves when mods mess up the blurMipmap settings
             this.renderBlockLayer(loadedWorld, RenderType.cutoutMipped(), matrixStack, cameraX, cameraY, cameraZ);
-            minecraft.getModelManager().getAtlas(TextureAtlas.LOCATION_BLOCKS).restoreLastBlurMipmap();
             this.renderBlockLayer(loadedWorld, RenderType.cutout(), matrixStack, cameraX, cameraY, cameraZ);
 //            RenderHelper.setupLevelDiffuseLighting(matrixStack.getLast().getMatrix());
             this.renderBlockLayer(loadedWorld, RenderType.translucent(), matrixStack, cameraX, cameraY, cameraZ);
@@ -204,10 +199,7 @@ public class StructureTemplateRenderer implements NativeResource
                     this.blocks.put(info.pos.asLong(), info.state);
                     if (info.nbt != null)
                     {
-                        if (info.state.hasTileEntity())
-                        {
-                            this.tileEntities.put(info.pos, info.state.createTileEntity(this));
-                        }
+                        createBlockEntity(this, this.tileEntities, info);
                     }
                     this.lightManager.checkBlock(info.pos);
                 }
@@ -224,7 +216,7 @@ public class StructureTemplateRenderer implements NativeResource
                 }
                 for (BlockPos pos : positions)
                 {
-                    int light = this.getBlockState(pos).getLightValue(this, pos);
+                    int light = this.getBlockState(pos).getLightBlock(this, pos);
                     if (light > 0)
                         this.lightManager.onBlockEmissionIncrease(pos, light);
                 }
@@ -362,54 +354,10 @@ public class StructureTemplateRenderer implements NativeResource
             PoseStack matrixstack = new PoseStack();
             ModelBlockRenderer.enableCaching();
             Random random = new Random();
-            BlockRenderDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRenderer();
 
             ItemBlockRenderTypes.setFancy(true);
-            for (BlockPos blockpos2 : positions)
-            {
-                BlockState blockstate = this.getBlockState(blockpos2);
-
-                FluidState fluidstate = this.getFluidState(blockpos2);
-                for (RenderType rendertype : RenderType.chunkBufferLayers())
-                {
-                    net.minecraftforge.client.ForgeHooksClient.setRenderLayer(rendertype);
-                    if (!fluidstate.isEmpty() && ItemBlockRenderTypes.canRenderInLayer(fluidstate, rendertype))
-                    {
-                        BufferBuilder bufferbuilder = builderIn.builder(rendertype);
-                        if (compiledChunkIn.layersStarted.add(rendertype))
-                        {
-                            bufferbuilder.begin(7, DefaultVertexFormat.BLOCK);
-                        }
-
-                        matrixstack.pushPose();
-                        matrixstack.translate((int) (blockpos2.getX() / 16.0) * 16.0, (int) (blockpos2.getY() / 16.0) * 16.0, (int) (blockpos2.getZ() / 16.0) * 16.0);
-                        if (blockrendererdispatcher.renderLiquid(blockpos2, this, new LiquidVertexBuffer(bufferbuilder, matrixstack.last().pose(), matrixstack.last().normal()), fluidstate))
-                        {
-                            compiledChunkIn.layersUsed.add(rendertype);
-                        }
-                        matrixstack.popPose();
-                    }
-
-                    if (blockstate.getRenderShape() != RenderShape.INVISIBLE && ItemBlockRenderTypes.canRenderInLayer(blockstate, rendertype))
-                    {
-                        BufferBuilder bufferbuilder2 = builderIn.builder(rendertype);
-                        if (compiledChunkIn.layersStarted.add(rendertype))
-                        {
-                            bufferbuilder2.begin(7, DefaultVertexFormat.BLOCK);
-                        }
-
-                        matrixstack.pushPose();
-                        matrixstack.translate(blockpos2.getX(), blockpos2.getY(), blockpos2.getZ());
-                        if (blockrendererdispatcher.renderModel(blockstate, blockpos2, this, matrixstack, bufferbuilder2, true, random, EmptyModelData.INSTANCE))
-                        {
-                            compiledChunkIn.layersUsed.add(rendertype);
-                        }
-
-                        matrixstack.popPose();
-                    }
-                }
-            }
-            net.minecraftforge.client.ForgeHooksClient.setRenderLayer(null);
+            renderBlocks(matrixstack, this, positions, compiledChunkIn, builderIn, random);
+            ItemBlockRenderTypes.setFancy(Minecraft.useFancyGraphics());
 
             if (compiledChunkIn.layersUsed.contains(RenderType.translucent()))
             {
@@ -423,13 +371,14 @@ public class StructureTemplateRenderer implements NativeResource
         }
     }
 
-    private static class LiquidVertexBuffer implements VertexConsumer
+    @ApiStatus.Internal
+    public static class LiquidVertexBuffer implements VertexConsumer
     {
         private final VertexConsumer delegate;
         private final Matrix4f position;
         private final Matrix3f normal;
 
-        private LiquidVertexBuffer(VertexConsumer delegate, Matrix4f position, Matrix3f normal)
+        public LiquidVertexBuffer(VertexConsumer delegate, Matrix4f position, Matrix3f normal)
         {
             this.delegate = delegate;
             this.position = position;
@@ -489,10 +438,11 @@ public class StructureTemplateRenderer implements NativeResource
         }
     }
 
+    @ApiStatus.Internal
     public static class CompiledChunk
     {
-        private final Set<RenderType> layersUsed = new ObjectArraySet<>();
-        private final Set<RenderType> layersStarted = new ObjectArraySet<>();
+        public final Set<RenderType> layersUsed = new ObjectArraySet<>();
+        public final Set<RenderType> layersStarted = new ObjectArraySet<>();
         @Nullable
         private BufferBuilder.State state;
     }
@@ -531,16 +481,21 @@ public class StructureTemplateRenderer implements NativeResource
         });
     }
 
-    @SuppressWarnings("deprecation")
+    @ExpectPlatform
     private static List<StructureTemplate.StructureBlockInfo> getTemplateBlocks(@Nullable StructureTemplate template)
     {
-        if (template == null)
-            return Collections.emptyList();
-        List<StructureTemplate.Palette> blockInfos = ObfuscationReflectionHelper.getPrivateValue(StructureTemplate.class, template, "field_204769_a");
-        if (blockInfos == null)
-            return Collections.emptyList();
-        List<StructureTemplate.StructureBlockInfo> blocks = blockInfos.get(0).blocks();
-        blocks.removeIf(block -> block.state.isAir());
-        return blocks;
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
+    private static void renderBlocks(PoseStack matrixstack, BlockAndTintGetter level, Set<BlockPos> positions, CompiledChunk compiledChunkIn, ChunkBufferBuilderPack builderIn, Random random)
+    {
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
+    private static void createBlockEntity(BlockGetter level, Map<BlockPos, BlockEntity> tileEntities, StructureTemplate.StructureBlockInfo info)
+    {
+        throw new AssertionError();
     }
 }

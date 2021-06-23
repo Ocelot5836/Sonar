@@ -1,16 +1,10 @@
 package io.github.ocelot.sonar.client.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Mth;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11C;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
@@ -23,7 +17,6 @@ import static org.lwjgl.opengl.GL11C.GL_QUADS;
  * @author Ocelot
  * @since 2.0.0
  */
-@OnlyIn(Dist.CLIENT)
 public final class ShapeRenderer
 {
     private static float zLevel = 0.0F;

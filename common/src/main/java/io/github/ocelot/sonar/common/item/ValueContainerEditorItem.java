@@ -2,9 +2,9 @@ package io.github.ocelot.sonar.common.item;
 
 import io.github.ocelot.sonar.Sonar;
 import io.github.ocelot.sonar.SonarModule;
-import io.github.ocelot.sonar.common.network.inbuilt.SonarInbuiltMessages;
 import io.github.ocelot.sonar.common.valuecontainer.OpenValueContainerMessage;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainer;
+import io.github.ocelot.sonar.core.network.SonarInbuiltMessages;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
@@ -14,7 +14,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.network.PacketDistributor;
 
 import java.util.Optional;
 
@@ -56,8 +55,8 @@ public class ValueContainerEditorItem extends Item
     protected boolean sendPacket(ValueContainer valueContainer, ServerLevel world, BlockPos pos, ServerPlayer player)
     {
         if (!Sonar.isModuleLoaded(SonarModule.INBUILT_NETWORK))
-            throw new IllegalStateException("There is no implementation to send a packet! Enable INBUILT_NETWORK Sonar Module to automatically handle.");
-        SonarInbuiltMessages.PLAY.send(PacketDistributor.PLAYER.with(() -> player), new OpenValueContainerMessage(world, pos));
+            throw new IllegalStateException("There is no implementation to send a packet! Enable " + SonarModule.INBUILT_NETWORK.name() + " Sonar Module to automatically handle.");
+        SonarInbuiltMessages.PLAY.sendTo(player, new OpenValueContainerMessage(world, pos));
         return true;
     }
 

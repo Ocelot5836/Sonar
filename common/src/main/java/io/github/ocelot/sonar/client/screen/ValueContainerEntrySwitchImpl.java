@@ -5,8 +5,6 @@ import io.github.ocelot.sonar.common.valuecontainer.ValueContainerEntry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * <p>A simple implementation of an {@link AbstractButton} that can be used to modify {@link SwitchEntry}.</p>
@@ -14,7 +12,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author Ocelot
  * @since 3.1.0
  */
-@OnlyIn(Dist.CLIENT)
 public class ValueContainerEntrySwitchImpl extends AbstractButton
 {
     private final ValueContainerEntry<?> entry;

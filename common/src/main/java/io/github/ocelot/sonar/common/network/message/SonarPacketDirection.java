@@ -8,5 +8,15 @@ package io.github.ocelot.sonar.common.network.message;
  */
 public enum SonarPacketDirection
 {
-    PLAY_SERVERBOUND, PLAY_CLIENTBOUND, LOGIN_SERVERBOUND, LOGIN_CLIENTBOUND
+    PLAY_SERVERBOUND, PLAY_CLIENTBOUND, LOGIN_SERVERBOUND, LOGIN_CLIENTBOUND;
+
+    public boolean isClientbound()
+    {
+        return this == PLAY_CLIENTBOUND || this == LOGIN_CLIENTBOUND;
+    }
+
+    public boolean isServerbound()
+    {
+        return this == PLAY_SERVERBOUND || this == LOGIN_SERVERBOUND;
+    }
 }

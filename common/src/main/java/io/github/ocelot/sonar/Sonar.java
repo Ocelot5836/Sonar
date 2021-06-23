@@ -1,6 +1,7 @@
 package io.github.ocelot.sonar;
 
 import me.shedaniel.architectury.annotations.ExpectPlatform;
+import net.minecraft.util.thread.BlockableEventLoop;
 
 import java.util.Arrays;
 import java.util.concurrent.Executor;
@@ -22,12 +23,6 @@ public final class Sonar
 
     private Sonar()
     {
-    }
-
-    @ExpectPlatform
-    private static String getActiveNamespace()
-    {
-        throw new AssertionError();
     }
 
     @ExpectPlatform
@@ -59,9 +54,9 @@ public final class Sonar
      *
      * @param modules The modules to load. Duplicate modules are ignored
      */
-    public static void init(SonarModule... modules)
+    public static void init(String modId, SonarModule... modules)
     {
-        Sonar.parentModId = getActiveNamespace();
+        Sonar.parentModId = modId;
         Sonar.modules = Arrays.stream(modules).distinct().toArray(SonarModule[]::new);
         initCommon(() -> Arrays.stream(Sonar.modules).filter(SonarModule::isCommonOnly).forEach(SonarModule::init));
         initClient(() -> Arrays.stream(Sonar.modules).filter(SonarModule::isClientOnly).forEach(SonarModule::init));
@@ -70,7 +65,7 @@ public final class Sonar
     }
 
     @ExpectPlatform
-    public static Executor getSidedExecutor(boolean client)
+    public static BlockableEventLoop<?> getSidedExecutor(boolean client)
     {
         throw new AssertionError();
     }

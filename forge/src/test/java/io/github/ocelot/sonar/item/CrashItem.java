@@ -22,7 +22,7 @@ public class CrashItem extends Item
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
     {
         if (!world.isClientSide())
-            TestMessageHandler.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), new STestPlayMessage());
+            TestMessageHandler.PLAY.sendTo((ServerPlayer) player, new STestPlayMessage());
         return InteractionResultHolder.success(player.getItemInHand(hand));
     }
 }

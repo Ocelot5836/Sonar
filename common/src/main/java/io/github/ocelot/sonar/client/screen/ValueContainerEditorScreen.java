@@ -5,6 +5,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.ocelot.sonar.Sonar;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainer;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainerEntry;
+import me.shedaniel.architectury.annotations.ExpectPlatform;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
@@ -13,8 +15,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.List;
 import java.util.Objects;
@@ -27,7 +27,6 @@ import java.util.function.Supplier;
  * @see ValueContainer
  * @since 2.2.0
  */
-@OnlyIn(Dist.CLIENT)
 public abstract class ValueContainerEditorScreen extends Screen
 {
     private final ValueContainer container;
@@ -43,7 +42,7 @@ public abstract class ValueContainerEditorScreen extends Screen
     @Deprecated
     public ValueContainerEditorScreen(ValueContainer container, BlockPos pos, Supplier<Component> defaultTitle)
     {
-        super(container.getTitle(Objects.requireNonNull(Minecraft.getInstance().level), pos).orElseGet(defaultTitle));
+        super(container.getValueContainerTitle(Objects.requireNonNull(Minecraft.getInstance().level), pos).orElseGet(defaultTitle));
         this.container = container;
         this.pos = pos;
         this.entries = container.getEntries(Minecraft.getInstance().level, pos);
@@ -117,7 +116,7 @@ public abstract class ValueContainerEditorScreen extends Screen
             return;
 
         // Fixes the partial ticks actually being the tick length
-        partialTicks = this.getMinecraft().getFrameTime();
+        partialTicks = this.minecraft.getFrameTime();
 
         super.renderBackground(matrixStack);
         this.renderBackground(matrixStack, mouseX, mouseY, partialTicks);
@@ -149,7 +148,7 @@ public abstract class ValueContainerEditorScreen extends Screen
             return true;
 
         InputConstants.Key mouseKey = InputConstants.getKey(keyCode, scanCode);
-        if (keyCode == 256 || this.minecraft.options.keyInventory.isActiveAndMatches(mouseKey))
+        if (keyCode == 256 || isActiveAndMatches(this.minecraft.options.keyInventory, mouseKey))
         {
             this.minecraft.player.closeContainer();
             return true;
@@ -203,5 +202,11 @@ public abstract class ValueContainerEditorScreen extends Screen
     public String getFormattedTitle()
     {
         return formattedTitle;
+    }
+
+    @ExpectPlatform
+    private static boolean isActiveAndMatches(KeyMapping mapping, InputConstants.Key keyCode)
+    {
+        throw new AssertionError();
     }
 }
