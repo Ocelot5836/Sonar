@@ -1,4 +1,4 @@
-[![Release](https://jitpack.io/v/Ocelot5836/Sonar.svg)](https://github.com/Ocelot5836/Sonar)
+[![Release](https://jitpack.io/v/Ocelot5836/Sonar.svg)](https://jitpack.io/#Ocelot5836/Sonar)
 
 # Sonar
 
