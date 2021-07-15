@@ -1,3 +1,5 @@
+[![Release](https://jitpack.io/v/Ocelot5836/Sonar.svg)](https://github.com/Ocelot5836/Sonar)
+
 # Sonar
 
 General 1.16 Mod utilties in one spot so they can be added to future mods without having to clone code over.
