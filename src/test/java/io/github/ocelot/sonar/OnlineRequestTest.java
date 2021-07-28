@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class Test
+public class OnlineRequestTest
 {
     private static long runPhase(boolean async)
     {
@@ -29,5 +29,6 @@ public class Test
     public static void main(String[] args)
     {
         System.out.println("Took " + runPhase(false) + "ms");
+        System.out.println("Took " + runPhase(true) + "ms async");
     }
 }

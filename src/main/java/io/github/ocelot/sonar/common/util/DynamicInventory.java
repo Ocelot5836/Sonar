@@ -1,13 +1,14 @@
 package io.github.ocelot.sonar.common.util;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import java.util.HashSet;
-import java.util.Set;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerListener;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <p>A dynamic {@link Container} implementation.</p>
@@ -127,6 +128,22 @@ public abstract class DynamicInventory implements Container
             this.setChanged();
 
         return copy;
+    }
+
+    /**
+     * @return Whether every single slot is filled to capacity
+     */
+    public boolean isFull()
+    {
+        for (int i = 0; i < this.getContainerSize(); i++)
+        {
+            ItemStack s = this.getItem(i);
+            if (s.isEmpty() || s.getCount() < s.getMaxStackSize())
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
