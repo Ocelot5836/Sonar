@@ -11,19 +11,25 @@ import static org.lwjgl.opengl.GL30.*;
  * @author Ocelot
  * @since 2.4.0
  */
-public class AdvancedFboAttachmentDepthRenderBuffer implements AdvancedFboAttachment
+public class AdvancedFboRenderAttachment implements AdvancedFboAttachment
 {
+    public static final int MAX_SAMPLES = glGetInteger(GL_MAX_SAMPLES);
+
     private int id;
+    private final int attachmentType;
+    private final int attachmentFormat;
     private final int width;
     private final int height;
     private final int samples;
 
-    public AdvancedFboAttachmentDepthRenderBuffer(int width, int height, int samples)
+    public AdvancedFboRenderAttachment(int attachmentType, int attachmentFormat, int width, int height, int samples)
     {
         this.id = -1;
+        this.attachmentType = attachmentType;
+        this.attachmentFormat = attachmentFormat;
         this.width = width;
         this.height = height;
-        Validate.inclusiveBetween(1, glGetInteger(GL_MAX_SAMPLES), samples);
+        Validate.inclusiveBetween(1, MAX_SAMPLES, samples);
         this.samples = samples;
     }
 
@@ -32,11 +38,11 @@ public class AdvancedFboAttachmentDepthRenderBuffer implements AdvancedFboAttach
         this.bindAttachment();
         if (this.samples == 1)
         {
-            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, this.width, this.height);
+            glRenderbufferStorage(GL_RENDERBUFFER, this.attachmentFormat, this.width, this.height);
         }
         else
         {
-            glRenderbufferStorageMultisample(GL_RENDERBUFFER, this.samples, GL_DEPTH_COMPONENT24, this.width, this.height);
+            glRenderbufferStorageMultisample(GL_RENDERBUFFER, this.samples, this.attachmentFormat, this.width, this.height);
         }
         this.unbindAttachment();
     }
@@ -68,15 +74,15 @@ public class AdvancedFboAttachmentDepthRenderBuffer implements AdvancedFboAttach
     @Override
     public void attach(int target, int attachment)
     {
-        Validate.isTrue(attachment == 0, "Only one depth buffer attachment is supported.");
+        Validate.isTrue(this.attachmentType != GL_DEPTH_ATTACHMENT || attachment == 0, "Only one depth buffer attachment is supported.");
 
         if (!RenderSystem.isOnRenderThreadOrInit())
         {
-            RenderSystem.recordRenderCall(() -> glFramebufferRenderbuffer(target, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, this.getId()));
+            RenderSystem.recordRenderCall(() -> glFramebufferRenderbuffer(target, this.attachmentType, GL_RENDERBUFFER, this.getId()));
         }
         else
         {
-            glFramebufferRenderbuffer(target, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, this.getId());
+            glFramebufferRenderbuffer(target, this.attachmentType, GL_RENDERBUFFER, this.getId());
         }
     }
 
@@ -133,7 +139,7 @@ public class AdvancedFboAttachmentDepthRenderBuffer implements AdvancedFboAttach
     @Override
     public AdvancedFboAttachment createCopy()
     {
-        return new AdvancedFboAttachmentDepthRenderBuffer(this.width, this.height, this.samples);
+        return new AdvancedFboRenderAttachment(this.attachmentType, this.attachmentFormat, this.width, this.height, this.samples);
     }
 
     @Override

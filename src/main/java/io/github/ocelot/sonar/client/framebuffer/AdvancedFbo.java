@@ -9,7 +9,6 @@ import org.apache.commons.lang3.Validate;
 import org.lwjgl.system.NativeResource;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -17,7 +16,7 @@ import java.util.Objects;
 import static org.lwjgl.opengl.GL30.*;
 
 /**
- * <p>A frame buffer that has more capabilities than the vanilla {@link RenderTarget}.</p>
+ * <p>A framebuffer that has more capabilities than the vanilla {@link RenderTarget}.</p>
  *
  * @author Ocelot
  * @since 2.4.0
@@ -29,6 +28,7 @@ public class AdvancedFbo implements NativeResource
     private int height;
     private final AdvancedFboAttachment[] colorAttachments;
     private final AdvancedFboAttachment depthAttachment;
+    private final int clearMask;
 
     private AdvancedFbo(int width, int height, AdvancedFboAttachment[] colorAttachments, @Nullable AdvancedFboAttachment depthAttachment)
     {
@@ -37,6 +37,13 @@ public class AdvancedFbo implements NativeResource
         this.height = height;
         this.colorAttachments = colorAttachments;
         this.depthAttachment = depthAttachment;
+
+        int mask = 0;
+        if (this.hasColorAttachment(0))
+            mask |= GL_COLOR_BUFFER_BIT;
+        if (this.hasDepthAttachment())
+            mask |= GL_DEPTH_BUFFER_BIT;
+        this.clearMask = mask;
     }
 
     /**
@@ -80,12 +87,8 @@ public class AdvancedFbo implements NativeResource
      */
     public void clear()
     {
-        int mask = 0;
-        if (this.hasColorAttachment(0))
-            mask |= GL_COLOR_BUFFER_BIT;
-        if (this.hasDepthAttachment())
-            mask |= GL_DEPTH_BUFFER_BIT;
-        GlStateManager._clear(mask, Minecraft.ON_OSX);
+        if (this.clearMask != 0)
+            GlStateManager._clear(this.clearMask, Minecraft.ON_OSX);
     }
 
     /**
@@ -97,19 +100,19 @@ public class AdvancedFbo implements NativeResource
     {
         if (!RenderSystem.isOnRenderThreadOrInit())
         {
-            RenderSystem.recordRenderCall(() ->
-            {
-                glBindFramebuffer(GL_FRAMEBUFFER, this.id);
-                if (setViewport)
-                    RenderSystem.viewport(0, 0, this.width, this.height);
-            });
+            RenderSystem.recordRenderCall(() -> this._bind(setViewport));
         }
         else
         {
-            glBindFramebuffer(GL_FRAMEBUFFER, this.id);
-            if (setViewport)
-                RenderSystem.viewport(0, 0, this.width, this.height);
+            this._bind(setViewport);
         }
+    }
+
+    private void _bind(boolean setViewport)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, this.id);
+        if (setViewport)
+            RenderSystem.viewport(0, 0, this.width, this.height);
     }
 
     /**
@@ -130,25 +133,25 @@ public class AdvancedFbo implements NativeResource
     /**
      * Binds this framebuffer for draw requests.
      *
-     * @param setViewport Whether or not to set the viewport to fit the bounds of this framebuffer
+     * @param setViewport Whether to set the viewport to fit the bounds of this framebuffer
      */
     public void bindDraw(boolean setViewport)
     {
         if (!RenderSystem.isOnRenderThreadOrInit())
         {
-            RenderSystem.recordRenderCall(() ->
-            {
-                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this.id);
-                if (setViewport)
-                    RenderSystem.viewport(0, 0, this.width, this.height);
-            });
+            RenderSystem.recordRenderCall(() -> this._bindDraw(this.id, setViewport));
         }
         else
         {
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this.id);
-            if (setViewport)
-                RenderSystem.viewport(0, 0, this.width, this.height);
+            this._bindDraw(this.id, setViewport);
         }
+    }
+
+    private void _bindDraw(int id, boolean setViewport)
+    {
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, id);
+        if (setViewport)
+            RenderSystem.viewport(0, 0, this.width, this.height);
     }
 
     /**
@@ -379,7 +382,7 @@ public class AdvancedFbo implements NativeResource
      * Checks to see if the provided attachment has been added to this framebuffer.
      *
      * @param attachment The attachment to check
-     * @return Whether or not there is a valid attachment in the specified slot
+     * @return Whether there is a valid attachment in the specified slot
      */
     public boolean hasColorAttachment(int attachment)
     {
@@ -387,7 +390,7 @@ public class AdvancedFbo implements NativeResource
     }
 
     /**
-     * @return Whether or not there is a depth attachment added to this framebuffer
+     * @return Whether there is a depth attachment added to this framebuffer
      */
     public boolean hasDepthAttachment()
     {
@@ -411,7 +414,7 @@ public class AdvancedFbo implements NativeResource
      * Checks to see if the provided attachment has been added to this framebuffer and is a texture attachment.
      *
      * @param attachment The attachment to check
-     * @return Whether or not there is a valid attachment in the specified slot
+     * @return Whether there is a valid attachment in the specified slot
      */
     public boolean isColorTextureAttachment(int attachment)
     {
@@ -419,17 +422,42 @@ public class AdvancedFbo implements NativeResource
     }
 
     /**
+     * Checks to see if the provided attachment has been added to this framebuffer and is a render attachment.
+     *
+     * @param attachment The attachment to check
+     * @return Whether there is a valid attachment in the specified slot
+     */
+    public boolean isColorRenderAttachment(int attachment)
+    {
+        return this.hasColorAttachment(attachment) && this.getColorAttachment(attachment) instanceof AdvancedFboRenderAttachment;
+    }
+
+    /**
      * Checks the attachments for the specified slot. If the attachment is not known to be an {@link AdvancedFboTextureAttachment}, use {@link #isColorTextureAttachment(int)} before calling this.
      *
      * @param attachment The attachment to get
      * @return The texture attachment in the specified attachment slot
-     * @throws IllegalArgumentException If there is no attachment in the specified attachment slot or it is not an {@link AdvancedFboTextureAttachment}
+     * @throws IllegalArgumentException If there is no attachment in the specified attachment slot, or it is not an {@link AdvancedFboTextureAttachment}
      */
     public AdvancedFboTextureAttachment getColorTextureAttachment(int attachment)
     {
         AdvancedFboAttachment advancedFboAttachment = this.getColorAttachment(attachment);
         Validate.isTrue(this.isColorTextureAttachment(attachment), "Color attachment " + attachment + " must be a texture attachment to modify texture information.");
         return (AdvancedFboTextureAttachment) advancedFboAttachment;
+    }
+
+    /**
+     * Checks the attachments for the specified slot. If the attachment is not known to be an {@link AdvancedFboRenderAttachment}, use {@link #isColorRenderAttachment(int)} before calling this.
+     *
+     * @param attachment The attachment to get
+     * @return The render attachment in the specified attachment slot
+     * @throws IllegalArgumentException If there is no attachment in the specified attachment slot, or it is not an {@link AdvancedFboRenderAttachment}
+     */
+    public AdvancedFboRenderAttachment getColorRenderAttachment(int attachment)
+    {
+        AdvancedFboAttachment advancedFboAttachment = this.getColorAttachment(attachment);
+        Validate.isTrue(this.isColorRenderAttachment(attachment), "Color attachment " + attachment + " must be a render attachment to modify render information.");
+        return (AdvancedFboRenderAttachment) advancedFboAttachment;
     }
 
     /**
@@ -444,7 +472,7 @@ public class AdvancedFbo implements NativeResource
     }
 
     /**
-     * @return Whether or not a depth attachment has been added to this framebuffer
+     * @return Whether a depth texture attachment has been added to this framebuffer
      */
     public boolean isDepthTextureAttachment()
     {
@@ -452,16 +480,37 @@ public class AdvancedFbo implements NativeResource
     }
 
     /**
+     * @return Whether a depth render attachment has been added to this framebuffer
+     */
+    public boolean isDepthRenderAttachment()
+    {
+        return this.hasDepthAttachment() && this.getDepthAttachment() instanceof AdvancedFboRenderAttachment;
+    }
+
+    /**
      * Checks this framebuffer for a depth buffer texture attachment. If the attachment is not known to be a {@link AdvancedFboTextureAttachment}, use {@link #isDepthTextureAttachment()} before calling this.
      *
      * @return The texture attachment in the specified attachment slot
-     * @throws IllegalArgumentException If there is no depth attachment in this framebuffer or it is not an {@link AdvancedFboTextureAttachment}
+     * @throws IllegalArgumentException If there is no depth attachment in this framebuffer, or it is not an {@link AdvancedFboTextureAttachment}
      */
     public AdvancedFboTextureAttachment getDepthTextureAttachment()
     {
         AdvancedFboAttachment advancedFboAttachment = this.getDepthAttachment();
         Validate.isTrue(this.isDepthTextureAttachment(), "Depth attachment must be a texture attachment to modify texture information.");
         return (AdvancedFboTextureAttachment) advancedFboAttachment;
+    }
+
+    /**
+     * Checks this framebuffer for a depth buffer render attachment. If the attachment is not known to be a {@link AdvancedFboRenderAttachment}, use {@link #isDepthRenderAttachment()} before calling this.
+     *
+     * @return The render attachment in the specified attachment slot
+     * @throws IllegalArgumentException If there is no depth attachment in this framebuffer, or it is not an {@link AdvancedFboRenderAttachment}
+     */
+    public AdvancedFboRenderAttachment getDepthRenderAttachment()
+    {
+        AdvancedFboAttachment advancedFboAttachment = this.getDepthAttachment();
+        Validate.isTrue(this.isDepthRenderAttachment(), "Depth attachment must be a render attachment to modify render information.");
+        return (AdvancedFboRenderAttachment) advancedFboAttachment;
     }
 
     /**
@@ -603,7 +652,7 @@ public class AdvancedFbo implements NativeResource
          */
         public Builder addColorTextureBuffer(int width, int height, int mipmapLevels)
         {
-            this.colorAttachments.add(new AdvancedFboAttachmentColorTexture2D(width, height, mipmapLevels));
+            this.colorAttachments.add(new AdvancedFboTextureAttachment(GL_COLOR_ATTACHMENT0, width, height, mipmapLevels));
             this.validateColorSize();
             return this;
         }
@@ -640,7 +689,7 @@ public class AdvancedFbo implements NativeResource
          */
         public Builder addColorRenderBuffer(int width, int height, int samples)
         {
-            this.colorAttachments.add(new AdvancedFboAttachmentColorRenderBuffer(width, height, samples));
+            this.colorAttachments.add(new AdvancedFboRenderAttachment(GL_COLOR_ATTACHMENT0, GL_RGBA8, width, height, samples));
             this.validateColorSize();
             return this;
         }
@@ -675,7 +724,7 @@ public class AdvancedFbo implements NativeResource
         public Builder setDepthTextureBuffer(int width, int height, int mipmapLevels)
         {
             Validate.isTrue(this.depthAttachment == null, "Only one depth attachment can be applied to an FBO.");
-            this.depthAttachment = new AdvancedFboAttachmentDepthTexture2D(width, height, mipmapLevels);
+            this.depthAttachment = new AdvancedFboTextureAttachment(GL_DEPTH_ATTACHMENT, width, height, mipmapLevels);
             return this;
         }
 
@@ -712,7 +761,7 @@ public class AdvancedFbo implements NativeResource
         public Builder setDepthRenderBuffer(int width, int height, int samples)
         {
             Validate.isTrue(this.depthAttachment == null, "Only one depth attachment can be applied to an FBO.");
-            this.depthAttachment = new AdvancedFboAttachmentDepthRenderBuffer(width, height, samples);
+            this.depthAttachment = new AdvancedFboRenderAttachment(GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT24, width, height, samples);
             return this;
         }
 
