@@ -5,8 +5,6 @@ import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
@@ -18,7 +16,6 @@ import static org.lwjgl.opengl.GL30.glFramebufferTexture2D;
  * @author Ocelot
  * @since 2.4.0
  */
-@OnlyIn(Dist.CLIENT)
 public class AdvancedFboAttachmentColorTexture2D extends AbstractTexture implements AdvancedFboTextureAttachment
 {
     private final int width;

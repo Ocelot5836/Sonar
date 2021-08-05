@@ -1,21 +1,17 @@
 package io.github.ocelot.sonar.client.framebuffer;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 /**
  * <p>A texture attachment added to an {@link AdvancedFbo}</p>
  *
  * @author Ocelot
  * @since 2.4.0
  */
-@OnlyIn(Dist.CLIENT)
 public interface AdvancedFboTextureAttachment extends AdvancedFboAttachment
 {
     @Override
     default void attach(int target, int attachment)
     {
-        for (int i = 0; i < this.getMipmapLevels(); i++)
+        for (int i = 0; i <= this.getMipmapLevels(); i++)
             this.attach(target, attachment, i);
     }
 

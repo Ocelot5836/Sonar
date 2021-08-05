@@ -5,13 +5,12 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.Validate;
 import org.lwjgl.system.NativeResource;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,7 +22,6 @@ import static org.lwjgl.opengl.GL30.*;
  * @author Ocelot
  * @since 2.4.0
  */
-@OnlyIn(Dist.CLIENT)
 public class AdvancedFbo implements NativeResource
 {
     private int id;
@@ -41,7 +39,22 @@ public class AdvancedFbo implements NativeResource
         this.depthAttachment = depthAttachment;
     }
 
-    private void createRaw()
+    /**
+     * Creates the framebuffer and all attachments.
+     */
+    public void create()
+    {
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(this::_create);
+        }
+        else
+        {
+            this._create();
+        }
+    }
+
+    private void _create()
     {
         for (AdvancedFboAttachment attachment : this.colorAttachments)
             attachment.create();
@@ -63,21 +76,6 @@ public class AdvancedFbo implements NativeResource
     }
 
     /**
-     * Creates the framebuffer and all attachments.
-     */
-    public void create()
-    {
-        if (!RenderSystem.isOnRenderThreadOrInit())
-        {
-            RenderSystem.recordRenderCall(this::createRaw);
-        }
-        else
-        {
-            this.createRaw();
-        }
-    }
-
-    /**
      * Clears the buffers in this framebuffer.
      */
     public void clear()
@@ -93,7 +91,7 @@ public class AdvancedFbo implements NativeResource
     /**
      * Binds this framebuffer for read and draw requests.
      *
-     * @param setViewport Whether or not to set the viewport to fit the bounds of this framebuffer
+     * @param setViewport Whether to set the viewport to fit the bounds of this framebuffer
      */
     public void bind(boolean setViewport)
     {
@@ -115,56 +113,17 @@ public class AdvancedFbo implements NativeResource
     }
 
     /**
-     * Unbinds the framebuffer used for read and draw requests.
-     */
-    public static void unbind()
-    {
-        if (!RenderSystem.isOnRenderThreadOrInit())
-        {
-            RenderSystem.recordRenderCall(() -> glBindFramebuffer(GL_FRAMEBUFFER, 0));
-        }
-        else
-        {
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        }
-    }
-
-    /**
      * Binds this framebuffer for read requests.
-     *
-     * @param setViewport Whether or not to set the viewport to fit the bounds of this framebuffer
      */
-    public void bindRead(boolean setViewport)
+    public void bindRead()
     {
         if (!RenderSystem.isOnRenderThreadOrInit())
         {
-            RenderSystem.recordRenderCall(() ->
-            {
-                glBindFramebuffer(GL_READ_FRAMEBUFFER, this.id);
-                if (setViewport)
-                    RenderSystem.viewport(0, 0, this.width, this.height);
-            });
+            RenderSystem.recordRenderCall(() -> glBindFramebuffer(GL_READ_FRAMEBUFFER, this.id));
         }
         else
         {
             glBindFramebuffer(GL_READ_FRAMEBUFFER, this.id);
-            if (setViewport)
-                RenderSystem.viewport(0, 0, this.width, this.height);
-        }
-    }
-
-    /**
-     * Unbinds the framebuffer used for read requests.
-     */
-    public static void unbindRead()
-    {
-        if (!RenderSystem.isOnRenderThreadOrInit())
-        {
-            RenderSystem.recordRenderCall(() -> glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
-        }
-        else
-        {
-            glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
         }
     }
 
@@ -193,17 +152,56 @@ public class AdvancedFbo implements NativeResource
     }
 
     /**
-     * Unbinds the framebuffer used for draw requests.
+     * Binds the main Minecraft framebuffer for writing and reading.
      */
-    public static void unbindDraw()
+    public static void unbind()
     {
+        RenderTarget mainTarget = Minecraft.getInstance().getMainRenderTarget();
+        if (mainTarget != null)
+        {
+            mainTarget.bindWrite(true);
+            return;
+        }
+
         if (!RenderSystem.isOnRenderThreadOrInit())
         {
-            RenderSystem.recordRenderCall(() -> glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
+            RenderSystem.recordRenderCall(() -> glBindFramebuffer(GL_FRAMEBUFFER, 0));
         }
         else
         {
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
+    }
+
+    /**
+     * Binds the main Minecraft framebuffer for reading.
+     */
+    public static void unbindRead()
+    {
+        int mainTarget = Minecraft.getInstance().getMainRenderTarget() != null ? Minecraft.getInstance().getMainRenderTarget().frameBufferId : 0;
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(() -> glBindFramebuffer(GL_READ_FRAMEBUFFER, mainTarget));
+        }
+        else
+        {
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, mainTarget);
+        }
+    }
+
+    /**
+     * Binds the main Minecraft framebuffer for drawing.
+     */
+    public static void unbindDraw()
+    {
+        int mainTarget = Minecraft.getInstance().getMainRenderTarget() != null ? Minecraft.getInstance().getMainRenderTarget().frameBufferId : 0;
+        if (!RenderSystem.isOnRenderThreadOrInit())
+        {
+            RenderSystem.recordRenderCall(() -> glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mainTarget));
+        }
+        else
+        {
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mainTarget);
         }
     }
 
@@ -220,23 +218,21 @@ public class AdvancedFbo implements NativeResource
     {
         if (!RenderSystem.isOnRenderThreadOrInit())
         {
-            RenderSystem.recordRenderCall(() ->
-            {
-                this.bindRead(false);
-                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, id);
-                glBlitFramebuffer(0, 0, this.width, this.height, 0, 0, width, height, mask, filtering);
-                unbindDraw();
-                unbindRead();
-            });
+            RenderSystem.recordRenderCall(() -> this._resolveToFbo(id, width, height, mask, filtering));
         }
         else
         {
-            this.bindRead(false);
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, id);
-            glBlitFramebuffer(0, 0, this.width, this.height, 0, 0, width, height, mask, filtering);
-            unbindDraw();
-            unbindRead();
+            this._resolveToFbo(id, width, height, mask, filtering);
         }
+    }
+
+    private void _resolveToFbo(int id, int width, int height, int mask, int filtering)
+    {
+        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
+        this.bindRead();
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, id);
+        glBlitFramebuffer(0, 0, this.width, this.height, 0, 0, width, height, mask, filtering);
+        unbind();
     }
 
     /**
@@ -301,25 +297,23 @@ public class AdvancedFbo implements NativeResource
     {
         if (!RenderSystem.isOnRenderThreadOrInit())
         {
-            RenderSystem.recordRenderCall(() ->
-            {
-                Window window = Minecraft.getInstance().getWindow();
-                this.bindRead(false);
-                unbindDraw();
-                glDrawBuffer(GL_BACK);
-                glBlitFramebuffer(0, 0, this.width, this.height, 0, 0, window.getWidth(), window.getHeight(), mask, filtering);
-                unbindRead();
-            });
+            RenderSystem.recordRenderCall(() -> this._resolveToScreen(mask, filtering));
         }
         else
         {
-            Window window = Minecraft.getInstance().getWindow();
-            this.bindRead(false);
-            unbindDraw();
-            glDrawBuffer(GL_BACK);
-            glBlitFramebuffer(0, 0, this.width, this.height, 0, 0, window.getWidth(), window.getHeight(), mask, filtering);
-            unbindRead();
+            this._resolveToScreen(mask, filtering);
         }
+    }
+
+    private void _resolveToScreen(int mask, int filtering)
+    {
+        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
+        Window window = Minecraft.getInstance().getWindow();
+        this.bindRead();
+        unbindDraw();
+        glDrawBuffer(GL_BACK);
+        glBlitFramebuffer(0, 0, this.width, this.height, 0, 0, window.getWidth(), window.getHeight(), mask, filtering);
+        unbindRead();
     }
 
     @Override
@@ -327,31 +321,26 @@ public class AdvancedFbo implements NativeResource
     {
         if (!RenderSystem.isOnRenderThreadOrInit())
         {
-            RenderSystem.recordRenderCall(() ->
-            {
-                if (this.id != -1)
-                {
-                    glDeleteFramebuffers(this.id);
-                    this.id = -1;
-                }
-                for (AdvancedFboAttachment attachment : this.colorAttachments)
-                    attachment.free();
-                if (this.depthAttachment != null)
-                    this.depthAttachment.free();
-            });
+            RenderSystem.recordRenderCall(this::_free);
         }
         else
         {
-            if (this.id != -1)
-            {
-                glDeleteFramebuffers(this.id);
-                this.id = -1;
-            }
-            for (AdvancedFboAttachment attachment : this.colorAttachments)
-                attachment.free();
-            if (this.depthAttachment != null)
-                this.depthAttachment.free();
+            this._free();
         }
+    }
+
+    private void _free()
+    {
+        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
+        if (this.id != -1)
+        {
+            glDeleteFramebuffers(this.id);
+            this.id = -1;
+        }
+        for (AdvancedFboAttachment attachment : this.colorAttachments)
+            attachment.free();
+        if (this.depthAttachment != null)
+            this.depthAttachment.free();
     }
 
     /**
@@ -478,9 +467,48 @@ public class AdvancedFbo implements NativeResource
     /**
      * @return A {@link RenderTarget} that uses this advanced fbo as the target
      */
-    public Wrapper getVanillaWrapper()
+    public Wrapper toRenderTarget()
     {
         return new Wrapper(this);
+    }
+
+    /**
+     * Creates a new {@link AdvancedFbo} with the provided width and height.
+     *
+     * @param width  The width of the canvas
+     * @param height The height of the canvas
+     * @return A builder to construct a new FBO
+     */
+    public static Builder withSize(int width, int height)
+    {
+        return new Builder(width, height);
+    }
+
+    /**
+     * Creates a copy of the provided {@link AdvancedFbo}.
+     *
+     * @param parent The parent to copy attachments from
+     * @return A builder to construct a new FBO
+     */
+    public static Builder copy(AdvancedFbo parent)
+    {
+        return new Builder(parent.getWidth(), parent.getHeight()).addAttachments(parent);
+    }
+
+    /**
+     * Creates a copy of the provided {@link RenderTarget}.
+     *
+     * @param parent The parent to copy attachments from
+     * @return A builder to construct a new FBO
+     */
+    public static Builder copy(RenderTarget parent)
+    {
+        if (parent instanceof Wrapper)
+        {
+            AdvancedFbo fbo = ((Wrapper) parent).getFbo();
+            return new Builder(fbo.getWidth(), fbo.getHeight()).addAttachments(fbo);
+        }
+        return new Builder(parent.width, parent.height).addAttachments(parent);
     }
 
     /**
@@ -492,34 +520,24 @@ public class AdvancedFbo implements NativeResource
      */
     public static class Builder
     {
+        private static final int MAX_COLOR_ATTACHMENTS = glGetInteger(GL_MAX_COLOR_ATTACHMENTS);
+
         private final int width;
         private final int height;
         private final List<AdvancedFboAttachment> colorAttachments;
         private AdvancedFboAttachment depthAttachment;
 
-        public Builder(int width, int height)
+        private Builder(int width, int height)
         {
             this.width = width;
             this.height = height;
-            this.colorAttachments = new ArrayList<>();
+            this.colorAttachments = new LinkedList<>();
             this.depthAttachment = null;
-        }
-
-        public Builder(AdvancedFbo parent)
-        {
-            this(parent.getWidth(), parent.getHeight());
-            this.addAttachments(parent);
-        }
-
-        public Builder(RenderTarget parent)
-        {
-            this(parent.viewWidth, parent.viewHeight);
-            this.addAttachments(parent);
         }
 
         private void validateColorSize()
         {
-            Validate.inclusiveBetween(0, glGetInteger(GL_MAX_COLOR_ATTACHMENTS), this.colorAttachments.size());
+            Validate.inclusiveBetween(0, MAX_COLOR_ATTACHMENTS, this.colorAttachments.size());
         }
 
         /**
@@ -699,9 +717,10 @@ public class AdvancedFbo implements NativeResource
         }
 
         /**
+         * @param create Whether to immediately create the buffer
          * @return A new {@link AdvancedFbo} with the specified builder properties.
          */
-        public AdvancedFbo build()
+        public AdvancedFbo build(boolean create)
         {
             if (this.colorAttachments.isEmpty())
                 throw new IllegalArgumentException("Framebuffer needs at least one color attachment to be complete.");
@@ -718,7 +737,10 @@ public class AdvancedFbo implements NativeResource
             }
             if (this.depthAttachment != null && this.depthAttachment.getSamples() != samples)
                 throw new IllegalArgumentException("Framebuffer attachments need to have the same number of samples to be complete.");
-            return new AdvancedFbo(this.width, this.height, this.colorAttachments.toArray(new AdvancedFboAttachment[0]), this.depthAttachment);
+            AdvancedFbo advancedFbo = new AdvancedFbo(this.width, this.height, this.colorAttachments.toArray(new AdvancedFboAttachment[0]), this.depthAttachment);
+            if (create)
+                advancedFbo.create();
+            return advancedFbo;
         }
     }
 
