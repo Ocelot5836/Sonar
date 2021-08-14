@@ -49,6 +49,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -57,32 +58,49 @@ import java.util.stream.Collectors;
  *
  * @author Ocelot
  * @since 6.1.0
- * TODO add the ability to reload structure blocks
  */
 public class StructureTemplateRenderer implements NativeResource
 {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final CompletableFuture<LoadedWorld> level;
+    private final Supplier<CompletableFuture<StructureTemplate>> template;
+    private final boolean constantAmbientLight;
+    private final Function<LightChunkGetter, LevelLightEngine> lightManager;
+    private final BiFunction<BlockPos, ColorResolver, Integer> colorResolver;
+    private CompletableFuture<LoadedWorld> level;
+
+    public StructureTemplateRenderer(Supplier<CompletableFuture<StructureTemplate>> template, boolean constantAmbientLight, Function<LightChunkGetter, LevelLightEngine> lightManager, BiFunction<BlockPos, ColorResolver, Integer> colorResolver)
+    {
+        this.template = template;
+        this.constantAmbientLight = constantAmbientLight;
+        this.lightManager = lightManager;
+        this.colorResolver = colorResolver;
+        this.reload();
+    }
+
+    public StructureTemplateRenderer(Supplier<CompletableFuture<StructureTemplate>> template, BiFunction<BlockPos, ColorResolver, Integer> colorResolver)
+    {
+        this(template, false, level -> new LevelLightEngine(level, true, true), colorResolver);
+    }
 
     public StructureTemplateRenderer(CompletableFuture<StructureTemplate> template, boolean constantAmbientLight, Function<LightChunkGetter, LevelLightEngine> lightManager, BiFunction<BlockPos, ColorResolver, Integer> colorResolver)
     {
-        this.level = loadLevel(template, constantAmbientLight, lightManager, colorResolver);
+        this(() -> template, constantAmbientLight, lightManager, colorResolver);
     }
 
     public StructureTemplateRenderer(CompletableFuture<StructureTemplate> template, BiFunction<BlockPos, ColorResolver, Integer> colorResolver)
     {
-        this.level = loadLevel(template, false, level -> new LevelLightEngine(level, true, true), colorResolver);
+        this(() -> template, false, level -> new LevelLightEngine(level, true, true), colorResolver);
     }
 
     public StructureTemplateRenderer(String templateLocation, boolean constantAmbientLight, Function<LightChunkGetter, LevelLightEngine> lightManager, BiFunction<BlockPos, ColorResolver, Integer> colorResolver)
     {
-        this(downloadTemplate(templateLocation), constantAmbientLight, lightManager, colorResolver);
+        this(() -> downloadTemplate(templateLocation), constantAmbientLight, lightManager, colorResolver);
     }
 
     public StructureTemplateRenderer(String templateLocation, BiFunction<BlockPos, ColorResolver, Integer> colorResolver)
     {
-        this(downloadTemplate(templateLocation), false, level -> new LevelLightEngine(level, true, true), colorResolver);
+        this(() -> downloadTemplate(templateLocation), false, level -> new LevelLightEngine(level, true, true), colorResolver);
     }
 
     @SuppressWarnings("deprecation")
@@ -151,6 +169,16 @@ public class StructureTemplateRenderer implements NativeResource
     }
 
     /**
+     * Reloads the current template if it has already been loaded.
+     */
+    public void reload()
+    {
+        if (this.level != null && !this.level.isDone())
+            return;
+        this.level = loadLevel(this.template.get(), this.constantAmbientLight, this.lightManager, this.colorResolver);
+    }
+
+    /**
      * @return A future of the level that will exist after it has loaded.
      */
     public CompletableFuture<? extends BlockAndTintGetter> getLevel()
@@ -159,7 +187,7 @@ public class StructureTemplateRenderer implements NativeResource
     }
 
     /**
-     * @return Whether or not the level loading has failed
+     * @return Whether the level loading has failed
      */
     public boolean hasFailed()
     {
