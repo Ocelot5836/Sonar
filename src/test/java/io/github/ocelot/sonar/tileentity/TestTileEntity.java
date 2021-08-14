@@ -10,6 +10,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -24,9 +25,9 @@ import java.util.Optional;
 
 public class TestTileEntity extends BaseTileEntity implements ValueContainer
 {
-    public TestTileEntity()
+    public TestTileEntity(BlockPos pos, BlockState state)
     {
-        super(TestMod.TEST_TILE_ENTITY.get());
+        super(TestMod.TEST_TILE_ENTITY.get(), pos, state);
     }
 
     @Override

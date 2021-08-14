@@ -14,7 +14,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -92,56 +92,56 @@ public class ResourcePackRipper
 
                 Stopwatch stopwatch = Stopwatch.createStarted();
                 CompletableFuture.allOf(resourcePacks.stream().filter(info -> info.open() instanceof FilePackResources).map(info ->
-                {
-                    String name = info.getId();
-                    PackResources resourcePack = info.open();
-                    Path packFolder = output.resolve(name);
-
-                    return CompletableFuture.runAsync(() ->
-                    {
-                        ZipFile zipFile;
-                        try
                         {
-                            zipFile = (ZipFile) ObfuscationReflectionHelper.findMethod(FilePackResources.class, "func_195773_b").invoke(resourcePack);
-                            if (zipFile == null)
-                                throw new IOException("Failed to retrieve zip from resource pack '" + name + "'");
-                        }
-                        catch (Exception e)
-                        {
-                            LOGGER.error("Failed to dump resource pack '" + name + "' to '" + packFolder + "'", e);
-                            return;
-                        }
+                            String name = info.getId();
+                            PackResources resourcePack = info.open();
+                            Path packFolder = output.resolve(name);
 
-                        Collections.list(zipFile.entries()).forEach(entry ->
-                        {
-                            Path file = packFolder.resolve(entry.getName());
-
-                            try
+                            return CompletableFuture.runAsync(() ->
                             {
-                                if (entry.isDirectory())
+                                ZipFile zipFile;
+                                try
                                 {
-                                    if (!Files.exists(file))
-                                        Files.createDirectories(file);
+                                    zipFile = (ZipFile) ObfuscationReflectionHelper.findMethod(FilePackResources.class, "func_195773_b").invoke(resourcePack);
+                                    if (zipFile == null)
+                                        throw new IOException("Failed to retrieve zip from resource pack '" + name + "'");
                                 }
-                                else
+                                catch (Exception e)
                                 {
-                                    if (!Files.exists(file.getParent()))
-                                        Files.createDirectories(file.getParent());
-                                    if (!Files.exists(file))
-                                        Files.createFile(file);
-                                    try (FileOutputStream os = new FileOutputStream(file.toFile()))
+                                    LOGGER.error("Failed to dump resource pack '" + name + "' to '" + packFolder + "'", e);
+                                    return;
+                                }
+
+                                Collections.list(zipFile.entries()).forEach(entry ->
+                                {
+                                    Path file = packFolder.resolve(entry.getName());
+
+                                    try
                                     {
-                                        IOUtils.copy(zipFile.getInputStream(entry), os);
+                                        if (entry.isDirectory())
+                                        {
+                                            if (!Files.exists(file))
+                                                Files.createDirectories(file);
+                                        }
+                                        else
+                                        {
+                                            if (!Files.exists(file.getParent()))
+                                                Files.createDirectories(file.getParent());
+                                            if (!Files.exists(file))
+                                                Files.createFile(file);
+                                            try (FileOutputStream os = new FileOutputStream(file.toFile()))
+                                            {
+                                                IOUtils.copy(zipFile.getInputStream(entry), os);
+                                            }
+                                        }
                                     }
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                LOGGER.error("Failed to write ZIP entry '" + entry.getName() + "' to '" + file + "'", e);
-                            }
-                        });
-                    }, Util.ioPool());
-                }).toArray(CompletableFuture[]::new)).
+                                    catch (Exception e)
+                                    {
+                                        LOGGER.error("Failed to write ZIP entry '" + entry.getName() + "' to '" + file + "'", e);
+                                    }
+                                });
+                            }, Util.ioPool());
+                        }).toArray(CompletableFuture[]::new)).
                         thenRunAsync(() ->
                         {
                             log("complete", stopwatch);

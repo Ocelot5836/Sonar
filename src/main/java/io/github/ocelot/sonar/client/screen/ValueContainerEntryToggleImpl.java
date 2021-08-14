@@ -3,6 +3,7 @@ package io.github.ocelot.sonar.client.screen;
 import io.github.ocelot.sonar.common.valuecontainer.ToggleEntry;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainerEntry;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -78,5 +79,11 @@ public class ValueContainerEntryToggleImpl extends AbstractButton
     {
         this.toggled = toggled;
         this.setMessage(toggled ? new TranslatableComponent("gui.yes") : new TranslatableComponent("gui.no"));
+    }
+
+    @Override
+    public void updateNarration(NarrationElementOutput output)
+    {
+        this.defaultButtonNarrationText(output);
     }
 }

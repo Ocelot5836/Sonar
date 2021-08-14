@@ -1,20 +1,14 @@
 package io.github.ocelot.sonar.client.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11C;
-
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11C.GL_QUADS;
 
 /**
  * <p>Renders {@link GL11C#GL_QUADS} to the screen using enhanced precision and {@link BufferBuilder}.</p>
@@ -110,7 +104,8 @@ public final class ShapeRenderer
     public static VertexConsumer begin()
     {
         BufferBuilder buffer = Tesselator.getInstance().getBuilder();
-        buffer.begin(GL_QUADS, DefaultVertexFormat.POSITION_COLOR_TEX);
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         return buffer;
     }
 
@@ -211,7 +206,7 @@ public final class ShapeRenderer
     public static void drawSunburst(PoseStack matrixStack, float x, float y, float width, float height, int segments)
     {
         BufferBuilder builder = Tesselator.getInstance().getBuilder();
-        builder.begin(GL_TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
+        builder.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
 
         Matrix4f matrix4f = matrixStack.last().pose();
         float burstAngleOffset = (float) (Math.PI * (1.0F / segments / 2F));

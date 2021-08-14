@@ -39,13 +39,13 @@ public class AdvancedFboTextureAttachment extends AbstractTexture implements Adv
             RenderSystem.recordRenderCall(() ->
             {
                 this.setBlurMipmap(false, this.mipmapLevels > 1);
-                TextureUtil.prepareImage(this.getId(), this.mipmapLevels, this.width, this.height);
+                TextureUtil.m_85287_(this.getId(), this.mipmapLevels, this.width, this.height);
             });
         }
         else
         {
             this.setBlurMipmap(false, this.mipmapLevels > 1);
-            TextureUtil.prepareImage(this.getId(), this.mipmapLevels, this.width, this.height);
+            TextureUtil.m_85287_(this.getId(), this.mipmapLevels, this.width, this.height);
         }
     }
 

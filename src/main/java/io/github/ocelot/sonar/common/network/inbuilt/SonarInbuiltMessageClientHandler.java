@@ -6,7 +6,7 @@ import io.github.ocelot.sonar.common.valuecontainer.SyncValueContainerMessage;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 

@@ -4,6 +4,7 @@ import io.github.ocelot.sonar.common.valuecontainer.SwitchEntry;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainerEntry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -82,5 +83,11 @@ public class ValueContainerEntrySwitchImpl extends AbstractButton
     public SwitchEntry getSwitchEntry()
     {
         return switchEntry;
+    }
+
+    @Override
+    public void updateNarration(NarrationElementOutput output)
+    {
+        this.defaultButtonNarrationText(output);
     }
 }

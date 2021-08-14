@@ -1,7 +1,7 @@
 package io.github.ocelot.sonar.common.network.message;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * <p>A message intended for the specified message handler.</p>

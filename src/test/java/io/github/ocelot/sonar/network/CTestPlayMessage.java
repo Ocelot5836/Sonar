@@ -2,7 +2,7 @@ package io.github.ocelot.sonar.network;
 
 import io.github.ocelot.sonar.common.network.message.SonarMessage;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 public class CTestPlayMessage implements SonarMessage<Object>
 {

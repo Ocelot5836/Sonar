@@ -14,7 +14,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 
 import java.util.Optional;
 
@@ -37,7 +37,7 @@ public class ValueContainerEditorItem extends Item
      * @param world  The world the player is in
      * @param pos    The position the player clicked
      * @param player The player to check
-     * @return Whether or not that player can use this container editor
+     * @return Whether that player can use this container editor
      */
     protected boolean canPlayerUse(ValueContainer valueContainer, Level world, BlockPos pos, Player player)
     {
@@ -51,7 +51,7 @@ public class ValueContainerEditorItem extends Item
      * @param world          The world the container is in
      * @param pos            The position of the container
      * @param player         The player who opened the container
-     * @return Whether or not the packet was sent successfully
+     * @return Whether the packet was sent successfully
      */
     protected boolean sendPacket(ValueContainer valueContainer, ServerLevel world, BlockPos pos, ServerPlayer player)
     {

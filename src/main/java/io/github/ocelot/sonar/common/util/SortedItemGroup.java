@@ -1,15 +1,12 @@
 package io.github.ocelot.sonar.common.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
+import com.google.common.base.Suppliers;
 import net.minecraft.core.NonNullList;
-import net.minecraft.util.LazyLoadedValue;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.*;
+
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * <p>Automatically indexes and sorts an item group by.</p>
@@ -19,20 +16,20 @@ import net.minecraft.world.item.ItemStack;
 public abstract class SortedItemGroup extends CreativeModeTab
 {
     private final List<Supplier<? extends Item>> orderedItems;
-    private final LazyLoadedValue<Map<Item, Integer>> indexedItems;
+    private final Supplier<Map<Item, Integer>> indexedItems;
 
     public SortedItemGroup(String label)
     {
         super(label);
         this.orderedItems = new ArrayList<>();
-        this.indexedItems = new LazyLoadedValue<>(this::indexItems);
+        this.indexedItems = Suppliers.memoize(this::indexItems);
     }
 
     public SortedItemGroup(int index, String label)
     {
         super(index, label);
         this.orderedItems = new ArrayList<>();
-        this.indexedItems = new LazyLoadedValue<>(this::indexItems);
+        this.indexedItems = Suppliers.memoize(this::indexItems);
     }
 
     private Map<Item, Integer> indexItems()
@@ -73,5 +70,27 @@ public abstract class SortedItemGroup extends CreativeModeTab
     public List<Supplier<? extends Item>> getOrderedItems()
     {
         return orderedItems;
+    }
+
+    public static void insertAfter(ItemStack insert, NonNullList<ItemStack> items, Predicate<ItemStack> filter)
+    {
+        if (items.stream().anyMatch(filter))
+        {
+            String itemName = insert.getItem().getRegistryName() == null ? null : insert.getItem().getRegistryName().getPath();
+            Optional<ItemStack> optional = itemName == null ? Optional.empty() : items.stream().filter(filter).max((a, b) ->
+            {
+                if (a.getItem().getRegistryName() == null || b.getItem().getRegistryName() == null)
+                    return 0;
+                int valA = itemName.compareToIgnoreCase(a.getItem().getRegistryName().getPath());
+                int valB = b.getItem().getRegistryName().getPath().compareToIgnoreCase(itemName);
+                return valB - valA;
+            });
+            if (optional.isPresent())
+            {
+                items.add(items.indexOf(optional.get()) + 1, insert);
+                return;
+            }
+        }
+        items.add(insert);
     }
 }

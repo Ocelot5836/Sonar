@@ -3,9 +3,9 @@ package io.github.ocelot.sonar.network;
 import io.github.ocelot.sonar.TestMod;
 import io.github.ocelot.sonar.common.network.SonarNetworkManager;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.fmllegacy.network.NetworkDirection;
+import net.minecraftforge.fmllegacy.network.NetworkRegistry;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 
 public class TestMessageHandler
 {

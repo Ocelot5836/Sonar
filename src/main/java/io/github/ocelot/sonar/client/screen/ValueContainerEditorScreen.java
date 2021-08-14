@@ -6,8 +6,8 @@ import io.github.ocelot.sonar.Sonar;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainer;
 import io.github.ocelot.sonar.common.valuecontainer.ValueContainerEntry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -30,6 +30,8 @@ import java.util.function.Supplier;
 @OnlyIn(Dist.CLIENT)
 public abstract class ValueContainerEditorScreen extends Screen
 {
+    private static final Component DEFAULT_TITLE = new TranslatableComponent("screen." + Sonar.DOMAIN + ".value_container");
+
     private final ValueContainer container;
     private final BlockPos pos;
     private final List<ValueContainerEntry<?>> entries;
@@ -37,13 +39,7 @@ public abstract class ValueContainerEditorScreen extends Screen
 
     public ValueContainerEditorScreen(ValueContainer container, BlockPos pos)
     {
-        this(container, pos, () -> new TranslatableComponent("screen." + Sonar.DOMAIN + ".value_container"));
-    }
-
-    @Deprecated
-    public ValueContainerEditorScreen(ValueContainer container, BlockPos pos, Supplier<Component> defaultTitle)
-    {
-        super(container.getTitle(Objects.requireNonNull(Minecraft.getInstance().level), pos).orElseGet(defaultTitle));
+        super(container.getTitle(Objects.requireNonNull(Minecraft.getInstance().level), pos).orElse(DEFAULT_TITLE));
         this.container = container;
         this.pos = pos;
         this.entries = container.getEntries(Minecraft.getInstance().level, pos);
@@ -102,7 +98,7 @@ public abstract class ValueContainerEditorScreen extends Screen
         if (this.minecraft == null || this.minecraft.player == null || this.minecraft.level == null)
             return;
 
-        this.children.forEach(this::tickChild);
+        this.children().forEach(this::tickChild);
 
         if (!this.shouldStayOpen())
         {
@@ -127,9 +123,9 @@ public abstract class ValueContainerEditorScreen extends Screen
 
     public void renderWidgets(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        for (AbstractWidget button : this.buttons)
+        for (Widget widget : this.renderables)
         {
-            button.render(matrixStack, mouseX, mouseY, partialTicks);
+            widget.render(matrixStack, mouseX, mouseY, partialTicks);
         }
     }
 

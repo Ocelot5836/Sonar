@@ -14,7 +14,10 @@ import java.util.function.Consumer;
  */
 public enum SonarModule
 {
-    INBUILT_NETWORK(false, SonarInbuiltMessages::register, null);
+    INBUILT_NETWORK(false, bus ->
+    {
+        SonarInbuiltMessages.register();
+    }, null);
 
     private final boolean clientOnly;
     private final Consumer<IEventBus> init;

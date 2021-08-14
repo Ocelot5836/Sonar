@@ -26,24 +26,10 @@ import java.util.function.Consumer;
  */
 public class SkinHelper
 {
-    private static final Map<GameProfile, GameProfile> PROFILE_CACHE = new WeakHashMap<>();
+    private static final Map<GameProfile, CompletableFuture<GameProfile>> PROFILE_CACHE = new WeakHashMap<>();
 
     /**
-     * Caches the results of {@link SkullBlockEntity#updateGameprofile(GameProfile)}. Use {@link SkinHelper#updateGameProfileAsync(GameProfile)} to fill the profile without blocking the current thread.
-     *
-     * @param input The input game profile
-     * @return The filled game profile with properties
-     */
-    @Nullable
-    public static synchronized GameProfile updateGameProfile(@Nullable GameProfile input)
-    {
-        if (input == null)
-            return null;
-        return PROFILE_CACHE.computeIfAbsent(input, SkullBlockEntity::updateGameprofile);
-    }
-
-    /**
-     * Caches the results of {@link SkullBlockEntity#updateGameprofile(GameProfile)}.
+     * Caches the results of {@link SkullBlockEntity#updateGameprofile(GameProfile, Consumer)}.
      *
      * @param input The input game profile
      * @return The filled game profile with properties
@@ -52,7 +38,12 @@ public class SkinHelper
     {
         if (input == null)
             return CompletableFuture.completedFuture(null);
-        return CompletableFuture.supplyAsync(() -> updateGameProfile(input));
+        return PROFILE_CACHE.computeIfAbsent(input, key ->
+        {
+            CompletableFuture<GameProfile> future = new CompletableFuture<>();
+            SkullBlockEntity.updateGameprofile(key, future::complete);
+            return future;
+        });
     }
 
     /**

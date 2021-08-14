@@ -14,7 +14,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -66,19 +65,6 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
         this.scrolling = false;
     }
 
-    @Deprecated
-    public ValueContainerEditorScreenImpl(ValueContainer container, BlockPos pos, Supplier<Component> defaultTitle)
-    {
-        super(container, pos, defaultTitle);
-        this.xSize = WIDTH;
-        this.ySize = HEIGHT;
-        this.entryWidgets = new ArrayList<>();
-        this.scrollHandler = new ScrollHandler(this.getEntries().size() * VALUE_HEIGHT, 142);
-        this.scrollHandler.setScrollSpeed((float) this.scrollHandler.getMaxScroll() / (float) this.getEntries().size());
-
-        this.scrolling = false;
-    }
-
     private void renderLabels(PoseStack matrixStack, float partialTicks)
     {
         float scroll = this.scrollHandler.getInterpolatedScroll(partialTicks);
@@ -97,9 +83,10 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     @Override
     protected void init()
     {
+        this.entryWidgets.clear();
         this.getMinecraft().keyboardHandler.setSendRepeatsToGui(true);
 
-        this.addButton(new Button((this.width - this.xSize) / 2, (this.height + this.ySize) / 2 + 4, this.xSize, 20, new TranslatableComponent("gui.done"), button -> this.getMinecraft().setScreen(null)));
+        this.addRenderableWidget(new Button((this.width - this.xSize) / 2, (this.height + this.ySize) / 2 + 4, this.xSize, 20, new TranslatableComponent("gui.done"), button -> this.getMinecraft().setScreen(null)));
 
         for (int i = 0; i < this.getEntries().size(); i++)
         {
@@ -142,14 +129,6 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     }
 
     @Override
-    public void init(Minecraft minecraft, int width, int height)
-    {
-        this.entryWidgets.clear();
-        super.init(minecraft, width, height);
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
     public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         if (this.minecraft == null)
@@ -160,25 +139,23 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
 
         super.renderBackground(matrixStack);
         this.renderBackground(matrixStack, mouseX, mouseY, partialTicks);
+        this.renderWidgets(matrixStack, mouseX, mouseY, partialTicks);
 
-        for (AbstractWidget widget : this.buttons)
-            widget.render(matrixStack, mouseX, mouseY, partialTicks);
-
-        RenderSystem.pushMatrix();
-        RenderSystem.translatef((this.width - this.xSize) / 2f, (this.height - this.ySize) / 2f, 0);
+        matrixStack.pushPose();
+        matrixStack.translate((this.width - this.xSize) / 2f, (this.height - this.ySize) / 2f, 0);
         {
-            RenderSystem.pushMatrix();
-            RenderSystem.translatef(0, -this.scrollHandler.getInterpolatedScroll(partialTicks), 0);
+            matrixStack.pushPose();
+            matrixStack.translate(0, -this.scrollHandler.getInterpolatedScroll(partialTicks), 0);
             {
                 ScissorHelper.push((this.width - this.xSize) / 2f + 6, (this.height - this.ySize) / 2f + 18, 148, 142);
                 this.renderWidgets(matrixStack, mouseX - (int) ((this.width - this.xSize) / 2f), mouseY - (int) ((this.height - this.ySize) / 2f) + (int) this.scrollHandler.getInterpolatedScroll(partialTicks), partialTicks);
                 this.renderLabels(matrixStack, partialTicks);
                 ScissorHelper.pop();
             }
-            RenderSystem.popMatrix();
+            matrixStack.popPose();
             this.renderForeground(matrixStack, mouseX - (int) ((this.width - this.xSize) / 2f), mouseY - (int) ((this.height - this.ySize) / 2f), partialTicks);
         }
-        RenderSystem.popMatrix();
+        matrixStack.popPose();
     }
 
     @Override
@@ -200,7 +177,8 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     {
         float screenX = (this.width - this.xSize) / 2f;
         float screenY = (this.height - this.ySize) / 2f;
-        this.getMinecraft().getTextureManager().bind(BACKGROUND_LOCATION);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, BACKGROUND_LOCATION);
         ShapeRenderer.drawRectWithTexture(matrixStack, screenX, screenY, 0, 0, this.xSize, this.ySize);
     }
 
@@ -209,7 +187,8 @@ public abstract class ValueContainerEditorScreenImpl extends ValueContainerEdito
     {
         this.getMinecraft().font.draw(matrixStack, this.getFormattedTitle(), (this.xSize - this.getMinecraft().font.width(this.getFormattedTitle())) / 2f, 6f, 4210752);
 
-        this.getMinecraft().getTextureManager().bind(BACKGROUND_LOCATION);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, BACKGROUND_LOCATION);
         boolean hasScroll = this.scrollHandler.getMaxScroll() > 0;
         float scrollbarY = hasScroll ? 127 * (this.scrollHandler.getInterpolatedScroll(partialTicks) / this.scrollHandler.getMaxScroll()) : 0;
         ShapeRenderer.drawRectWithTexture(matrixStack, 158, 18 + scrollbarY, hasScroll ? 176 : 188, 0, 12, 15);

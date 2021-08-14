@@ -1,5 +1,6 @@
 package io.github.ocelot.sonar.common.network;
 
+import com.google.common.base.Suppliers;
 import io.github.ocelot.sonar.common.network.message.SonarLoginMessage;
 import io.github.ocelot.sonar.common.network.message.SonarMessage;
 import net.minecraft.network.Connection;
@@ -11,11 +12,10 @@ import net.minecraft.network.protocol.status.ClientStatusPacketListener;
 import net.minecraft.network.protocol.status.ServerStatusPacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
-import net.minecraft.util.LazyLoadedValue;
-import net.minecraftforge.fml.network.FMLHandshakeHandler;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.fmllegacy.network.FMLHandshakeHandler;
+import net.minecraftforge.fmllegacy.network.NetworkDirection;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,15 +35,15 @@ public class SonarNetworkManager
 {
     private static final Logger LOGGER = LogManager.getLogger();
     private final SimpleChannel channel;
-    private final LazyLoadedValue<LazyLoadedValue<Object>> clientMessageHandler;
-    private final LazyLoadedValue<LazyLoadedValue<Object>> serverMessageHandler;
+    private final Supplier<Supplier<Object>> clientMessageHandler;
+    private final Supplier<Supplier<Object>> serverMessageHandler;
     private int nextId;
 
     public SonarNetworkManager(SimpleChannel channel, Supplier<Supplier<Object>> clientFactory, Supplier<Supplier<Object>> serverFactory)
     {
         this.channel = channel;
-        this.clientMessageHandler = new LazyLoadedValue<>(() -> new LazyLoadedValue<>(clientFactory.get()));
-        this.serverMessageHandler = new LazyLoadedValue<>(() -> new LazyLoadedValue<>(serverFactory.get()));
+        this.clientMessageHandler = Suppliers.memoize(() -> Suppliers.memoize(clientFactory::get));
+        this.serverMessageHandler = Suppliers.memoize(() -> Suppliers.memoize(serverFactory::get));
     }
 
     @SuppressWarnings("unchecked")
@@ -119,11 +119,11 @@ public class SonarNetworkManager
     public <MSG extends SonarLoginMessage<T>, T> void registerLoginReply(Class<MSG> clazz, Supplier<MSG> generator, @Nullable NetworkDirection direction)
     {
         this.channel.messageBuilder(clazz, this.nextId++, direction).encoder(SonarMessage::writePacketData).decoder(buf ->
-        {
-            MSG msg = generator.get();
-            msg.readPacketData(buf);
-            return msg;
-        })
+                {
+                    MSG msg = generator.get();
+                    msg.readPacketData(buf);
+                    return msg;
+                })
                 .consumer(FMLHandshakeHandler.indexFirst((__, msg, ctx) -> ctx.get().setPacketHandled(this.processMessage(msg, ctx))))
                 .loginIndex(SonarLoginMessage::getAsInt, SonarLoginMessage::setLoginIndex)
                 .add();

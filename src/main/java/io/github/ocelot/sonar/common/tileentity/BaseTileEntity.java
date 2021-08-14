@@ -8,6 +8,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
@@ -23,9 +24,9 @@ import java.util.Optional;
  */
 public class BaseTileEntity extends BlockEntity
 {
-    public BaseTileEntity(BlockEntityType<?> tileEntityType)
+    public BaseTileEntity(BlockEntityType<?> tileEntityType, BlockPos pos, BlockState state)
     {
-        super(tileEntityType);
+        super(tileEntityType, pos, state);
     }
 
     /**
@@ -47,7 +48,7 @@ public class BaseTileEntity extends BlockEntity
     @OnlyIn(Dist.CLIENT)
     public void readSyncTag(CompoundTag nbt)
     {
-        this.load(this.getBlockState(), nbt);
+        this.load(nbt);
     }
 
     @Override

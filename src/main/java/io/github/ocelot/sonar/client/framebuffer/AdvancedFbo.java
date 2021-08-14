@@ -806,7 +806,7 @@ public class AdvancedFbo implements NativeResource
 
         private Wrapper(AdvancedFbo fbo)
         {
-            super(fbo.width, fbo.height, fbo.hasDepthAttachment(), Minecraft.ON_OSX);
+            super(fbo.hasDepthAttachment());
             this.fbo = fbo;
             this.createBuffers(this.fbo.getWidth(), this.fbo.getHeight(), Minecraft.ON_OSX);
         }
@@ -835,8 +835,6 @@ public class AdvancedFbo implements NativeResource
         {
             this.viewWidth = width;
             this.viewHeight = height;
-            if (this.fbo == null) // Assumed to be init phase so no action taken
-                return;
             this.fbo.width = width;
             this.fbo.height = height;
             AdvancedFboAttachment attachment = this.fbo.hasColorAttachment(0) ? this.fbo.getColorAttachment(0) : null;

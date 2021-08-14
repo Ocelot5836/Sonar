@@ -1,5 +1,6 @@
 package io.github.ocelot.sonar.common.item;
 
+import io.github.ocelot.sonar.common.util.SortedItemGroup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
@@ -8,12 +9,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 import javax.annotation.Nullable;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -48,24 +48,25 @@ public class SpawnEggItemBase<T extends EntityType<?>> extends SpawnEggItem
     {
         if (this.allowdedIn(group) || (this.addToMisc && group == CreativeModeTab.TAB_MISC))
         {
-            if (items.stream().anyMatch(stack -> stack.getItem() instanceof SpawnEggItem))
-            {
-                String itemName = this.getRegistryName() == null ? null : this.getRegistryName().getPath();
-                Optional<ItemStack> optional = itemName == null ? Optional.empty() : items.stream().filter(stack -> stack.getItem() instanceof SpawnEggItem).max((a, b) ->
-                {
-                    if (a.getItem().getRegistryName() == null || b.getItem().getRegistryName() == null)
-                        return 0;
-                    int valA = itemName.compareToIgnoreCase(a.getItem().getRegistryName().getPath());
-                    int valB = b.getItem().getRegistryName().getPath().compareToIgnoreCase(itemName);
-                    return valB - valA;
-                });
-                if (optional.isPresent())
-                {
-                    items.add(items.indexOf(optional.get()) + 1, new ItemStack(this));
-                    return;
-                }
-            }
-            items.add(new ItemStack(this));
+            SortedItemGroup.insertAfter(new ItemStack(this), items, stack -> stack.getItem() instanceof SpawnEggItem);
+//            if (items.stream().anyMatch(stack -> stack.getItem() instanceof SpawnEggItem))
+//            {
+//                String itemName = this.getRegistryName() == null ? null : this.getRegistryName().getPath();
+//                Optional<ItemStack> optional = itemName == null ? Optional.empty() : items.stream().filter(stack -> stack.getItem() instanceof SpawnEggItem).max((a, b) ->
+//                {
+//                    if (a.getItem().getRegistryName() == null || b.getItem().getRegistryName() == null)
+//                        return 0;
+//                    int valA = itemName.compareToIgnoreCase(a.getItem().getRegistryName().getPath());
+//                    int valB = b.getItem().getRegistryName().getPath().compareToIgnoreCase(itemName);
+//                    return valB - valA;
+//                });
+//                if (optional.isPresent())
+//                {
+//                    items.add(items.indexOf(optional.get()) + 1, new ItemStack(this));
+//                    return;
+//                }
+//            }
+//            items.add(new ItemStack(this));
         }
     }
 

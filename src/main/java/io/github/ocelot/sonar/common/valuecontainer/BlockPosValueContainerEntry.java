@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.util.Constants;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>Specifies a {@link ValueContainerEntry} as being for a {@link BlockPos} type</p>
@@ -20,7 +21,7 @@ public class BlockPosValueContainerEntry extends AbstractVectorValueContainerEnt
         this(displayName, name, value, null, null);
     }
 
-    public BlockPosValueContainerEntry(Component displayName, String name, Vec3i value, Vec3i minValue, Vec3i maxValue)
+    public BlockPosValueContainerEntry(Component displayName, String name, Vec3i value, @Nullable Vec3i minValue, @Nullable Vec3i maxValue)
     {
         super(displayName, name, new BlockPos(value), minValue == null ? null : new BlockPos(minValue), maxValue == null ? null : new BlockPos(maxValue), false);
     }

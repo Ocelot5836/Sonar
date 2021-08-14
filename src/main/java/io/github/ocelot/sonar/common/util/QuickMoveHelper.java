@@ -133,7 +133,7 @@ public class QuickMoveHelper
 
                 Slot slot = menu.getSlot(i);
                 ItemStack itemstack = slot.getItem();
-                if (slot.mayPlace(stack) && !itemstack.isEmpty() && AbstractContainerMenu.consideredTheSameItem(stack, itemstack))
+                if (slot.mayPlace(stack) && !itemstack.isEmpty() && ItemStack.isSameItemSameTags(stack, itemstack))
                 {
                     int j = itemstack.getCount() + stack.getCount();
                     int maxSize = Math.min(slot.getMaxStackSize(stack), stack.getMaxStackSize());
