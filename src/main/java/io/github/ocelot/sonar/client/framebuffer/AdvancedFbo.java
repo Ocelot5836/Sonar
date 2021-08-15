@@ -6,6 +6,7 @@ import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import org.apache.commons.lang3.Validate;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.NativeResource;
 
 import javax.annotation.Nullable;
@@ -575,6 +576,9 @@ public class AdvancedFbo implements NativeResource
         private final int height;
         private final List<AdvancedFboAttachment> colorAttachments;
         private AdvancedFboAttachment depthAttachment;
+        private int mipmaps;
+        private int samples;
+        private int format;
 
         private Builder(int width, int height)
         {
@@ -582,6 +586,9 @@ public class AdvancedFbo implements NativeResource
             this.height = height;
             this.colorAttachments = new LinkedList<>();
             this.depthAttachment = null;
+            this.mipmaps = 0;
+            this.samples = 1;
+            this.format = GL_RGBA;
         }
 
         private void validateColorSize()
@@ -614,12 +621,47 @@ public class AdvancedFbo implements NativeResource
          */
         public Builder addAttachments(RenderTarget parent)
         {
-            this.addColorTextureBuffer(parent.width, parent.height, 0);
+            this.setMipmaps(0);
+            this.addColorTextureBuffer(parent.width, parent.height);
             if (parent.useDepth)
             {
                 Validate.isTrue(this.depthAttachment == null, "Only one depth attachment can be applied to an FBO.");
-                this.setDepthRenderBuffer(parent.width, parent.height, 1);
+                this.setSamples(1);
+                this.setDepthRenderBuffer(parent.width, parent.height);
             }
+            return this;
+        }
+
+        /**
+         * Sets the number of mipmaps levels to use for texture attachments. <code>0</code> is the default for none.
+         *
+         * @param mipmaps The levels to have
+         */
+        public Builder setMipmaps(int mipmaps)
+        {
+            this.mipmaps = mipmaps;
+            return this;
+        }
+
+        /**
+         * Sets the number of samples to use for render buffer attachments. <code>1</code> is the default for single sample buffers.
+         *
+         * @param samples The samples to have
+         */
+        public Builder setSamples(int samples)
+        {
+            this.samples = samples;
+            return this;
+        }
+
+        /**
+         * Sets the format to use for texture attachments. {@link GL11#GL_RGBA} is the default.
+         *
+         * @param format The new format to use
+         */
+        public Builder setFormat(int format)
+        {
+            this.format = format;
             return this;
         }
 
@@ -628,31 +670,19 @@ public class AdvancedFbo implements NativeResource
          */
         public Builder addColorTextureBuffer()
         {
-            this.addColorTextureBuffer(this.width, this.height, 0);
-            return this;
-        }
-
-        /**
-         * Adds a color texture buffer with the size of the framebuffer and the specified mipmap levels.
-         *
-         * @param mipmapLevels The levels of mipmapping to allocate
-         */
-        public Builder addColorTextureBuffer(int mipmapLevels)
-        {
-            this.addColorTextureBuffer(this.width, this.height, mipmapLevels);
+            this.addColorTextureBuffer(this.width, this.height);
             return this;
         }
 
         /**
          * Adds a color texture buffer with the specified size and the specified mipmap levels.
          *
-         * @param width        The width of the texture buffer
-         * @param height       The height of the texture buffer
-         * @param mipmapLevels The levels of mipmapping to allocate
+         * @param width  The width of the texture buffer
+         * @param height The height of the texture buffer
          */
-        public Builder addColorTextureBuffer(int width, int height, int mipmapLevels)
+        public Builder addColorTextureBuffer(int width, int height)
         {
-            this.colorAttachments.add(new AdvancedFboTextureAttachment(GL_COLOR_ATTACHMENT0, width, height, mipmapLevels));
+            this.colorAttachments.add(new AdvancedFboTextureAttachment(GL_COLOR_ATTACHMENT0, this.format, width, height, this.mipmaps));
             this.validateColorSize();
             return this;
         }
@@ -663,19 +693,7 @@ public class AdvancedFbo implements NativeResource
          */
         public Builder addColorRenderBuffer()
         {
-            this.addColorRenderBuffer(this.width, this.height, 1);
-            return this;
-        }
-
-        /**
-         * <p>Adds a color render buffer with the size of the framebuffer and the specified samples.</p>
-         * <p><b><i>NOTE: COLOR RENDER BUFFERS CAN ONLY BE COPIED TO OTHER FRAMEBUFFERS</i></b></p>
-         *
-         * @param samples The amount of samples to use with this buffer
-         */
-        public Builder addColorRenderBuffer(int samples)
-        {
-            this.addColorRenderBuffer(this.width, this.height, samples);
+            this.addColorRenderBuffer(this.width, this.height);
             return this;
         }
 
@@ -683,13 +701,12 @@ public class AdvancedFbo implements NativeResource
          * <p>Adds a color render buffer with the specified size and the specified samples.</p>
          * <p><b><i>NOTE: COLOR RENDER BUFFERS CAN ONLY BE COPIED TO OTHER FRAMEBUFFERS</i></b></p>
          *
-         * @param width   The width of the render buffer
-         * @param height  The height of the render buffer
-         * @param samples The amount of samples to use with this buffer
+         * @param width  The width of the render buffer
+         * @param height The height of the render buffer
          */
-        public Builder addColorRenderBuffer(int width, int height, int samples)
+        public Builder addColorRenderBuffer(int width, int height)
         {
-            this.colorAttachments.add(new AdvancedFboRenderAttachment(GL_COLOR_ATTACHMENT0, GL_RGBA8, width, height, samples));
+            this.colorAttachments.add(new AdvancedFboRenderAttachment(GL_COLOR_ATTACHMENT0, this.format, width, height, this.samples));
             this.validateColorSize();
             return this;
         }
@@ -699,32 +716,20 @@ public class AdvancedFbo implements NativeResource
          */
         public Builder setDepthTextureBuffer()
         {
-            this.setDepthTextureBuffer(this.width, this.height, 0);
+            this.setDepthTextureBuffer(this.width, this.height);
             return this;
         }
 
         /**
          * Sets the depth texture buffer to the size of the framebuffer and the specified mipmap levels.
          *
-         * @param mipmapLevels The levels of mipmapping to allocate
+         * @param width  The width of the texture buffer
+         * @param height The height of the texture buffer
          */
-        public Builder setDepthTextureBuffer(int mipmapLevels)
-        {
-            this.setDepthTextureBuffer(this.width, this.height, mipmapLevels);
-            return this;
-        }
-
-        /**
-         * Sets the depth texture buffer to the size of the framebuffer and the specified mipmap levels.
-         *
-         * @param width        The width of the texture buffer
-         * @param height       The height of the texture buffer
-         * @param mipmapLevels The levels of mipmapping to allocate
-         */
-        public Builder setDepthTextureBuffer(int width, int height, int mipmapLevels)
+        public Builder setDepthTextureBuffer(int width, int height)
         {
             Validate.isTrue(this.depthAttachment == null, "Only one depth attachment can be applied to an FBO.");
-            this.depthAttachment = new AdvancedFboTextureAttachment(GL_DEPTH_ATTACHMENT, width, height, mipmapLevels);
+            this.depthAttachment = new AdvancedFboTextureAttachment(GL_DEPTH_ATTACHMENT, this.format, width, height, this.mipmaps);
             return this;
         }
 
@@ -734,19 +739,7 @@ public class AdvancedFbo implements NativeResource
          */
         public Builder setDepthRenderBuffer()
         {
-            this.setDepthRenderBuffer(this.width, this.height, 1);
-            return this;
-        }
-
-        /**
-         * <p>Sets the depth texture buffer to the size of the framebuffer and the specified samples.</p>
-         * <p><b><i>NOTE: DEPTH RENDER BUFFERS CAN ONLY BE COPIED TO OTHER FRAMEBUFFERS</i></b></p>
-         *
-         * @param samples The amount of samples to use with this buffer
-         */
-        public Builder setDepthRenderBuffer(int samples)
-        {
-            this.setDepthRenderBuffer(this.width, this.height, samples);
+            this.setDepthRenderBuffer(this.width, this.height);
             return this;
         }
 
@@ -754,18 +747,19 @@ public class AdvancedFbo implements NativeResource
          * <p>Sets the depth texture buffer to the specified size and the specified samples.</p>
          * <p><b><i>NOTE: DEPTH RENDER BUFFERS CAN ONLY BE COPIED TO OTHER FRAMEBUFFERS</i></b></p>
          *
-         * @param width   The width of the render buffer
-         * @param height  The height of the render buffer
-         * @param samples The amount of samples to use with this buffer
+         * @param width  The width of the render buffer
+         * @param height The height of the render buffer
          */
-        public Builder setDepthRenderBuffer(int width, int height, int samples)
+        public Builder setDepthRenderBuffer(int width, int height)
         {
             Validate.isTrue(this.depthAttachment == null, "Only one depth attachment can be applied to an FBO.");
-            this.depthAttachment = new AdvancedFboRenderAttachment(GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT24, width, height, samples);
+            this.depthAttachment = new AdvancedFboRenderAttachment(GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT24, width, height, this.samples);
             return this;
         }
 
         /**
+         * Constructs a new {@link AdvancedFbo} with the specified attachments.
+         *
          * @param create Whether to immediately create the buffer
          * @return A new {@link AdvancedFbo} with the specified builder properties.
          */
@@ -850,10 +844,10 @@ public class AdvancedFbo implements NativeResource
             for (int i = 0; i < this.fbo.getColorAttachments(); i++)
             {
                 this.fbo.getColorAttachment(i).bindAttachment();
-                GlStateManager._texParameter(3553, 10241, framebufferFilter);
-                GlStateManager._texParameter(3553, 10240, framebufferFilter);
-                GlStateManager._texParameter(3553, 10242, 10496);
-                GlStateManager._texParameter(3553, 10243, 10496);
+                GlStateManager._texParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, framebufferFilter);
+                GlStateManager._texParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, framebufferFilter);
+                GlStateManager._texParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+                GlStateManager._texParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
                 this.fbo.getColorAttachment(i).unbindAttachment();
             }
         }

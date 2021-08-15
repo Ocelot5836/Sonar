@@ -49,7 +49,7 @@ public interface AdvancedFboAttachment extends NativeResource
     int getSamples();
 
     /**
-     * @return Whether or not this attachment can be read from
+     * @return Whether this attachment can be read from
      */
     boolean canSample();
 
