@@ -54,19 +54,6 @@ public interface TextureCache
      * Fetches an image from the specified url and caches the result as long as this cache specifies.
      *
      * @param url The url to get the image from
-     * @return The location of the texture downloaded or <code>null</code> if it is currently being processed
-     * @deprecated Use {@link #requestTexture(String)} instead. TODO remove in 7.0.0
-     */
-    @Nullable
-    default ResourceLocation getTextureLocation(String url)
-    {
-        return this.requestTexture(url).getNow(null);
-    }
-
-    /**
-     * Fetches an image from the specified url and caches the result as long as this cache specifies.
-     *
-     * @param url The url to get the image from
      * @return The location of the texture downloaded
      */
     CompletableFuture<ResourceLocation> requestTexture(String url);
