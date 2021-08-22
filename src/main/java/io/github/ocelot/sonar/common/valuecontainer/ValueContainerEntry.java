@@ -1,9 +1,10 @@
 package io.github.ocelot.sonar.common.valuecontainer;
 
-import java.util.Optional;
-import java.util.function.Predicate;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+
+import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * <p>Handles the serialization and deserialization of {@link ValueContainer} entries to/from the screen.</p>

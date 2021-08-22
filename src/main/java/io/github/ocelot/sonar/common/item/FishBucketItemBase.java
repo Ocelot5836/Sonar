@@ -1,8 +1,5 @@
 package io.github.ocelot.sonar.common.item;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.server.level.ServerLevel;
@@ -13,6 +10,10 @@ import net.minecraft.world.item.FishBucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
+
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * <p>A fish bucket that allows all entity types.</p>

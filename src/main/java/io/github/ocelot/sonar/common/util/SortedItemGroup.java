@@ -1,15 +1,16 @@
 package io.github.ocelot.sonar.common.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
 import net.minecraft.core.NonNullList;
 import net.minecraft.util.LazyLoadedValue;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * <p>Automatically indexes and sorts an item group by.</p>

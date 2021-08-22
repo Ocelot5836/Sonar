@@ -1,10 +1,11 @@
 package io.github.ocelot.sonar.common.util;
 
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Quick moves items from one slot to another in an easier way than manually checking for slot indices.</p>

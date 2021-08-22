@@ -1,5 +1,6 @@
 package io.github.ocelot.sonar.client.util;
 
+import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -10,8 +11,6 @@ import java.util.EmptyStackException;
 import java.util.Stack;
 
 import static org.lwjgl.opengl.GL11C.*;
-
-import com.mojang.blaze3d.platform.Window;
 
 /**
  * <p>Handles scissoring parts of the screen based on GUI coordinates instead of raw screen coordinates.</p>

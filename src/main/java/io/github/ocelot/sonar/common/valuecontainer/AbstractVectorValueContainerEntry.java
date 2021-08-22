@@ -1,10 +1,10 @@
 package io.github.ocelot.sonar.common.valuecontainer;
 
+import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import javax.annotation.Nullable;
-import net.minecraft.network.chat.Component;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
