@@ -163,7 +163,7 @@ public final class ShaderLoader
                 for (ResourceLocation location : resourceManager.listResources("shaders/program", path -> ShaderProgram.Shader.byExtension(path) != null))
                 {
                     ShaderProgram.Shader type = Objects.requireNonNull(ShaderProgram.Shader.byExtension(location.getPath()));
-                    ResourceLocation id = new ResourceLocation(location.getNamespace(), location.getPath().substring(13, location.getPath().length() - type.getExtension().length()));
+                    ResourceLocation id = new ResourceLocation(location.getNamespace(), location.getPath().substring(16, location.getPath().length() - type.getExtension().length()));
                     try (Resource resource = resourceManager.getResource(location))
                     {
                         sources.computeIfAbsent(type, key -> new HashMap<>()).put(id, IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8));
@@ -192,8 +192,6 @@ public final class ShaderLoader
                 return sources;
             }, backgroundExecutor).thenCompose(stage::wait), (sources, programs) ->
             {
-                System.out.println(GL.getCapabilities());
-                System.out.println("After Capabilities");
                 SHADERS.values().stream().flatMap(map -> map.values().stream()).forEach(GL20C::glDeleteShader);
                 SHADERS.clear();
                 PROGRAMS.clear();
