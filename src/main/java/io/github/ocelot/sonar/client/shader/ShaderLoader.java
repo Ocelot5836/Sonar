@@ -47,6 +47,11 @@ public final class ShaderLoader
     {
     }
 
+    /**
+     * Initializes all shader loading.
+     *
+     * @param bus The main mod event bus
+     */
     public static void init(IEventBus bus)
     {
         bus.addListener(EventPriority.NORMAL, false, ColorHandlerEvent.Block.class, event ->

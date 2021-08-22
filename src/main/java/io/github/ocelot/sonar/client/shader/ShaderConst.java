@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
-import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.opengl.ARBComputeShader;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL43C;
@@ -20,7 +19,11 @@ public class ShaderConst
     private static ShaderMode computeMode;
     private static ShaderMode geometryMode;
 
-    @ApiStatus.Internal
+    /**
+     * Loads all shader constants. This cannot be static because of the OpenGL Context not being present until later.
+     *
+     * @param bus The main mod event bus
+     */
     public static void init(IEventBus bus)
     {
         bus.addListener(EventPriority.NORMAL, false, ColorHandlerEvent.Block.class, event ->
