@@ -19,6 +19,7 @@ import net.minecraftforge.resource.VanillaResourceType;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL20C;
 
@@ -47,13 +48,10 @@ public final class ShaderLoader
     {
     }
 
-    /**
-     * Initializes all shader loading.
-     *
-     * @param bus The main mod event bus
-     */
+@ApiStatus.Internal
     public static void init(IEventBus bus)
     {
+        ShaderConst.init(bus);
         bus.addListener(EventPriority.NORMAL, false, ColorHandlerEvent.Block.class, event ->
         {
             ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
