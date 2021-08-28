@@ -23,6 +23,7 @@ import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.util.HttpUtil;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -527,7 +528,7 @@ public class StructureTemplateRenderer implements NativeResource
 
     private static CompletableFuture<StructureTemplate> downloadTemplate(String templateUrl)
     {
-        return OnlineRequest.request(templateUrl, Util.backgroundExecutor()).thenApply(stream ->
+        return OnlineRequest.request(templateUrl, HttpUtil.DOWNLOAD_EXECUTOR).thenApply(stream ->
         {
             try
             {

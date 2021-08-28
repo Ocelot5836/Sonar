@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.HttpUtil;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -33,7 +34,7 @@ public interface TextureCache
     {
         Logger logger = LogManager.getLogger();
         logger.info("Requesting image from '" + url + "'");
-        return OnlineRequest.request(url, Util.backgroundExecutor()).thenApplyAsync(stream ->
+        return OnlineRequest.request(url, HttpUtil.DOWNLOAD_EXECUTOR).thenApplyAsync(stream ->
         {
             try
             {
