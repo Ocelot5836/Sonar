@@ -10,6 +10,9 @@ import net.minecraftforge.fml.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 
+/**
+ * @deprecated TODO remove in 7.0.0
+ */
 class SonarInbuiltMessageClientHandler implements IValueContainerClientHandler
 {
     @Nullable

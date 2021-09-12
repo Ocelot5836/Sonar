@@ -26,6 +26,7 @@ import java.util.function.Supplier;
  * @author Ocelot
  * @see ValueContainer
  * @since 2.2.0
+ * @deprecated TODO remove in 7.0.0
  */
 @OnlyIn(Dist.CLIENT)
 public abstract class ValueContainerEditorScreen extends Screen

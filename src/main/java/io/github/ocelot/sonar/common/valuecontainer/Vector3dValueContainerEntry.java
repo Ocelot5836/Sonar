@@ -11,6 +11,7 @@ import org.apache.commons.lang3.math.NumberUtils;
  *
  * @author Ocelot
  * @since 2.1.0
+ * @deprecated TODO remove in 7.0.0
  */
 public class Vector3dValueContainerEntry extends AbstractVectorValueContainerEntry<Vec3>
 {

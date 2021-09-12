@@ -13,6 +13,7 @@ import java.util.function.Predicate;
  *
  * @author Ocelot
  * @since 2.1.0
+ * @deprecated TODO remove in 7.0.0
  */
 public class StringValueContainerEntry implements ValueContainerEntry<String>
 {

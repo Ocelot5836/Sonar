@@ -9,6 +9,7 @@ import net.minecraftforge.common.util.Constants;
  *
  * @author Ocelot
  * @since 2.1.0
+ * @deprecated TODO remove in 7.0.0
  */
 public class ShortValueContainerEntry extends NumberValueContainerEntry<Short>
 {

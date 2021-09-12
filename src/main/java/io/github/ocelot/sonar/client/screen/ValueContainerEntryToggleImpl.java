@@ -15,6 +15,7 @@ import java.util.function.Predicate;
  *
  * @author Ocelot
  * @since 2.2.0
+ * @deprecated TODO remove in 7.0.0
  */
 @OnlyIn(Dist.CLIENT)
 public class ValueContainerEntryToggleImpl extends AbstractButton

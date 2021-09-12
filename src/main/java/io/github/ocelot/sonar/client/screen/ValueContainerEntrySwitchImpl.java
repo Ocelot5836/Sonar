@@ -13,6 +13,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  *
  * @author Ocelot
  * @since 3.1.0
+ * @deprecated TODO remove in 7.0.0
  */
 @OnlyIn(Dist.CLIENT)
 public class ValueContainerEntrySwitchImpl extends AbstractButton

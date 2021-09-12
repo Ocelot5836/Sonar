@@ -5,11 +5,12 @@ package io.github.ocelot.sonar.common.valuecontainer;
  *
  * @author Ocelot
  * @since 2.1.0
+ * @deprecated TODO remove in 7.0.0
  */
 public interface ToggleEntry
 {
     /**
-     * @return Whether or not this entry is toggled
+     * @return Whether this entry is toggled
      */
     boolean isToggled();
 }

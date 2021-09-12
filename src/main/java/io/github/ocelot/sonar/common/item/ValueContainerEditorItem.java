@@ -23,6 +23,7 @@ import java.util.Optional;
  *
  * @author Ocelot
  * @since 3.1.0
+ * @deprecated TODO remove in 7.0.0
  */
 public class ValueContainerEditorItem extends Item
 {

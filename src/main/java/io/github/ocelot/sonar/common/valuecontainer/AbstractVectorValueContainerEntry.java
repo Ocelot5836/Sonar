@@ -14,6 +14,7 @@ import java.util.function.Predicate;
  *
  * @author Ocelot
  * @since 3.1.0
+ * @deprecated TODO remove in 7.0.0
  */
 public abstract class AbstractVectorValueContainerEntry<T> implements ValueContainerEntry<T>
 {

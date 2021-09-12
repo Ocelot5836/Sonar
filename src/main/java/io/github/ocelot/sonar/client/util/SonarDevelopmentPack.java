@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
  *
  * @author Ocelot
  * @since 5.1.0
+ * @deprecated TODO remove in 7.0.0
  */
 public final class SonarDevelopmentPack extends AbstractPackResources
 {

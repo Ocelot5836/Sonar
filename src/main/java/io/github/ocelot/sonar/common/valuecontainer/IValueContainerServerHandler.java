@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
  *
  * @author Ocelot
  * @since 3.2.0
+ * @deprecated TODO remove in 7.0.0
  */
 public interface IValueContainerServerHandler
 {

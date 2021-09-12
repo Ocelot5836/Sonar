@@ -15,6 +15,7 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
  *
  * @author Ocelot
  * @since 5.1.0
+ * @deprecated TODO remove in 7.0.0
  */
 public class SonarInbuiltMessages
 {

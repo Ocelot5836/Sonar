@@ -12,6 +12,7 @@ import java.util.function.Predicate;
  * @param <T> The type of data stored in this entry
  * @author Ocelot
  * @since 2.1.0
+ * @deprecated TODO remove in 7.0.0
  */
 public interface ValueContainerEntry<T>
 {

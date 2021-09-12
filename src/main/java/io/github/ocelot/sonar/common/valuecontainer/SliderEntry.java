@@ -5,6 +5,7 @@ package io.github.ocelot.sonar.common.valuecontainer;
  *
  * @author Ocelot
  * @since 2.1.0
+ * @deprecated TODO remove in 7.0.0
  */
 public interface SliderEntry
 {

@@ -35,8 +35,8 @@ import java.util.Optional;
  *
  * @author Ocelot
  * @since 2.3.0
+ * @deprecated TODO remove in 7.0.0
  */
-@SuppressWarnings("deprecation")
 public class BaseBlock extends Block
 {
     public static final DirectionProperty HORIZONTAL_FACING = BlockStateProperties.HORIZONTAL_FACING;

@@ -15,6 +15,9 @@ import java.util.function.Consumer;
  */
 public enum SonarModule
 {
+    /**
+     * @deprecated TODO remove in 7.0.0
+     */
     INBUILT_NETWORK(false, SonarInbuiltMessages::register, null),
     SHADER(true, ShaderLoader::init, null);
 
