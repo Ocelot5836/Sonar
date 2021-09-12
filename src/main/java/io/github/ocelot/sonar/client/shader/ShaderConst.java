@@ -14,6 +14,7 @@ import org.lwjgl.opengl.GLCapabilities;
  * <p>Constants for potentially supported shader options.</p>
  *
  * @author Ocelot
+ * @since 7.0.0
  */
 public class ShaderConst
 {

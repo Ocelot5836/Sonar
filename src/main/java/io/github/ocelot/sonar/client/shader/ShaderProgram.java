@@ -17,6 +17,7 @@ import static org.lwjgl.opengl.GL43C.GL_COMPUTE_SHADER;
  * <p>A template for creating a {@link ShaderInstance}.</p>
  *
  * @author Ocelot
+ * @since 7.0.0
  */
 public class ShaderProgram
 {

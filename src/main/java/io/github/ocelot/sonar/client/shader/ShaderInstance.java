@@ -20,6 +20,7 @@ import static org.lwjgl.opengl.GL20C.*;
  * <p>A usable instance of a {@link ShaderProgram}.</p>
  *
  * @author Ocelot
+ * @since 7.0.0
  */
 public class ShaderInstance implements NativeResource
 {

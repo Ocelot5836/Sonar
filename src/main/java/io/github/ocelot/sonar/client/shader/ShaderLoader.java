@@ -20,7 +20,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
-import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL20C;
 
 import java.io.InputStreamReader;
@@ -36,6 +35,7 @@ import static org.lwjgl.opengl.GL20C.*;
  * <p>Loads GLSL shaders designed for rendering instead of Post-Processing.</p>
  *
  * @author Ocelot
+ * @since 7.0.0
  */
 public final class ShaderLoader
 {
@@ -48,7 +48,7 @@ public final class ShaderLoader
     {
     }
 
-@ApiStatus.Internal
+    @ApiStatus.Internal
     public static void init(IEventBus bus)
     {
         ShaderConst.init(bus);
