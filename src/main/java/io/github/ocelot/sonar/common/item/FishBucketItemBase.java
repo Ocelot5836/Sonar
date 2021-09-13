@@ -1,14 +1,11 @@
 package io.github.ocelot.sonar.common.item;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.FishBucketItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.item.MobBucketItem;
 import net.minecraft.world.level.material.Fluid;
 
 import java.util.Objects;
@@ -21,13 +18,13 @@ import java.util.function.Supplier;
  * @author Ocelot
  * @since 5.0.0
  */
-public class FishBucketItemBase extends FishBucketItem
+public class FishBucketItemBase extends MobBucketItem
 {
     private final boolean addToMisc;
 
-    public FishBucketItemBase(Supplier<? extends EntityType<?>> entityType, Supplier<? extends Fluid> fluid, boolean addToMisc, Properties builder)
+    public FishBucketItemBase(Supplier<? extends EntityType<?>> entityType, Supplier<? extends Fluid> fluid, Supplier<? extends SoundEvent> soundSupplier, boolean addToMisc, Properties builder)
     {
-        super(entityType, fluid, builder);
+        super(entityType, fluid, soundSupplier, builder);
         this.addToMisc = addToMisc;
     }
 
@@ -42,9 +39,9 @@ public class FishBucketItemBase extends FishBucketItem
 
         if (this.allowdedIn(group) || group == CreativeModeTab.TAB_MISC)
         {
-            if (items.stream().anyMatch(stack -> stack.getItem() instanceof FishBucketItem))
+            if (items.stream().anyMatch(stack -> stack.getItem() instanceof MobBucketItem))
             {
-                Optional<ItemStack> optional = items.stream().filter(stack -> stack.getItem() instanceof FishBucketItem && "minecraft".equals(Objects.requireNonNull(stack.getItem().getRegistryName()).getNamespace())).reduce((a, b) -> b);
+                Optional<ItemStack> optional = items.stream().filter(stack -> stack.getItem() instanceof MobBucketItem && "minecraft".equals(Objects.requireNonNull(stack.getItem().getRegistryName()).getNamespace())).reduce((a, b) -> b);
                 if (optional.isPresent() && items.contains(optional.get()))
                 {
                     items.add(items.indexOf(optional.get()) + 1, new ItemStack(this));
@@ -53,19 +50,5 @@ public class FishBucketItemBase extends FishBucketItem
             }
             items.add(new ItemStack(this));
         }
-    }
-
-    @Override
-    public void checkExtraContent(Level world, ItemStack stack, BlockPos pos)
-    {
-        if (!world.isClientSide())
-        {
-            this.spawn((ServerLevel) world, stack, pos);
-        }
-    }
-
-    protected void spawn(ServerLevel world, ItemStack stack, BlockPos pos)
-    {
-        this.getFishType().spawn(world, stack, null, pos, MobSpawnType.BUCKET, true, false);
     }
 }

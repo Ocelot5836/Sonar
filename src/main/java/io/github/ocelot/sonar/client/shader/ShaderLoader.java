@@ -11,10 +11,10 @@ import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.resource.SelectiveReloadStateHandler;
 import net.minecraftforge.resource.VanillaResourceType;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -155,8 +155,6 @@ public final class ShaderLoader
         @Override
         public CompletableFuture<Void> reload(PreparationBarrier stage, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor)
         {
-            if (!SelectiveReloadStateHandler.INSTANCE.get().test(VanillaResourceType.SHADERS))
-                return stage.wait(null);
             return CompletableFuture.supplyAsync(() ->
             {
                 Map<ShaderProgram.Shader, Map<ResourceLocation, CharSequence>> sources = new HashMap<>();

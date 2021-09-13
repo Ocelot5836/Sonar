@@ -10,6 +10,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -21,7 +22,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import javax.annotation.Nullable;
 import java.util.concurrent.TimeUnit;
 
-public class TestBlock extends Block implements SimpleWaterloggedBlock
+public class TestBlock extends BaseEntityBlock implements SimpleWaterloggedBlock
 {
     private static final VoxelShape SHAPE = new VoxelShapeHelper.Builder().append(Block.box(4, 0, 4, 12, 8, 12), Block.box(5, 8, 5, 11, 16, 11)).rotate(Direction.NORTH).build();
 
@@ -44,16 +45,10 @@ public class TestBlock extends Block implements SimpleWaterloggedBlock
         return SHAPE;
     }
 
-    @Override
-    public boolean hasTileEntity(BlockState state)
-    {
-        return true;
-    }
-
     @Nullable
     @Override
-    public BlockEntity createTileEntity(BlockState state, BlockGetter world)
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state)
     {
-        return new TestTileEntity();
+        return new TestTileEntity(pos, state);
     }
 }
