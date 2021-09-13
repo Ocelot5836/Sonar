@@ -1,6 +1,5 @@
 package io.github.ocelot.sonar;
 
-import io.github.ocelot.sonar.client.util.SonarDevelopmentPack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
@@ -42,7 +41,6 @@ public final class Sonar
         Arrays.stream(Sonar.modules).filter(module -> !module.isClientOnly()).forEach(module -> module.init(modBus));
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
         {
-            SonarDevelopmentPack.init();
             Arrays.stream(Sonar.modules).filter(SonarModule::isClientOnly).forEach(module -> module.init(modBus));
         });
         modBus.addListener(Sonar::setup);

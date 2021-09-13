@@ -60,7 +60,6 @@ public class SonarNetworkManager
             Component reason = new TranslatableComponent("disconnect.genericReason", "Internal Exception: " + e);
             Connection networkManager = ctx.get().getNetworkManager();
             PacketListener netHandler = networkManager.getPacketListener();
-            boolean local = networkManager.isMemoryConnection();
 
             // Need to check the channel type to determine how to disconnect
             if (netHandler instanceof ServerStatusPacketListener)

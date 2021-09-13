@@ -2,7 +2,9 @@ package io.github.ocelot.sonar.common.util;
 
 import com.google.common.base.Suppliers;
 import net.minecraft.core.NonNullList;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.*;
 import java.util.function.Predicate;

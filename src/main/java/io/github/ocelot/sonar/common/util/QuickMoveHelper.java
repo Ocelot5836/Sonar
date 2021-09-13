@@ -1,10 +1,11 @@
 package io.github.ocelot.sonar.common.util;
 
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Quick moves items from one slot to another in an easier way than manually checking for slot indices.</p>
@@ -29,7 +30,7 @@ public class QuickMoveHelper
      * @param fromSize  The amount of slots to include in the starting area
      * @param toStart   The slot index to move items to
      * @param toSize    The amount of slots to include in the ending area
-     * @param reverse   Whether or not to start from the last slot of the to area
+     * @param reverse   Whether to start from the last slot of the to area
      */
     public QuickMoveHelper add(int fromStart, int fromSize, int toStart, int toSize, boolean reverse)
     {

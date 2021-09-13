@@ -1,6 +1,6 @@
 package io.github.ocelot.sonar;
 
-import io.github.ocelot.sonar.common.network.inbuilt.SonarInbuiltMessages;
+import io.github.ocelot.sonar.client.shader.ShaderLoader;
 import net.minecraftforge.eventbus.api.IEventBus;
 
 import javax.annotation.Nullable;
@@ -14,10 +14,7 @@ import java.util.function.Consumer;
  */
 public enum SonarModule
 {
-    INBUILT_NETWORK(false, bus ->
-    {
-        SonarInbuiltMessages.register();
-    }, null);
+    SHADER(true, ShaderLoader::init, null);
 
     private final boolean clientOnly;
     private final Consumer<IEventBus> init;

@@ -1,10 +1,8 @@
 package io.github.ocelot.sonar.block;
 
-import io.github.ocelot.sonar.common.block.BaseBlock;
 import io.github.ocelot.sonar.common.util.Scheduler;
 import io.github.ocelot.sonar.common.util.VoxelShapeHelper;
 import io.github.ocelot.sonar.tileentity.TestTileEntity;
-import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -13,17 +11,17 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import javax.annotation.Nullable;
 import java.util.concurrent.TimeUnit;
 
-public class TestBlock extends BaseBlock implements EntityBlock, SimpleWaterloggedBlock
+public class TestBlock extends Block implements SimpleWaterloggedBlock
 {
     private static final VoxelShape SHAPE = new VoxelShapeHelper.Builder().append(Block.box(4, 0, 4, 12, 8, 12), Block.box(5, 8, 5, 11, 16, 11)).rotate(Direction.NORTH).build();
 
@@ -46,16 +44,16 @@ public class TestBlock extends BaseBlock implements EntityBlock, SimpleWaterlogg
         return SHAPE;
     }
 
-    @Nullable
     @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state)
+    public boolean hasTileEntity(BlockState state)
     {
-        return new TestTileEntity(pos, state);
+        return true;
     }
 
+    @Nullable
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
+    public BlockEntity createTileEntity(BlockState state, BlockGetter world)
     {
-        builder.add(WATERLOGGED);
+        return new TestTileEntity();
     }
 }

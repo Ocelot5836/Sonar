@@ -1,6 +1,6 @@
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-package io.github.ocelot.sonar.client.screen;
+package io.github.ocelot.sonar.client.shader;
 
 import mcp.MethodsReturnNonnullByDefault;
 
