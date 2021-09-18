@@ -566,7 +566,7 @@ public class StructureTemplateRenderer implements NativeResource
         if (template == null)
             return Collections.emptyList();
         List<StructureTemplate.Palette> blockInfos = ObfuscationReflectionHelper.getPrivateValue(StructureTemplate.class, template, "field_204769_a");
-        if (blockInfos == null)
+        if (blockInfos == null || blockInfos.isEmpty())
             return Collections.emptyList();
         List<StructureTemplate.StructureBlockInfo> blocks = blockInfos.get(0).blocks();
         blocks.removeIf(block -> block.state.isAir());
