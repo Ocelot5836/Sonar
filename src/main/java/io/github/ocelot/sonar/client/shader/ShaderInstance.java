@@ -27,7 +27,6 @@ public class ShaderInstance implements NativeResource
     public static final int MAX_VERTEX_ATTRIBUTES = glGetInteger(GL_MAX_VERTEX_ATTRIBS);
     private static final Logger LOGGER = LogManager.getLogger();
     private static final FloatBuffer MATRIX_4_4 = BufferUtils.createFloatBuffer(4 * 4);
-    private static final FloatBuffer MATRIX_3_3 = BufferUtils.createFloatBuffer(3 * 3);
 
     private final Map<CharSequence, Integer> uniforms;
     private int program;
@@ -227,21 +226,6 @@ public class ShaderInstance implements NativeResource
     {
         this.loadFloats(uniformName, value.x(), value.y(), value.z(), value.w());
     }
-
-//    /**
-//     * Loads a 3x3 matrix into the shader.
-//     *
-//     * @param uniformName The name of the uniform to load
-//     * @param matrix      The matrix data to upload
-//     */
-//    public void loadMatrix(CharSequence uniformName, Matrix3f matrix)
-//    {
-//        this.getUniform(uniformName).ifPresent(uniform ->
-//        {
-//            MagicMath.store(matrix, MATRIX_3_3);
-//            glUniformMatrix3fv(uniform, false, MATRIX_3_3);
-//        });
-//    }
 
     /**
      * Loads a 4x4 matrix into the shader.
