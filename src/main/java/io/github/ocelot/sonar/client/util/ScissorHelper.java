@@ -11,8 +11,6 @@ import org.lwjgl.opengl.GL11C;
 import java.util.EmptyStackException;
 import java.util.Stack;
 
-import static org.lwjgl.opengl.GL11C.*;
-
 /**
  * <p>Handles scissoring parts of the screen based on GUI coordinates instead of raw screen coordinates.</p>
  *
@@ -72,21 +70,13 @@ public final class ScissorHelper
         {
             Entry parent = stack.peek();
 
-            if (x < parent.getX())
-            {
-                width -= parent.getX() - x;
-                x = parent.getX();
-            }
-            if (y < parent.getY())
-            {
-                height -= parent.getY() - y;
-                y = parent.getY();
-            }
+            if (x + width > parent.getWidth())
+                width = parent.getWidth() - x;
+            if (y + height > parent.getHeight())
+                height = parent.getHeight() - y;
 
-            if (x + width > parent.getX() + parent.getWidth())
-                width = parent.getX() + parent.getWidth() - x;
-            if (y + height > parent.getY() + parent.getHeight())
-                height = parent.getY() + parent.getHeight() - y;
+            x += parent.getX();
+            y += parent.getY();
         }
 
         stack.push(new ScissorHelper.Entry(x, y, width, height));
