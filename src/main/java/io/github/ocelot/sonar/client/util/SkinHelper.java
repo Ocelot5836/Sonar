@@ -1,18 +1,27 @@
 package io.github.ocelot.sonar.client.util;
 
+import com.google.common.collect.Iterables;
+import com.mojang.authlib.AuthenticationService;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
+import com.mojang.authlib.minecraft.MinecraftSessionService;
+import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.players.GameProfileCache;
+import net.minecraft.util.StringUtil;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
@@ -27,6 +36,32 @@ import java.util.function.Consumer;
 public class SkinHelper
 {
     private static final Map<GameProfile, GameProfile> PROFILE_CACHE = new WeakHashMap<>();
+    @OnlyIn(Dist.CLIENT)
+    private static MinecraftSessionService sessionService;
+    @OnlyIn(Dist.CLIENT)
+    private static GameProfileCache gameProfileCache;
+
+    private static GameProfile guiUpdateGameProfile(GameProfile input)
+    {
+        if (sessionService == null || gameProfileCache == null)
+        {
+            AuthenticationService authenticationservice = new YggdrasilAuthenticationService(Minecraft.getInstance().getProxy());
+            sessionService = authenticationservice.createMinecraftSessionService();
+            gameProfileCache = new GameProfileCache(authenticationservice.createProfileRepository(), new File(Minecraft.getInstance().gameDirectory, MinecraftServer.USERID_CACHE_FILE.getName()));
+        }
+
+        if (StringUtil.isNullOrEmpty(input.getName()))
+            return input;
+        if (input.isComplete() && input.getProperties().containsKey("textures"))
+            return input;
+        GameProfile gameProfile2 = gameProfileCache.get(input.getName());
+        if (gameProfile2 == null)
+            return input;
+        Property property = Iterables.getFirst(gameProfile2.getProperties().get("textures"), null);
+        if (property == null)
+            gameProfile2 = sessionService.fillProfileProperties(gameProfile2, true);
+        return gameProfile2;
+    }
 
     /**
      * Caches the results of {@link SkullBlockEntity#updateGameprofile(GameProfile)}. Use {@link SkinHelper#updateGameProfileAsync(GameProfile)} to fill the profile without blocking the current thread.
@@ -39,6 +74,8 @@ public class SkinHelper
     {
         if (input == null)
             return null;
+        if (Minecraft.getInstance().level == null)
+            return PROFILE_CACHE.computeIfAbsent(input, SkinHelper::guiUpdateGameProfile);
         return PROFILE_CACHE.computeIfAbsent(input, SkullBlockEntity::updateGameprofile);
     }
 

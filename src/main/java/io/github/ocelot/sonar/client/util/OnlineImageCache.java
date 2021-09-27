@@ -257,7 +257,7 @@ public class OnlineImageCache implements TextureCache
             return cachedFuture;
         }
 
-        LOGGER.info("Requesting image from '" + hash + "'");
+        LOGGER.info("Requesting image from '" + url + "'");
         CompletableFuture<ResourceLocation> future = OnlineRequest.request(url).thenApplyAsync(result ->
         {
             if (result == null)
