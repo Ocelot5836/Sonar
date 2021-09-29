@@ -19,6 +19,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -41,26 +42,41 @@ public class SkinHelper
     @OnlyIn(Dist.CLIENT)
     private static GameProfileCache gameProfileCache;
 
+    @ApiStatus.Internal
+    public static void init()
+    {
+        AuthenticationService authenticationservice = new YggdrasilAuthenticationService(Minecraft.getInstance().getProxy());
+        sessionService = authenticationservice.createMinecraftSessionService();
+        gameProfileCache = new GameProfileCache(authenticationservice.createProfileRepository(), new File(Minecraft.getInstance().gameDirectory, MinecraftServer.USERID_CACHE_FILE.getName()));
+    }
+
     private static GameProfile guiUpdateGameProfile(GameProfile input)
     {
-        if (sessionService == null || gameProfileCache == null)
-        {
-            AuthenticationService authenticationservice = new YggdrasilAuthenticationService(Minecraft.getInstance().getProxy());
-            sessionService = authenticationservice.createMinecraftSessionService();
-            gameProfileCache = new GameProfileCache(authenticationservice.createProfileRepository(), new File(Minecraft.getInstance().gameDirectory, MinecraftServer.USERID_CACHE_FILE.getName()));
-        }
-
-        if (StringUtil.isNullOrEmpty(input.getName()))
-            return input;
         if (input.isComplete() && input.getProperties().containsKey("textures"))
             return input;
-        GameProfile gameProfile2 = gameProfileCache.get(input.getName());
-        if (gameProfile2 == null)
+        if (StringUtil.isNullOrEmpty(input.getName()) && input.getId() == null)
             return input;
-        Property property = Iterables.getFirst(gameProfile2.getProperties().get("textures"), null);
-        if (property == null)
-            gameProfile2 = sessionService.fillProfileProperties(gameProfile2, true);
-        return gameProfile2;
+
+        if (StringUtil.isNullOrEmpty(input.getName()))
+        {
+            GameProfile gameProfile2 = gameProfileCache.get(input.getId());
+            if (gameProfile2 == null)
+                return input;
+            Property property = Iterables.getFirst(gameProfile2.getProperties().get("textures"), null);
+            if (property == null)
+                gameProfile2 = sessionService.fillProfileProperties(gameProfile2, true);
+            return gameProfile2;
+        }
+        else
+        {
+            GameProfile gameProfile2 = gameProfileCache.get(input.getName());
+            if (gameProfile2 == null)
+                return input;
+            Property property = Iterables.getFirst(gameProfile2.getProperties().get("textures"), null);
+            if (property == null)
+                gameProfile2 = sessionService.fillProfileProperties(gameProfile2, true);
+            return gameProfile2;
+        }
     }
 
     /**
@@ -74,7 +90,7 @@ public class SkinHelper
     {
         if (input == null)
             return null;
-        if (Minecraft.getInstance().level == null)
+        if (Minecraft.getInstance().level == null || StringUtil.isNullOrEmpty(input.getName()))
             return PROFILE_CACHE.computeIfAbsent(input, SkinHelper::guiUpdateGameProfile);
         return PROFILE_CACHE.computeIfAbsent(input, SkullBlockEntity::updateGameprofile);
     }
