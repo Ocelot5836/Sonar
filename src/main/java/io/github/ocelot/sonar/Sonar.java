@@ -1,5 +1,6 @@
 package io.github.ocelot.sonar;
 
+import io.github.ocelot.sonar.client.util.SkinHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
@@ -42,6 +43,7 @@ public final class Sonar
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
         {
             Arrays.stream(Sonar.modules).filter(SonarModule::isClientOnly).forEach(module -> module.init(modBus));
+            SkinHelper.init();
         });
         modBus.addListener(Sonar::setup);
         modBus.addListener(Sonar::setupClient);
