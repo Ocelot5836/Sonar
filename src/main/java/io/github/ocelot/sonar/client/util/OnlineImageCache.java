@@ -179,57 +179,6 @@ public class OnlineImageCache implements TextureCache
         image.writeToFile(this.cacheFolder.resolve(hash));
     }
 
-//        String hash = DigestUtils.md5Hex(url);
-//        if (this.errored.contains(hash))
-//        {
-//            this.textureCache.put(hash, System.currentTimeMillis() + 30000);
-//            return MissingTextureSprite.getLocation();
-//        }
-//
-//        ResourceLocation location = this.locationCache.computeIfAbsent(hash, ResourceLocation::new);
-//        if (Minecraft.getInstance().getTextureManager().getTexture(location) != null)
-//        {
-//            this.textureCache.put(hash, System.currentTimeMillis() + 30000);
-//            return location;
-//        }
-//
-//        if (this.requested.contains(hash))
-//            return null;
-//
-//        if (this.loadCache(hash, location))
-//        {
-//            this.requested.add(hash);
-//            return null;
-//        }
-//
-//        LOGGER.info("Requesting image from '" + hash + "'");
-//        this.requested.add(hash);
-//        OnlineRequest.request(url).thenAcceptAsync(result ->
-//        {
-//            try
-//            {
-//                NativeImage image = NativeImage.read(result);
-//                this.writeCache(hash, image, Instant.now().toEpochMilli() + this.textureCacheTime);
-//                Minecraft.getInstance().execute(() ->
-//                {
-//                    Minecraft.getInstance().getTextureManager().loadTexture(location, new DynamicTexture(image));
-//                    this.textureCache.put(hash, System.currentTimeMillis() + 30000);
-//                    this.requested.remove(hash);
-//                });
-//            }
-//            catch (IOException e)
-//            {
-//                LOGGER.error("Failed to load online texture from '" + url + "'. Using missing texture sprite.", e);
-//                Minecraft.getInstance().execute(() ->
-//                {
-//                    this.errored.add(hash);
-//                    this.textureCache.put(hash, System.currentTimeMillis() + 30000);
-//                    this.requested.remove(hash);
-//                });
-//            }
-//        });
-//        return null;
-
     @Override
     public CompletableFuture<ResourceLocation> requestTexture(String url)
     {
