@@ -40,6 +40,8 @@ import static org.lwjgl.opengl.GL20C.*;
 public final class ShaderLoader
 {
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final List<ShaderPreProcessor> GLOBAL_PRE_PROCESSERS = new ArrayList<>(0);
+    private static final Map<ResourceLocation, List<ShaderPreProcessor>> PRE_PROCESSERS = new HashMap<>(0);
     private static final Map<ShaderProgram.Shader, Map<ResourceLocation, Integer>> SHADERS = new HashMap<>();
     private static final Map<ResourceLocation, ShaderProgram> PROGRAMS = new HashMap<>();
     private static final Map<ShaderInstance, ResourceLocation> INSTANCES = new HashMap<>();
@@ -63,6 +65,27 @@ public final class ShaderLoader
     }
 
     /**
+     * Adds a processor to change shader information just before it is compiled into a real shader.
+     *
+     * @param shader    The specific shader to add the processor to
+     * @param processor The processor to add
+     */
+    public static synchronized void addPreProcessor(ResourceLocation shader, ShaderPreProcessor processor)
+    {
+        PRE_PROCESSERS.computeIfAbsent(shader, key -> new ArrayList<>(1)).add(processor);
+    }
+
+    /**
+     * Adds a processor to change shader information just before it is compiled into a real shader. Global processors are processed <b>AFTER</b> normal pre-processors.
+     *
+     * @param processor The processor to add
+     */
+    public static synchronized void addGlobalPreProcessor(ShaderPreProcessor processor)
+    {
+        GLOBAL_PRE_PROCESSERS.add(processor);
+    }
+
+    /**
      * Creates a new {@link ShaderInstance} of the specified type.
      *
      * @param program The program to create
@@ -70,6 +93,7 @@ public final class ShaderLoader
      */
     public static ShaderInstance create(ResourceLocation program)
     {
+        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
         try
         {
             int programId = linkShaders(program, 0);
@@ -92,6 +116,36 @@ public final class ShaderLoader
             return OptionalInt.empty();
         Map<ResourceLocation, Integer> map = SHADERS.get(type);
         return map.containsKey(id) ? OptionalInt.of(map.get(id)) : OptionalInt.empty();
+    }
+
+    private static CharSequence preprocessShader(ResourceLocation id, String data, ShaderProgram.Shader type)
+    {
+        if (PRE_PROCESSERS.containsKey(id))
+        {
+            for (ShaderPreProcessor processer : PRE_PROCESSERS.get(id))
+            {
+                try
+                {
+                    data = processer.modify(id, data, type);
+                }
+                catch (Throwable t)
+                {
+                    LOGGER.error("Shader Pre-Processor threw an exception. Ignoring processing step.", t);
+                }
+            }
+        }
+        for (ShaderPreProcessor processer : GLOBAL_PRE_PROCESSERS)
+        {
+            try
+            {
+                data = processer.modify(id, data, type);
+            }
+            catch (Throwable t)
+            {
+                LOGGER.error("Shader Pre-Processor threw an exception. Ignoring processing step.", t);
+            }
+        }
+        return data;
     }
 
     private static int loadShader(CharSequence data, ShaderProgram.Shader type) throws ShaderException
@@ -159,7 +213,7 @@ public final class ShaderLoader
                 return stage.wait(null);
             return CompletableFuture.supplyAsync(() ->
             {
-                Map<ShaderProgram.Shader, Map<ResourceLocation, CharSequence>> sources = new HashMap<>();
+                Map<ShaderProgram.Shader, Map<ResourceLocation, String>> sources = new HashMap<>();
                 for (ResourceLocation location : resourceManager.listResources("shaders/program", path -> ShaderProgram.Shader.byExtension(path) != null))
                 {
                     ShaderProgram.Shader type = Objects.requireNonNull(ShaderProgram.Shader.byExtension(location.getPath()));
@@ -200,7 +254,7 @@ public final class ShaderLoader
                 // Load all shaders
                 for (ShaderProgram.Shader type : sources.keySet())
                 {
-                    for (Map.Entry<ResourceLocation, CharSequence> entry : sources.get(type).entrySet())
+                    for (Map.Entry<ResourceLocation, String> entry : sources.get(type).entrySet())
                     {
                         if (!type.isSupported())
                         {
@@ -208,7 +262,7 @@ public final class ShaderLoader
                         }
                         try
                         {
-                            SHADERS.computeIfAbsent(type, key -> new Object2IntArrayMap<>()).put(entry.getKey(), loadShader(entry.getValue(), type));
+                            SHADERS.computeIfAbsent(type, key -> new Object2IntArrayMap<>()).put(entry.getKey(), loadShader(preprocessShader(entry.getKey(), entry.getValue(), type), type));
                         }
                         catch (Exception e)
                         {
