@@ -4,6 +4,7 @@ import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import com.mojang.math.Vector4f;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
+import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
@@ -13,7 +14,6 @@ import java.nio.FloatBuffer;
 import java.util.Map;
 import java.util.OptionalInt;
 
-import static org.lwjgl.opengl.GL11C.glGetInteger;
 import static org.lwjgl.opengl.GL20C.*;
 
 /**
@@ -24,7 +24,6 @@ import static org.lwjgl.opengl.GL20C.*;
  */
 public class ShaderInstance implements NativeResource
 {
-    public static final int MAX_VERTEX_ATTRIBUTES = glGetInteger(GL_MAX_VERTEX_ATTRIBS);
     private static final Logger LOGGER = LogManager.getLogger();
     private static final FloatBuffer MATRIX_4_4 = BufferUtils.createFloatBuffer(4 * 4);
 
@@ -56,175 +55,208 @@ public class ShaderInstance implements NativeResource
     }
 
     /**
-     * Loads a single boolean into the shader
+     * Loads booleans into the shader.
      *
      * @param uniformName The name of the uniform to load
-     * @param value       The boolean value to upload
+     * @param values      The values to upload
      */
-    public void loadBoolean(CharSequence uniformName, boolean value)
+    public void loadBoolean(CharSequence uniformName, boolean... values)
     {
-        this.loadInt(uniformName, value ? 1 : 0);
+        int[] integers = new int[values.length];
+        for (int i = 0; i < values.length; i++)
+            integers[i] = values[i] ? 1 : 0;
+        this.loadInt(uniformName, integers);
     }
 
     /**
-     * Loads two booleans into the shader
+     * Loads 2D vectors into the shader.
      *
      * @param uniformName The name of the uniform to load
-     * @param x           The first boolean value to upload
-     * @param y           The second boolean value to upload
+     * @param values      The values to upload. Must be a multiple of 2
      */
-    public void loadBooleans(CharSequence uniformName, boolean x, boolean y)
+    public void loadVector2(CharSequence uniformName, boolean... values)
     {
-        this.loadInts(uniformName, x ? 1 : 0, y ? 1 : 0);
+        int[] integers = new int[values.length];
+        for (int i = 0; i < values.length; i++)
+            integers[i] = values[i] ? 1 : 0;
+        this.loadVector2(uniformName, integers);
     }
 
     /**
-     * Loads three booleans into the shader
+     * Loads 3D vectors into the shader.
      *
      * @param uniformName The name of the uniform to load
-     * @param x           The first boolean value to upload
-     * @param y           The second boolean value to upload
-     * @param z           The third boolean value to upload
+     * @param values      The values to upload. Must be a multiple of 3
      */
-    public void loadBooleans(CharSequence uniformName, boolean x, boolean y, boolean z)
+    public void loadVector3(CharSequence uniformName, boolean... values)
     {
-        this.loadInts(uniformName, x ? 1 : 0, y ? 1 : 0, z ? 1 : 0);
+        int[] integers = new int[values.length];
+        for (int i = 0; i < values.length; i++)
+            integers[i] = values[i] ? 1 : 0;
+        this.loadVector3(uniformName, integers);
     }
 
     /**
-     * Loads four booleans into the shader
+     * Loads 4D vectors into the shader.
      *
      * @param uniformName The name of the uniform to load
-     * @param x           The first boolean value to upload
-     * @param y           The second boolean value to upload
-     * @param z           The third boolean value to upload
-     * @param w           The third boolean value to upload
+     * @param values      The values to upload. Must be a multiple of 4
      */
-    public void loadBooleans(CharSequence uniformName, boolean x, boolean y, boolean z, boolean w)
+    public void loadVector4(CharSequence uniformName, boolean... values)
     {
-        this.loadInts(uniformName, x ? 1 : 0, y ? 1 : 0, z ? 1 : 0, w ? 1 : 0);
+        int[] integers = new int[values.length];
+        for (int i = 0; i < values.length; i++)
+            integers[i] = values[i] ? 1 : 0;
+        this.loadVector4(uniformName, integers);
     }
 
     /**
-     * Loads a single float into the shader
+     * Loads integers into the shader.
      *
      * @param uniformName The name of the uniform to load
-     * @param value       The float value to upload
+     * @param values      The values to upload
      */
-    public void loadFloat(CharSequence uniformName, float value)
+    public void loadInt(CharSequence uniformName, int... values)
     {
-        this.getUniform(uniformName).ifPresent(uniform -> glUniform1f(uniform, value));
+        if (values.length == 0)
+            return;
+        this.getUniform(uniformName).ifPresent(uniform -> glUniform1iv(uniform, values));
     }
 
     /**
-     * Loads two floats into the shader
+     * Loads 2D vectors into the shader.
      *
      * @param uniformName The name of the uniform to load
-     * @param x           The first float value to upload
-     * @param y           The second float value to upload
+     * @param values      The values to upload. Must be a multiple of 2
      */
-    public void loadFloats(CharSequence uniformName, float x, float y)
+    public void loadVector2(CharSequence uniformName, int... values)
     {
-        this.getUniform(uniformName).ifPresent(uniform -> glUniform2f(uniform, x, y));
+        if (values.length == 0)
+            return;
+        Validate.isTrue(values.length % 2 == 0);
+        this.getUniform(uniformName).ifPresent(uniform -> glUniform2iv(uniform, values));
     }
 
     /**
-     * Loads three floats into the shader
+     * Loads 3D vectors into the shader.
      *
      * @param uniformName The name of the uniform to load
-     * @param x           The first float value to upload
-     * @param y           The second float value to upload
-     * @param z           The third float value to upload
+     * @param values      The values to upload. Must be a multiple of 3
      */
-    public void loadFloats(CharSequence uniformName, float x, float y, float z)
+    public void loadVector3(CharSequence uniformName, int... values)
     {
-        this.getUniform(uniformName).ifPresent(uniform -> glUniform3f(uniform, x, y, z));
+        if (values.length == 0)
+            return;
+        Validate.isTrue(values.length % 3 == 0);
+        this.getUniform(uniformName).ifPresent(uniform -> glUniform3iv(uniform, values));
     }
 
     /**
-     * Loads a single integer into the shader
+     * Loads 4D vectors into the shader.
      *
      * @param uniformName The name of the uniform to load
-     * @param value       The integer value to upload
+     * @param values      The values to upload. Must be a multiple of 4
      */
-    public void loadInt(CharSequence uniformName, int value)
+    public void loadVector4(CharSequence uniformName, int... values)
     {
-        this.getUniform(uniformName).ifPresent(uniform -> glUniform1i(uniform, value));
+        if (values.length == 0)
+            return;
+        Validate.isTrue(values.length % 4 == 0);
+        this.getUniform(uniformName).ifPresent(uniform -> glUniform4iv(uniform, values));
     }
 
     /**
-     * Loads two integers into the shader
+     * Loads floats into the shader.
      *
      * @param uniformName The name of the uniform to load
-     * @param x           The first integer value to upload
-     * @param y           The second integer value to upload
+     * @param values      The values to upload
      */
-    public void loadInts(CharSequence uniformName, int x, int y)
+    public void loadFloat(CharSequence uniformName, float... values)
     {
-        this.getUniform(uniformName).ifPresent(uniform -> glUniform2i(uniform, x, y));
+        if (values.length == 0)
+            return;
+        this.getUniform(uniformName).ifPresent(uniform -> glUniform1fv(uniform, values));
     }
 
     /**
-     * Loads three integers into the shader
+     * Loads 2D vectors into the shader.
      *
      * @param uniformName The name of the uniform to load
-     * @param x           The first integer value to upload
-     * @param y           The second integer value to upload
-     * @param z           The third  integer value to upload
+     * @param values      The values to upload. Must be a multiple of 2
      */
-    public void loadInts(CharSequence uniformName, int x, int y, int z)
+    public void loadVector2(CharSequence uniformName, float... values)
     {
-        this.getUniform(uniformName).ifPresent(uniform -> glUniform3i(uniform, x, y, z));
+        if (values.length == 0)
+            return;
+        Validate.isTrue(values.length % 2 == 0);
+        this.getUniform(uniformName).ifPresent(uniform -> glUniform2fv(uniform, values));
     }
 
     /**
-     * Loads four integers into the shader
+     * Loads 3D vectors into the shader.
      *
      * @param uniformName The name of the uniform to load
-     * @param x           The first integer value to upload
-     * @param y           The second integer value to upload
-     * @param z           The third  integer value to upload
-     * @param w           The fourth  integer value to upload
+     * @param values      The values to upload. Must be a multiple of 3
      */
-    public void loadInts(CharSequence uniformName, int x, int y, int z, int w)
+    public void loadVector3(CharSequence uniformName, float... values)
     {
-        this.getUniform(uniformName).ifPresent(uniform -> glUniform4i(uniform, x, y, z, w));
+        if (values.length == 0)
+            return;
+        Validate.isTrue(values.length % 3 == 0);
+        this.getUniform(uniformName).ifPresent(uniform -> glUniform3fv(uniform, values));
     }
 
     /**
-     * Loads four floats into the shader
+     * Loads 4D vectors into the shader.
      *
      * @param uniformName The name of the uniform to load
-     * @param x           The first float value to upload
-     * @param y           The second float value to upload
-     * @param z           The third float value to upload
-     * @param w           The fourth float value to upload
+     * @param values      The values to upload. Must be a multiple of 4
      */
-    public void loadFloats(CharSequence uniformName, float x, float y, float z, float w)
+    public void loadVector4(CharSequence uniformName, float... values)
     {
-        this.getUniform(uniformName).ifPresent(uniform -> glUniform4f(uniform, x, y, z, w));
+        if (values.length == 0)
+            return;
+        Validate.isTrue(values.length % 4 == 0);
+        this.getUniform(uniformName).ifPresent(uniform -> glUniform4fv(uniform, values));
     }
 
     /**
-     * Loads a 3D vector into the shader
+     * Loads 3D vectors into the shader.
      *
      * @param uniformName The name of the uniform to load
-     * @param value       The vector value to upload
+     * @param values      The vector value to upload
      */
-    public void loadVector(CharSequence uniformName, Vector3f value)
+    public void loadVector(CharSequence uniformName, Vector3f... values)
     {
-        this.loadFloats(uniformName, value.x(), value.y(), value.z());
+        float[] floats = new float[values.length * 3];
+        for (int i = 0; i < values.length; i++)
+        {
+            Vector3f value = values[i];
+            floats[i * 3] = value.x();
+            floats[i * 3 + 1] = value.y();
+            floats[i * 3 + 2] = value.z();
+        }
+        this.loadVector3(uniformName, floats);
     }
 
     /**
-     * Loads a 4D vector into the shader
+     * Loads 4D vectors into the shader.
      *
      * @param uniformName The name of the uniform to load
-     * @param value       The vector value to upload
+     * @param values      The vector value to upload
      */
-    public void loadVector(CharSequence uniformName, Vector4f value)
+    public void loadVector(CharSequence uniformName, Vector4f... values)
     {
-        this.loadFloats(uniformName, value.x(), value.y(), value.z(), value.w());
+        float[] floats = new float[values.length * 4];
+        for (int i = 0; i < values.length; i++)
+        {
+            Vector4f value = values[i];
+            floats[i * 4] = value.x();
+            floats[i * 4 + 1] = value.y();
+            floats[i * 4 + 2] = value.z();
+            floats[i * 4 + 3] = value.w();
+        }
+        this.loadVector4(uniformName, floats);
     }
 
     /**

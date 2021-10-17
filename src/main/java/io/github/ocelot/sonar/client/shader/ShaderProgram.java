@@ -3,8 +3,8 @@ package io.github.ocelot.sonar.client.shader;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -26,14 +26,14 @@ public class ShaderProgram
             ResourceLocation.CODEC.optionalFieldOf("fragment").forGetter(ShaderProgram::getFragmentShader),
             ResourceLocation.CODEC.optionalFieldOf("geometry").forGetter(ShaderProgram::getGeometryShader),
             ResourceLocation.CODEC.listOf().optionalFieldOf("compute").xmap(array -> array.map(list -> list.toArray(new ResourceLocation[0])), list -> list.map(Arrays::asList)).forGetter(ShaderProgram::getComputeShaders)
-    ).apply(instance, (vertex, fragment, geometry, computeShaders) -> new ShaderProgram(vertex.orElse(null), fragment.orElse(null), geometry.orElse(null), computeShaders.orElse(null))));
+    ).apply(instance, (vertex, fragment, geometry, computeShaders) -> new ShaderProgram(vertex.orElse(null), fragment.orElse(null), geometry.orElse(null), computeShaders.orElseGet(() -> new ResourceLocation[0]))));
 
     private final ResourceLocation vertexShader;
     private final ResourceLocation fragmentShader;
     private final ResourceLocation geometryShader;
     private final ResourceLocation[] computeShaders;
 
-    public ShaderProgram(@Nullable ResourceLocation vertexShader, @Nullable ResourceLocation fragmentShader, @Nullable ResourceLocation geometryShader, @Nullable ResourceLocation[] computeShaders)
+    public ShaderProgram(@Nullable ResourceLocation vertexShader, @Nullable ResourceLocation fragmentShader, @Nullable ResourceLocation geometryShader, ResourceLocation[] computeShaders)
     {
         this.vertexShader = vertexShader;
         this.fragmentShader = fragmentShader;
@@ -58,7 +58,7 @@ public class ShaderProgram
 
     public Optional<ResourceLocation[]> getComputeShaders()
     {
-        return Optional.ofNullable(this.computeShaders);
+        return this.computeShaders.length == 0 ? Optional.empty() : Optional.of(this.computeShaders);
     }
 
     /**
@@ -66,7 +66,7 @@ public class ShaderProgram
      *
      * @author Ocelot
      */
-    enum Shader
+    public enum Shader
     {
         VERTEX("Vertex", ".vert", GL_VERTEX_SHADER),
         FRAGMENT("Fragment", ".frag", GL_FRAGMENT_SHADER),
@@ -129,7 +129,7 @@ public class ShaderProgram
          * @param fileName The name of the file
          * @return The type of shader based on extension
          */
-        @org.jetbrains.annotations.Nullable
+        @Nullable
         public static ShaderProgram.Shader byExtension(String fileName)
         {
             for (Shader type : values())
