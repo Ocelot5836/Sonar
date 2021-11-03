@@ -63,7 +63,7 @@ public final class Sonar
      * Checks to see if the specified module has been loaded.
      *
      * @param module The module to load
-     * @return Whether or not that module is loaded
+     * @return Whether that module is loaded
      */
     public static boolean isModuleLoaded(SonarModule module)
     {
