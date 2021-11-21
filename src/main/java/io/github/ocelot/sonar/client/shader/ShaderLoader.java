@@ -211,7 +211,8 @@ public final class ShaderLoader
         {
             if (!SelectiveReloadStateHandler.INSTANCE.get().test(VanillaResourceType.SHADERS))
                 return stage.wait(null);
-            return CompletableFuture.supplyAsync(() ->
+
+            CompletableFuture<Map<ShaderProgram.Shader, Map<ResourceLocation, String>>> sourcesFuture = CompletableFuture.supplyAsync(() ->
             {
                 Map<ShaderProgram.Shader, Map<ResourceLocation, String>> sources = new HashMap<>();
                 for (ResourceLocation location : resourceManager.listResources("shaders/program", path -> ShaderProgram.Shader.byExtension(path) != null))
@@ -228,7 +229,8 @@ public final class ShaderLoader
                     }
                 }
                 return sources;
-            }, backgroundExecutor).thenCompose(stage::wait).thenAcceptBothAsync(CompletableFuture.supplyAsync(() ->
+            }, backgroundExecutor);
+            CompletableFuture<Map<ResourceLocation, ShaderProgram>> programsFuture = CompletableFuture.supplyAsync(() ->
             {
                 Map<ResourceLocation, ShaderProgram> sources = new HashMap<>();
                 for (ResourceLocation location : resourceManager.listResources("shaders/program_type", path -> path.endsWith(".json")))
@@ -244,8 +246,12 @@ public final class ShaderLoader
                     }
                 }
                 return sources;
-            }, backgroundExecutor).thenCompose(stage::wait), (sources, programs) ->
+            }, backgroundExecutor);
+
+            return CompletableFuture.allOf(sourcesFuture, programsFuture).thenCompose(stage::wait).thenRunAsync(() ->
             {
+                Map<ShaderProgram.Shader, Map<ResourceLocation, String>> sources = sourcesFuture.join();
+                Map<ResourceLocation, ShaderProgram> programs = programsFuture.join();
                 SHADERS.values().stream().flatMap(map -> map.values().stream()).forEach(GL20C::glDeleteShader);
                 SHADERS.clear();
                 PROGRAMS.clear();
@@ -288,7 +294,7 @@ public final class ShaderLoader
                     }
                 });
 
-                LOGGER.info("Loaded " + sources.size() + " shaders and " + programs.size() + " shader programs.");
+                LOGGER.info("Loaded " + sources.values().stream().mapToInt(Map::size).sum() + " shaders and " + programs.size() + " shader programs.");
             }, task -> RenderSystem.recordRenderCall(task::run));
         }
     }
