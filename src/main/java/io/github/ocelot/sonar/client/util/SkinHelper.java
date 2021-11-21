@@ -45,9 +45,12 @@ public class SkinHelper
     @ApiStatus.Internal
     public static void init()
     {
-        AuthenticationService authenticationservice = new YggdrasilAuthenticationService(Minecraft.getInstance().getProxy());
+        Minecraft minecraft = Minecraft.getInstance();
+        if(minecraft == null) // Can be null for data gens
+            return;
+        AuthenticationService authenticationservice = new YggdrasilAuthenticationService(minecraft.getProxy());
         sessionService = authenticationservice.createMinecraftSessionService();
-        gameProfileCache = new GameProfileCache(authenticationservice.createProfileRepository(), new File(Minecraft.getInstance().gameDirectory, MinecraftServer.USERID_CACHE_FILE.getName()));
+        gameProfileCache = new GameProfileCache(authenticationservice.createProfileRepository(), new File(minecraft.gameDirectory, MinecraftServer.USERID_CACHE_FILE.getName()));
     }
 
     private static GameProfile guiUpdateGameProfile(GameProfile input)
